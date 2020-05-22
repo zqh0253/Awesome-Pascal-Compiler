@@ -492,17 +492,17 @@ char *yytext;
 #include "pascal.hpp"
 
 int yycolumn = 1;
-// #define YY_USER_ACTION  yylloc.first_line = yylloc.last_line = yylineno; \
-//                         yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
-//                         yycolumn += yyleng;
+#define YY_USER_ACTION  yylloc.first_line = yylloc.last_line = yylineno; \
+                        yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
+                        yycolumn += yyleng;
 
-// void yyerror(const char *s);
+void yyerror(const char *s);
 
-// void copy_str(char *str, int len) {
-//     int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
-//     strncpy(yylval.str, str, l);
-//     yylval.str[l] = 0;
-// }
+void copy_str(char *str, int len) {
+    int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
+    strncpy(yylval.str, str, l);
+    yylval.str[l] = 0;
+}
 #line 506 "scanner.cpp"
 #line 507 "scanner.cpp"
 
@@ -794,7 +794,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 34 "pascal.l"
-{printf("ffff");return REV_PROGRAM;}
+{return REV_PROGRAM;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
@@ -805,31 +805,34 @@ case 3:
 YY_RULE_SETUP
 #line 39 "pascal.l"
 {
+    copy_str(yytext, yyleng);
+    yylval.idt = new ID(yytext);
+    yylval.idt->prt(0);
     return IDT;
 }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 43 "pascal.l"
+#line 46 "pascal.l"
 {}
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 45 "pascal.l"
+#line 48 "pascal.l"
 {
     yycolumn = 1;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 48 "pascal.l"
+#line 51 "pascal.l"
 {}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 50 "pascal.l"
+#line 53 "pascal.l"
 {
     printf("unknown character %d\n", (int) yytext[0]);
     return yytext[0];
@@ -837,10 +840,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 55 "pascal.l"
+#line 58 "pascal.l"
 ECHO;
 	YY_BREAK
-#line 843 "scanner.cpp"
+#line 846 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1857,14 +1860,10 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 55 "pascal.l"
+#line 58 "pascal.l"
 
 
 void yyerror(const char *s) {
-    // fprintf(stderr, "%s (at %d:%d)\n", s, yylloc.first_line, yylloc.first_column);
+    fprintf(stderr, "%s (at %d:%d)\n", s, yylloc.first_line, yylloc.first_column);
 }
 
-int main(){
-    yylex();
-    printf("ok");
-}

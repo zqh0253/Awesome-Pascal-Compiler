@@ -38,6 +38,8 @@ COMMENT "{"[^\}]*"}"
 
 {IDT} {
     copy_str(yytext, yyleng);
+    yylval.idt = new ID(yytext);
+    yylval.idt->prt(0);
     return IDT;
 }
 
