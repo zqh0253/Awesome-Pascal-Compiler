@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.6.2.  */
+/* A Bison parser, made by GNU Bison 3.4.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -31,9 +31,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_YY_PASCAL_HPP_INCLUDED
 # define YY_YY_PASCAL_HPP_INCLUDED
@@ -44,28 +43,29 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 3 "pascal.y"
 
-/* Token kinds.  */
+#define MAX_STR_LEN 1024
+
+#line 52 "pascal.hpp"
+
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    REV_PROGRAM = 258,             /* REV_PROGRAM  */
-    IDT = 259,                     /* IDT  */
-    OP_SEMICOLON = 260             /* OP_SEMICOLON  */
+    REV_PROGRAM = 258,
+    IDT = 259,
+    OP_SEMICOLON = 260
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 6 "pascal.y"
+#line 16 "pascal.y"
 
 char chr;
 int num;
@@ -76,8 +76,9 @@ ProgramBlock* pb;
 ID* idt;
 Statement* stm;
 StatementList* stml;
+char *str;
 
-#line 81 "pascal.hpp"
+#line 82 "pascal.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -85,9 +86,23 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+/* Location type.  */
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE YYLTYPE;
+struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
+
 
 extern YYSTYPE yylval;
-
+extern YYLTYPE yylloc;
 int yyparse (void);
 
 #endif /* !YY_YY_PASCAL_HPP_INCLUDED  */

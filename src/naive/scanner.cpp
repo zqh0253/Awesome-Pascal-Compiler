@@ -496,13 +496,15 @@ int yycolumn = 1;
                         yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
                         yycolumn += yyleng;
 
-// void copy_str(char *str, int len) {
-//     int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
-//     strncpy(yylval.str, str, l);
-//     yylval.str[l] = 0;
-// }
-#line 504 "scanner.cpp"
-#line 505 "scanner.cpp"
+void yyerror(const char *s);
+
+void copy_str(char *str, int len) {
+    int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
+    strncpy(yylval.str, str, l);
+    yylval.str[l] = 0;
+}
+#line 506 "scanner.cpp"
+#line 507 "scanner.cpp"
 
 #define INITIAL 0
 
@@ -719,10 +721,10 @@ YY_DECL
 		}
 
 	{
-#line 30 "pascal.l"
+#line 32 "pascal.l"
 
 
-#line 725 "scanner.cpp"
+#line 727 "scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -791,17 +793,17 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 32 "pascal.l"
+#line 34 "pascal.l"
 {return REV_PROGRAM;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 34 "pascal.l"
+#line 36 "pascal.l"
 {return OP_SEMICOLON;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "pascal.l"
+#line 39 "pascal.l"
 {
     copy_str(yytext, yyleng);
     return IDT;
@@ -810,25 +812,25 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 42 "pascal.l"
+#line 44 "pascal.l"
 {}
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 44 "pascal.l"
+#line 46 "pascal.l"
 {
     yycolumn = 1;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 47 "pascal.l"
+#line 49 "pascal.l"
 {}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 49 "pascal.l"
+#line 51 "pascal.l"
 {
     printf("unknown character %d\n", (int) yytext[0]);
     return yytext[0];
@@ -836,10 +838,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 54 "pascal.l"
+#line 56 "pascal.l"
 ECHO;
 	YY_BREAK
-#line 842 "scanner.cpp"
+#line 844 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1856,7 +1858,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 54 "pascal.l"
+#line 56 "pascal.l"
 
 
 void yyerror(const char *s) {

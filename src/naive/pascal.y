@@ -1,6 +1,16 @@
+%locations
+
+%code requires {
+#define MAX_STR_LEN 1024
+}
+
 %{
 #include "ast/ast.h"
+
 Program* ast_root;
+
+extern int yylex();
+extern void yyerror(const char * s);
 %}
 
 %union{
@@ -13,6 +23,7 @@ ProgramBlock* pb;
 ID* idt;
 Statement* stm;
 StatementList* stml;
+char *str;
 }
 
 %token REV_PROGRAM IDT  OP_SEMICOLON
@@ -49,4 +60,4 @@ int main() {
     return 0; 
 }
 
-int yyerror(char * s){ printf("%s\n",s); return 0; }
+// int yyerror(char * s){ printf("%s\n",s); return 0; }

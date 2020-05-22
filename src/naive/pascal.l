@@ -11,11 +11,13 @@ int yycolumn = 1;
                         yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
                         yycolumn += yyleng;
 
-// void copy_str(char *str, int len) {
-//     int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
-//     strncpy(yylval.str, str, l);
-//     yylval.str[l] = 0;
-// }
+void yyerror(const char *s);
+
+void copy_str(char *str, int len) {
+    int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
+    strncpy(yylval.str, str, l);
+    yylval.str[l] = 0;
+}
 %}
 
 
