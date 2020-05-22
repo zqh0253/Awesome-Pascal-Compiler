@@ -21,7 +21,7 @@ void copy_str(char *str, int len) {
 %}
 
 
-REV_PROGRAM program
+REV_PROGRAM "program"
 
 OP_SEMICOLON ";"
 

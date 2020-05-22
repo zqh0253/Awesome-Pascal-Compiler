@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.4.1.  */
+/* A Bison parser, made by GNU Bison 3.6.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_PASCAL_HPP_INCLUDED
 # define YY_YY_PASCAL_HPP_INCLUDED
@@ -48,17 +49,22 @@ extern int yydebug;
 
 #define MAX_STR_LEN 1024
 
-#line 52 "pascal.hpp"
+#line 53 "pascal.hpp"
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    REV_PROGRAM = 258,
-    IDT = 259,
-    OP_SEMICOLON = 260
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    REV_PROGRAM = 258,             /* REV_PROGRAM  */
+    IDT = 259,                     /* IDT  */
+    OP_SEMICOLON = 260             /* OP_SEMICOLON  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
@@ -78,7 +84,7 @@ Statement* stm;
 StatementList* stml;
 char *str;
 
-#line 82 "pascal.hpp"
+#line 88 "pascal.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
