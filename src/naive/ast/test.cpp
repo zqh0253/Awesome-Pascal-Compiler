@@ -13,5 +13,5 @@ int main(){
     ProgramHeading ph(&id2);
     
     Program p(&ph, &pb);
-    p.prt();
+    p.prt(0);
 }

@@ -22,7 +22,7 @@ class Node {
         std::string name;
 
         virtual std::vector<Node *> get_descendants() = 0;
-        void prt();
+        void prt(int step);
 };
 
 class Program : public Node {
@@ -39,9 +39,22 @@ class Program : public Node {
         std::vector<Node *> get_descendants();
 };
 
+class ID : public Node {
+    public:
+        ID (std::string _id) : idt(_id) {
+            this->is_leaf = true;
+            this->name = "ID";
+        }
+        ~ID() {}
+
+        std::string idt;
+
+        std::vector<Node *> get_descendants();
+};
+
 class ProgramHeading : public Node {
     public:
-        ProgramHeading(ID * id) : program_ID(id) {
+        ProgramHeading(ID * idt) : program_ID(idt) {
             this->is_leaf = false;
             this->name = "ProgramHeading";
         }
@@ -65,18 +78,6 @@ class ProgramBlock : public Node {
         std::vector<Node *> get_descendants();
 };
 
-class ID : public Node {
-    public:
-        ID (std::string _id) : id(_id) {
-            this->is_leaf = true;
-            this->name = "ID";
-        }
-        ~ID() {}
-
-        std::string id;
-
-        std::vector<Node *> get_descendants();
-};
 
 class Statement : public Node {
     public:

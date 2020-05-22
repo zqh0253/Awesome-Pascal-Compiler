@@ -1,12 +1,17 @@
 #include "ast.h"
 
-void Node::prt(){
+#define TAB(n) for (int i=0;i<n;i++) std::cout<<"\t"
+
+void Node::prt(int step){
+    TAB(step);
     std::cout << this->name << std::endl;
     if (this->is_leaf) return; 
+    TAB(step);
     std::cout << "{" << std::endl;
     for (auto desc : this->get_descendants()){
-        desc->prt();
+        desc->prt(step + 1);
     }
+    TAB(step);
     std::cout << "}" << std::endl;
 }
 
