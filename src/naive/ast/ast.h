@@ -8,10 +8,23 @@
 class Node;
 class Program;
 class ProgramHeading;
-class ProgramBlock;
+class Routine;
 class ID;
-class Statement;
-class StatementList;
+class RoutineHead;
+class RoutineBody;
+class LabelPart; 
+class ConstPart; 
+class TypePart; 
+class VarPart; 
+class RoutinePart;
+class ConstExpr;
+class ConstExprList;
+class ConstValue;
+    class Integer;
+    class Real;
+    class Char;
+    class String;
+    class SysCon;
 
 class Node {
     public:
@@ -27,14 +40,14 @@ class Node {
 
 class Program : public Node {
     public:
-        Program(ProgramHeading* ph, ProgramBlock* pb): program_heading(ph), program_block(pb) {
+        Program(ProgramHeading* ph, Routine* rt): program_heading(ph), routine(rt) {
             this->is_leaf = false;
             this->name = "Program";
         }
         ~Program(){}
 
         ProgramHeading * program_heading;
-        ProgramBlock * program_block;
+        Routine * routine;
 
         std::vector<Node *> get_descendants();
 };
@@ -65,46 +78,122 @@ class ProgramHeading : public Node {
         std::vector<Node *> get_descendants();
 };
 
-class ProgramBlock : public Node {
+class Routine : public Node {
     public:
-        ProgramBlock(StatementList * stml): statement_list(stml) {
+        Routine(RoutineHead * rh, RoutineBody * rb): routine_head(rh), routine_body(rb) {
             this->is_leaf = false;
-            this->name = "ProgramBlock";
+            this->name = "Routine";
         }
-        ~ProgramBlock() {}
+        ~Routine() {}
 
-        StatementList * statement_list;
+        RoutineHead * routine_head;
+        RoutineBody * routine_body;
 
         std::vector<Node *> get_descendants();
 };
 
-
-class Statement : public Node {
+class RoutineHead : public Node {
     public:
-        Statement () {}
-        Statement (ID * id) : sid(id) {
-            this->is_leaf = false;
-            this->name = "Statement";
-        }
-        ~Statement () {}
+        RoutineHead(LabelPart * lp, ConstPart * cp, TypePart * tp, VarPart * vp, RoutinePart * rp): 
+            label_part(lp), const_part(cp), type_part(tp), var_part(vp), routine_part(rp) {}
+        ~RoutineHead() {}
 
-        ID * sid; 
-
-        std::vector<Node *> get_descendants();
+        LabelPart * label_part;
+        ConstPart * const_part;
+        TypePart * type_part;
+        VarPart * var_part;
+        RoutinePart * routine_part;
 };
 
-class StatementList : public Statement {
+class LabelPart : public Node {
+    // Empty class
     public:
-        StatementList () {
-            this->is_leaf = false;
-            this->name = "StatementList";
-        }
-        ~StatementList() {}
-
-        std::vector<Statement *> statement_list;
-
-        void add_statement(Statement * stm);
-        std::vector<Node *> get_descendants();
+        LabelPart(){}
+        ~LabelPart(){}
 };
 
+class ConstPart : public Node {
+    public:
+        ConstPart(ConstExprList * cel): const_expr_list(cel){}
+        ~ConstPart(){}
+
+        ConstExprList* const_expr_list;
+};
+
+class ConstExprList : public Node {
+    public:
+        ConstExprList() {}
+        ~ConstExprList() {}
+
+        std::vector<ConstExpr *> const_expr_list;
+};
+
+class ConstExpr : public Node {
+    // NAME EQUAL const_value SEMI
+    public:
+        ConstExpr(ConstValue * cv): const_value(cv) {}
+        ~ConstExpr() {}
+
+        ConstValue * const_value;
+};
+
+class ConstValue : public Node {
+    // Integer | Real | Char | String | SYS_CON
+    public:
+        ConstValue(){}
+        ~ConstValue() {}
+};
+
+class Integer : public ConstValue {
+    public:
+        Integer(int _num):integer(_num) {}
+        ~Integer() {}
+
+        const int integer;
+};
+
+class Real : public ConstValue {
+    public:
+        Real(float _real):real(_real) {}
+        ~Real() {}
+
+        const float real;
+};
+
+class Char : public ConstValue {
+    public:
+        Char(char _chr):chr(_chr) {}
+        ~Char() {}
+
+        const char chr;
+};
+
+class SysCon : public ConstValue {
+    // {0: "maxint", 1: "true", 2: "false"}
+    public:
+        SysCon(int _type):type(_type) {}
+        ~SysCon() {}
+
+        int type;
+};
+
+class TypePart : public Node {
+    public:
+        TypePart(){}
+        ~TypePart(){}
+};
+
+class VarPart : public Node {
+
+};
+
+class RoutinePart : public Node {
+
+};
+
+class RoutineBody : public Node {
+
+};
 #endif
+
+// TODO: ADD virtual function to each class

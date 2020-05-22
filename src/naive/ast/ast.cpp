@@ -18,7 +18,7 @@ void Node::prt(int step){
 std::vector<Node *> Program::get_descendants(){
     std::vector<Node *> list;
     list.push_back(this->program_heading);
-    list.push_back(this->program_block);
+    list.push_back(this->routine);
     return list;
 }
 
@@ -28,7 +28,7 @@ std::vector<Node *> ProgramHeading::get_descendants(){
     return list;
 }
 
-std::vector<Node *> ProgramBlock::get_descendants(){
+std::vector<Node *> Routine::get_descendants(){
     std::vector<Node *> list;
     list.push_back(this->statement_list);
     return list;
