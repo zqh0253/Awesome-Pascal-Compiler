@@ -10,6 +10,7 @@ class Program;
 class ProgramHeading;
 class Routine;
 class ID;
+class IDList;
 class RoutineHead;
 class RoutineBody;
 class LabelPart; 
@@ -25,6 +26,17 @@ class ConstValue;
     class Char;
     class String;
     class SysCon;
+class TypeDecList;
+class TypeDec;
+    class SimpleTypeDec;
+        class SysTypeDec;
+        //class ID
+        //class IDList
+        class RangeTypeDec;
+    class ArrayTypeDec;
+    class RecordTypeDec;
+class TypeDef;
+
 
 class Node {
     public:
@@ -63,6 +75,15 @@ class ID : public Node {
         std::string idt;
 
         std::vector<Node *> get_descendants();
+};
+
+class IDList : public Node {
+    public:
+        IDList (){}
+        ~IDList (){}
+
+        std::vector<ID *> ID_list;
+        void add(ID *);
 };
 
 class ProgramHeading : public Node {
@@ -126,6 +147,8 @@ class ConstExprList : public Node {
         ~ConstExprList() {}
 
         std::vector<ConstExpr *> const_expr_list;
+
+        void add(ConstExpr * ce);
 };
 
 class ConstExpr : public Node {
@@ -178,9 +201,37 @@ class SysCon : public ConstValue {
 };
 
 class TypePart : public Node {
+    // TYPE TypeDeclList | epsilon
     public:
-        TypePart(){}
+        TypePart(TypeDecList * tdl): type_dec_list(tdl){}
         ~TypePart(){}
+
+        TypeDecList * type_dec_list;
+};
+
+class TypeDecList : public Node {
+    public:
+        TypeDecList() {}
+        ~TypeDecList() {}
+
+        std::vector<TypeDef *> type_definition_list;
+        void add(TypeDef * td);
+};
+
+class TypeDef : public Node {
+    // NAME EQUAL TypeDec SEMI
+    public:
+        TypeDef(TypeDec * td):type_dec(td) {}
+        ~TypeDef() {}
+
+        TypeDec * type_dec;
+};
+
+class TypeDec : public Node {
+    public:
+        TypeDec() {}
+        ~TypeDec() {}
+
 };
 
 class VarPart : public Node {
@@ -197,3 +248,4 @@ class RoutineBody : public Node {
 #endif
 
 // TODO: ADD virtual function to each class
+// TODO: template class
