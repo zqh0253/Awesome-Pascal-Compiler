@@ -28,15 +28,12 @@ class ConstValue;
     class SysCon;
 class TypeDecList;
 class TypeDec;
-    class SimpleTypeDec;
-        class SysTypeDec;
-        //class ID
-        //class IDList
-        class RangeTypeDec;
-    class ArrayTypeDec;
-    class RecordTypeDec;
 class TypeDef;
-
+class SysType;
+class RangeType;
+class ArrayType;
+class RecordType;
+class SimpleType;
 
 class Node {
     public:
@@ -229,9 +226,63 @@ class TypeDef : public Node {
 
 class TypeDec : public Node {
     public:
+        enum type {SIMPLE, ARRAY, RECORD} type;
         TypeDec() {}
+        TypeDec(SimpleType * st):simple_type(st) {}
+        TypeDec(ArrayType * at):array_type(at) {}
+        TypeDec(RecordType * rt):record_type(rt) {}
         ~TypeDec() {}
 
+        SimpleType * simple_type;
+        ArrayType * array_type;
+        RecordType * record_type;
+};
+
+class SimpleType : public Node {
+    public:
+        enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE} type;
+        SimpleType() {}
+        SimpleType(SysType * st):sys_type(st) {}
+        SimpleType(ID * _id):id(_id) {}
+        SimpleType(IDList * il):id_list(il) {}
+        SimpleType(RangeType * rt):range_type(rt) {}
+        ~SimpleType() {}
+
+        SysType * sys_type;
+        ID * id;
+        IDList * id_list;
+        RangeType * range_type;
+};
+
+class SysType : public Node {
+    public:
+        enum type {BOOLEAN, CHAR, INTEGER, REAL};
+        SysType() {}
+        ~SysType() {}
+
+        static std::string type_name[4];
+        // TODO: to initialize type_name
+};
+
+class RangeType : public Node {
+    public:
+        RangeType(ID * id1, ID * id2): left_id(id1), right_id(id2) {}
+        RangeType(ConstValue * lc, ConstValue * rc, bool lm, bool rm): left_const(lc), right_const(rc), left_minus(lm), right_minus(rm) {}
+        ~RangeType() {}
+
+        ID * left_id, * right_id;
+        ConstValue * left_const, * right_const;
+        bool left_minus, right_minus;
+};
+
+class ArrayType : public Node {
+    // ARRAY (SimpleType) OF TypeDec
+    public:
+        ArrayType(SimpleType * st, TypeDec * td): simple_type(st), type_dec(td) {}
+        ~ArrayType() {}
+
+        SimpleType * simple_type;
+        TypeDec * type_dec; 
 };
 
 class VarPart : public Node {
@@ -247,5 +298,5 @@ class RoutineBody : public Node {
 };
 #endif
 
-// TODO: ADD virtual function to each class
+// TODO: ADD virtual function, name to each class
 // TODO: template class
