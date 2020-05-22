@@ -35,10 +35,10 @@ program : program_heading OP_SEMICOLON program_block OP_SEMICOLON {$$=new Progra
 
 program_heading : REV_PROGRAM IDT {$$=new ProgramHeading($2);}
 
-program_block : statement_list {$$=new program_block($1);}
+program_block : statement_list {$$=new ProgramBlock($1);}
 
-statement_list : statement_list  OP_SEMICOLON statement{$$=$1;$$->add_statement($2);}
-                |   statement                                       {$$=new StatementList($1);}
+statement_list : statement_list statement OP_SEMICOLON {$$=$1;$$->add_statement($2);}
+                |                                       {$$=new StatementList();}
 
 statement : IDT {$$=new Statement($1);}
 

@@ -488,7 +488,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  8
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  15
+#define YYNSTATES  14
 
 #define YYMAXUTOK   260
 
@@ -574,7 +574,7 @@ static const yytype_int16 yytoknum[] =
 };
 #endif
 
-#define YYPACT_NINF (-11)
+#define YYPACT_NINF (-4)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -588,8 +588,8 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -2,     1,   -11,    -1,   -11,   -11,     2,   -11,     0,
-       3,   -11,   -11,     2,   -11
+      -3,    -2,     1,    -4,    -1,    -4,    -4,    -4,     0,     2,
+      -4,    -4,     3,    -4
 };
 
   /* YYDEFACTSTATE-NUM -- Default reduction number in state STATE-NUM.
@@ -597,20 +597,20 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     0,     4,     1,     0,     8,     0,
-       0,     7,     3,     0,     6
+       0,     0,     0,     2,     0,     4,     1,     7,     0,     5,
+       3,     8,     0,     6
 };
 
   /* YYPGOTONTERM-NUM.  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,   -11,   -11,   -11,   -11,   -10
+      -4,    -4,    -4,    -4,    -4,    -4,    -4
 };
 
   /* YYDEFGOTONTERM-NUM.  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4,     9,    10,    11
+      -1,     2,     3,     4,     8,     9,    12
 };
 
   /* YYTABLEYYPACT[STATE-NUM] -- What to do in state STATE-NUM.  If
@@ -618,20 +618,20 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,     5,    14,     7,    12,     8,     0,    13
+       1,     6,     5,     0,     7,    10,    11,     0,    13
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     4,    13,     5,     5,     4,    -1,     5
+       3,     0,     4,    -1,     5,     5,     4,    -1,     5
 };
 
   /* YYSTOSSTATE-NUM -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     7,     8,     9,     4,     0,     5,     4,    10,
-      11,    12,     5,     5,    12
+       0,     3,     7,     8,     9,     4,     0,     5,    10,    11,
+       5,     4,    12,     5
 };
 
   /* YYR1YYN -- Symbol number of symbol that rule YYN derives.  */
@@ -643,7 +643,7 @@ static const yytype_int8 yyr1[] =
   /* YYR2YYN -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     4,     2,     1,     3,     1,     1
+       0,     2,     1,     4,     2,     1,     3,     0,     1
 };
 
 
@@ -1143,19 +1143,19 @@ yyreduce:
 
   case 5:
 #line 38 "pascal.y"
-                               {(yyval.pb)=new program_block((yyvsp[0].stml));}
+                               {(yyval.pb)=new ProgramBlock((yyvsp[0].stml));}
 #line 1148 "pascal.cpp"
     break;
 
   case 6:
 #line 40 "pascal.y"
-                                                       {(yyval.stml)=(yyvsp[-2].stml);(yyval.stml)->add_statement((yyvsp[-1].chr));}
+                                                       {(yyval.stml)=(yyvsp[-2].stml);(yyval.stml)->add_statement((yyvsp[-1].stm));}
 #line 1154 "pascal.cpp"
     break;
 
   case 7:
 #line 41 "pascal.y"
-                                                                    {(yyval.stml)=new StatementList((yyvsp[0].stm));}
+                                                        {(yyval.stml)=new StatementList();}
 #line 1160 "pascal.cpp"
     break;
 
