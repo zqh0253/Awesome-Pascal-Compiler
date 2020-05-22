@@ -507,7 +507,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   8
+#define YYLAST   6
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  6
@@ -516,7 +516,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  8
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  14
+#define YYNSTATES  13
 
 #define YYMAXUTOK   260
 
@@ -616,8 +616,8 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -2,     1,    -4,    -1,    -4,    -4,    -4,     0,     2,
-      -4,    -4,     3,    -4
+      -3,    -2,     1,    -4,    -1,    -4,    -4,    -4,    -4,     2,
+      -4,     0,    -4
 };
 
   /* YYDEFACTSTATE-NUM -- Default reduction number in state STATE-NUM.
@@ -625,8 +625,8 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     0,     4,     1,     7,     0,     5,
-       3,     8,     0,     6
+       0,     0,     0,     2,     0,     4,     1,     7,     3,     5,
+       8,     0,     6
 };
 
   /* YYPGOTONTERM-NUM.  */
@@ -638,7 +638,7 @@ static const yytype_int8 yypgoto[] =
   /* YYDEFGOTONTERM-NUM.  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4,     8,     9,    12
+      -1,     2,     3,     4,     8,     9,    11
 };
 
   /* YYTABLEYYPACT[STATE-NUM] -- What to do in state STATE-NUM.  If
@@ -646,12 +646,12 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,     5,     0,     7,    10,    11,     0,    13
+       1,     6,     5,     0,     7,    12,    10
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     4,    -1,     5,     5,     4,    -1,     5
+       3,     0,     4,    -1,     5,     5,     4
 };
 
   /* YYSTOSSTATE-NUM -- The (internal number of the) accessing
@@ -659,7 +659,7 @@ static const yytype_int8 yycheck[] =
 static const yytype_int8 yystos[] =
 {
        0,     3,     7,     8,     9,     4,     0,     5,    10,    11,
-       5,     4,    12,     5
+       4,    12,     5
 };
 
   /* YYR1YYN -- Symbol number of symbol that rule YYN derives.  */
@@ -671,7 +671,7 @@ static const yytype_int8 yyr1[] =
   /* YYR2YYN -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     4,     2,     1,     3,     0,     1
+       0,     2,     1,     3,     2,     1,     3,     0,     1
 };
 
 
@@ -1256,13 +1256,13 @@ yyreduce:
 
   case 3:
 #line 45 "pascal.y"
-                                                                  {(yyval.program)=new Program((yyvsp[-3].ph),(yyvsp[-1].pb));}
+                                                      {(yyval.program)=new Program((yyvsp[-2].ph),(yyvsp[0].pb));}
 #line 1261 "pascal.cpp"
     break;
 
   case 4:
 #line 47 "pascal.y"
-                                  {printf("ph\n");(yyval.ph)=new ProgramHeading((yyvsp[0].idt));}
+                                  {(yyval.ph)=new ProgramHeading((yyvsp[0].idt));}
 #line 1267 "pascal.cpp"
     break;
 

@@ -498,11 +498,11 @@ int yycolumn = 1;
 
 void yyerror(const char *s);
 
-void copy_str(char *str, int len) {
-    int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
-    strncpy(yylval.str, str, l);
-    yylval.str[l] = 0;
-}
+// void copy_str(char *str, int len) {
+//     int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
+//     strncpy(yylval.str, str, l);
+//     yylval.str[l] = 0;
+// }
 #line 506 "scanner.cpp"
 #line 507 "scanner.cpp"
 
@@ -805,34 +805,33 @@ case 3:
 YY_RULE_SETUP
 #line 39 "pascal.l"
 {
-    copy_str(yytext, yyleng);
-    yylval.idt = new ID(yytext);
-    yylval.idt->prt(0);
+    std::string context = yytext;
+    yylval.idt = new ID(context);
     return IDT;
 }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 46 "pascal.l"
+#line 45 "pascal.l"
 {}
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 48 "pascal.l"
+#line 47 "pascal.l"
 {
     yycolumn = 1;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 51 "pascal.l"
+#line 50 "pascal.l"
 {}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 53 "pascal.l"
+#line 52 "pascal.l"
 {
     printf("unknown character %d\n", (int) yytext[0]);
     return yytext[0];
@@ -840,10 +839,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 58 "pascal.l"
+#line 57 "pascal.l"
 ECHO;
 	YY_BREAK
-#line 846 "scanner.cpp"
+#line 845 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1860,7 +1859,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 58 "pascal.l"
+#line 57 "pascal.l"
 
 
 void yyerror(const char *s) {

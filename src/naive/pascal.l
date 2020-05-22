@@ -13,11 +13,11 @@ int yycolumn = 1;
 
 void yyerror(const char *s);
 
-void copy_str(char *str, int len) {
-    int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
-    strncpy(yylval.str, str, l);
-    yylval.str[l] = 0;
-}
+// void copy_str(char *str, int len) {
+//     int l = (len >= MAX_STR_LEN ? MAX_STR_LEN - 1 : len);
+//     strncpy(yylval.str, str, l);
+//     yylval.str[l] = 0;
+// }
 %}
 
 
@@ -37,9 +37,8 @@ COMMENT "{"[^\}]*"}"
 
 
 {IDT} {
-    copy_str(yytext, yyleng);
-    yylval.idt = new ID(yytext);
-    yylval.idt->prt(0);
+    std::string context = yytext;
+    yylval.idt = new ID(context);
     return IDT;
 }
 

@@ -42,9 +42,9 @@ char *str;
 
 root : program {ast_root = $1; ast_root->prt(0);}
 
-program : program_heading OP_SEMICOLON program_block OP_SEMICOLON {$$=new Program($1,$3);}
+program : program_heading OP_SEMICOLON program_block  {$$=new Program($1,$3);}
 
-program_heading : REV_PROGRAM IDT {printf("ph\n");$$=new ProgramHeading($2);}
+program_heading : REV_PROGRAM IDT {$$=new ProgramHeading($2);}
 
 program_block : statement_list {$$=new ProgramBlock($1);}
 
