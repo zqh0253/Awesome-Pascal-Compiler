@@ -59,6 +59,7 @@ std::vector<Node *> RoutineHead::get_descendants(){
     list.push_back(this->type_part);
     list.push_back(this->var_part);
     list.push_back(this->routine_part);
+    return list;
 }
 
 std::vector<Node *> LabelPart::get_descendants(){
@@ -92,26 +93,6 @@ std::vector<Node *> ConstExpr::get_descendants(){
 }
 
 std::vector<Node *> ConstValue::get_descendants(){
-    std::vector<Node *> list;
-    return list;
-}
-
-std::vector<Node *> Integer::get_descendants(){
-    std::vector<Node *> list;
-    return list;
-}
-
-std::vector<Node *> Real::get_descendants(){
-    std::vector<Node *> list;
-    return list;
-}
-
-std::vector<Node *> Char::get_descendants(){
-    std::vector<Node *> list;
-    return list;
-}
-
-std::vector<Node *> SysCon::get_descendants(){
     std::vector<Node *> list;
     return list;
 }
@@ -217,7 +198,7 @@ void VarDecList::add(VarDec * vd){
 std::vector<Node *> VarDec::get_descendants(){
     std::vector<Node *> list;
     list.push_back(this->id_list);
-    list.push_back(this->var_dec);
+    list.push_back(this->type_dec);
     return list;
 }
 

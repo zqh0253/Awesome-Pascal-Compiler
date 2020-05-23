@@ -126,9 +126,85 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    REV_PROGRAM = 258,             /* REV_PROGRAM  */
-    IDT = 259,                     /* IDT  */
-    OP_SEMICOLON = 260             /* OP_SEMICOLON  */
+    REV_AND = 258,                 /* REV_AND  */
+    REV_ARRAY = 259,               /* REV_ARRAY  */
+    REV_BEGIN = 260,               /* REV_BEGIN  */
+    REV_BREAK = 261,               /* REV_BREAK  */
+    REV_CASE = 262,                /* REV_CASE  */
+    REV_CONST = 263,               /* REV_CONST  */
+    REV_CONTINUE = 264,            /* REV_CONTINUE  */
+    REV_DEFAULT = 265,             /* REV_DEFAULT  */
+    REV_DIV = 266,                 /* REV_DIV  */
+    REV_DO = 267,                  /* REV_DO  */
+    REV_DOWNTO = 268,              /* REV_DOWNTO  */
+    REV_ELSE = 269,                /* REV_ELSE  */
+    REV_END = 270,                 /* REV_END  */
+    REV_EXIT = 271,                /* REV_EXIT  */
+    REV_FILE = 272,                /* REV_FILE  */
+    REV_FOR = 273,                 /* REV_FOR  */
+    REV_FORWARD = 274,             /* REV_FORWARD  */
+    REV_FUNCTION = 275,            /* REV_FUNCTION  */
+    REV_GOTO = 276,                /* REV_GOTO  */
+    REV_IF = 277,                  /* REV_IF  */
+    REV_IN = 278,                  /* REV_IN  */
+    REV_LABEL = 279,               /* REV_LABEL  */
+    REV_MOD = 280,                 /* REV_MOD  */
+    REV_NIL = 281,                 /* REV_NIL  */
+    REV_NOT = 282,                 /* REV_NOT  */
+    REV_OF = 283,                  /* REV_OF  */
+    REV_OR = 284,                  /* REV_OR  */
+    REV_PACKED = 285,              /* REV_PACKED  */
+    REV_PROCEDURE = 286,           /* REV_PROCEDURE  */
+    REV_PROGRAM = 287,             /* REV_PROGRAM  */
+    REV_RECORD = 288,              /* REV_RECORD  */
+    REV_REPEAT = 289,              /* REV_REPEAT  */
+    REV_SET = 290,                 /* REV_SET  */
+    REV_SIZEOF = 291,              /* REV_SIZEOF  */
+    REV_THEN = 292,                /* REV_THEN  */
+    REV_TO = 293,                  /* REV_TO  */
+    REV_TYPE = 294,                /* REV_TYPE  */
+    REV_UNTIL = 295,               /* REV_UNTIL  */
+    REV_VAR = 296,                 /* REV_VAR  */
+    REV_WHILE = 297,               /* REV_WHILE  */
+    REV_WITH = 298,                /* REV_WITH  */
+    REV_XOR = 299,                 /* REV_XOR  */
+    OP_ADD = 300,                  /* OP_ADD  */
+    OP_SUB = 301,                  /* OP_SUB  */
+    OP_MUL = 302,                  /* OP_MUL  */
+    OP_DIV = 303,                  /* OP_DIV  */
+    OP_EQ = 304,                   /* OP_EQ  */
+    OP_LT = 305,                   /* OP_LT  */
+    OP_GT = 306,                   /* OP_GT  */
+    OP_LBRAC = 307,                /* OP_LBRAC  */
+    OP_RBRAC = 308,                /* OP_RBRAC  */
+    OP_PERIOD = 309,               /* OP_PERIOD  */
+    OP_COMMA = 310,                /* OP_COMMA  */
+    OP_COLON = 311,                /* OP_COLON  */
+    OP_SEMICOLON = 312,            /* OP_SEMICOLON  */
+    OP_AT = 313,                   /* OP_AT  */
+    OP_CARET = 314,                /* OP_CARET  */
+    OP_LPAREN = 315,               /* OP_LPAREN  */
+    OP_RPAREN = 316,               /* OP_RPAREN  */
+    OP_NE = 317,                   /* OP_NE  */
+    OP_LEQ = 318,                  /* OP_LEQ  */
+    OP_GEQ = 319,                  /* OP_GEQ  */
+    OP_ASSIGN = 320,               /* OP_ASSIGN  */
+    OP_RANGE = 321,                /* OP_RANGE  */
+    TYPE_INT = 322,                /* TYPE_INT  */
+    TYPE_REAL = 323,               /* TYPE_REAL  */
+    TYPE_CHAR = 324,               /* TYPE_CHAR  */
+    TYPE_BOOL = 325,               /* TYPE_BOOL  */
+    TYPE_STRING = 326,             /* TYPE_STRING  */
+    BOOL_TRUE = 327,               /* BOOL_TRUE  */
+    BOOL_FALSE = 328,              /* BOOL_FALSE  */
+    IDT = 329,                     /* IDT  */
+    SIGN = 330,                    /* SIGN  */
+    INT = 331,                     /* INT  */
+    REAL = 332,                    /* REAL  */
+    CHAR = 333,                    /* CHAR  */
+    ESC_CHAR = 334,                /* ESC_CHAR  */
+    STR = 335,                     /* STR  */
+    COMMENT = 336                  /* COMMENT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -141,16 +217,35 @@ union YYSTYPE
 
 char chr;
 int num;
-double real;
+float real;
+char* str;
 Program* program;
-ProgramHeading* ph;
-ProgramBlock* pb;
+ProgramHeading* programh;
+Routine* rout;
 ID* idt;
-Statement* stm;
-StatementList* stml;
-char *str;
+IDList* idl;
+RoutineHead* routineh;
+RoutineBody* routineb;
+LabelPart* labelp;
+ConstPart* constp;
+TypePart* typep;
+VarPart* varp;
+RoutinePart* routinep;
+ConstExpr* conste;
+ConstExprList* constel;
+ConstValue* constv;
+TypeDecList* tdl;
+TypeDec* typedec;
+TypeDef* typedefi;
+SysType* syst;
+RangeType* ranget;
+ArrayType* arrayt;
+RecordType* recordt;
+SimpleType* simplet;
+VarDecList* vdl;
+VarDec* vard;
 
-#line 154 "pascal.cpp"
+#line 249 "pascal.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -185,16 +280,111 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_REV_PROGRAM = 3,                /* REV_PROGRAM  */
-  YYSYMBOL_IDT = 4,                        /* IDT  */
-  YYSYMBOL_OP_SEMICOLON = 5,               /* OP_SEMICOLON  */
-  YYSYMBOL_YYACCEPT = 6,                   /* $accept  */
-  YYSYMBOL_root = 7,                       /* root  */
-  YYSYMBOL_program = 8,                    /* program  */
-  YYSYMBOL_program_heading = 9,            /* program_heading  */
-  YYSYMBOL_program_block = 10,             /* program_block  */
-  YYSYMBOL_statement_list = 11,            /* statement_list  */
-  YYSYMBOL_statement = 12                  /* statement  */
+  YYSYMBOL_REV_AND = 3,                    /* REV_AND  */
+  YYSYMBOL_REV_ARRAY = 4,                  /* REV_ARRAY  */
+  YYSYMBOL_REV_BEGIN = 5,                  /* REV_BEGIN  */
+  YYSYMBOL_REV_BREAK = 6,                  /* REV_BREAK  */
+  YYSYMBOL_REV_CASE = 7,                   /* REV_CASE  */
+  YYSYMBOL_REV_CONST = 8,                  /* REV_CONST  */
+  YYSYMBOL_REV_CONTINUE = 9,               /* REV_CONTINUE  */
+  YYSYMBOL_REV_DEFAULT = 10,               /* REV_DEFAULT  */
+  YYSYMBOL_REV_DIV = 11,                   /* REV_DIV  */
+  YYSYMBOL_REV_DO = 12,                    /* REV_DO  */
+  YYSYMBOL_REV_DOWNTO = 13,                /* REV_DOWNTO  */
+  YYSYMBOL_REV_ELSE = 14,                  /* REV_ELSE  */
+  YYSYMBOL_REV_END = 15,                   /* REV_END  */
+  YYSYMBOL_REV_EXIT = 16,                  /* REV_EXIT  */
+  YYSYMBOL_REV_FILE = 17,                  /* REV_FILE  */
+  YYSYMBOL_REV_FOR = 18,                   /* REV_FOR  */
+  YYSYMBOL_REV_FORWARD = 19,               /* REV_FORWARD  */
+  YYSYMBOL_REV_FUNCTION = 20,              /* REV_FUNCTION  */
+  YYSYMBOL_REV_GOTO = 21,                  /* REV_GOTO  */
+  YYSYMBOL_REV_IF = 22,                    /* REV_IF  */
+  YYSYMBOL_REV_IN = 23,                    /* REV_IN  */
+  YYSYMBOL_REV_LABEL = 24,                 /* REV_LABEL  */
+  YYSYMBOL_REV_MOD = 25,                   /* REV_MOD  */
+  YYSYMBOL_REV_NIL = 26,                   /* REV_NIL  */
+  YYSYMBOL_REV_NOT = 27,                   /* REV_NOT  */
+  YYSYMBOL_REV_OF = 28,                    /* REV_OF  */
+  YYSYMBOL_REV_OR = 29,                    /* REV_OR  */
+  YYSYMBOL_REV_PACKED = 30,                /* REV_PACKED  */
+  YYSYMBOL_REV_PROCEDURE = 31,             /* REV_PROCEDURE  */
+  YYSYMBOL_REV_PROGRAM = 32,               /* REV_PROGRAM  */
+  YYSYMBOL_REV_RECORD = 33,                /* REV_RECORD  */
+  YYSYMBOL_REV_REPEAT = 34,                /* REV_REPEAT  */
+  YYSYMBOL_REV_SET = 35,                   /* REV_SET  */
+  YYSYMBOL_REV_SIZEOF = 36,                /* REV_SIZEOF  */
+  YYSYMBOL_REV_THEN = 37,                  /* REV_THEN  */
+  YYSYMBOL_REV_TO = 38,                    /* REV_TO  */
+  YYSYMBOL_REV_TYPE = 39,                  /* REV_TYPE  */
+  YYSYMBOL_REV_UNTIL = 40,                 /* REV_UNTIL  */
+  YYSYMBOL_REV_VAR = 41,                   /* REV_VAR  */
+  YYSYMBOL_REV_WHILE = 42,                 /* REV_WHILE  */
+  YYSYMBOL_REV_WITH = 43,                  /* REV_WITH  */
+  YYSYMBOL_REV_XOR = 44,                   /* REV_XOR  */
+  YYSYMBOL_OP_ADD = 45,                    /* OP_ADD  */
+  YYSYMBOL_OP_SUB = 46,                    /* OP_SUB  */
+  YYSYMBOL_OP_MUL = 47,                    /* OP_MUL  */
+  YYSYMBOL_OP_DIV = 48,                    /* OP_DIV  */
+  YYSYMBOL_OP_EQ = 49,                     /* OP_EQ  */
+  YYSYMBOL_OP_LT = 50,                     /* OP_LT  */
+  YYSYMBOL_OP_GT = 51,                     /* OP_GT  */
+  YYSYMBOL_OP_LBRAC = 52,                  /* OP_LBRAC  */
+  YYSYMBOL_OP_RBRAC = 53,                  /* OP_RBRAC  */
+  YYSYMBOL_OP_PERIOD = 54,                 /* OP_PERIOD  */
+  YYSYMBOL_OP_COMMA = 55,                  /* OP_COMMA  */
+  YYSYMBOL_OP_COLON = 56,                  /* OP_COLON  */
+  YYSYMBOL_OP_SEMICOLON = 57,              /* OP_SEMICOLON  */
+  YYSYMBOL_OP_AT = 58,                     /* OP_AT  */
+  YYSYMBOL_OP_CARET = 59,                  /* OP_CARET  */
+  YYSYMBOL_OP_LPAREN = 60,                 /* OP_LPAREN  */
+  YYSYMBOL_OP_RPAREN = 61,                 /* OP_RPAREN  */
+  YYSYMBOL_OP_NE = 62,                     /* OP_NE  */
+  YYSYMBOL_OP_LEQ = 63,                    /* OP_LEQ  */
+  YYSYMBOL_OP_GEQ = 64,                    /* OP_GEQ  */
+  YYSYMBOL_OP_ASSIGN = 65,                 /* OP_ASSIGN  */
+  YYSYMBOL_OP_RANGE = 66,                  /* OP_RANGE  */
+  YYSYMBOL_TYPE_INT = 67,                  /* TYPE_INT  */
+  YYSYMBOL_TYPE_REAL = 68,                 /* TYPE_REAL  */
+  YYSYMBOL_TYPE_CHAR = 69,                 /* TYPE_CHAR  */
+  YYSYMBOL_TYPE_BOOL = 70,                 /* TYPE_BOOL  */
+  YYSYMBOL_TYPE_STRING = 71,               /* TYPE_STRING  */
+  YYSYMBOL_BOOL_TRUE = 72,                 /* BOOL_TRUE  */
+  YYSYMBOL_BOOL_FALSE = 73,                /* BOOL_FALSE  */
+  YYSYMBOL_IDT = 74,                       /* IDT  */
+  YYSYMBOL_SIGN = 75,                      /* SIGN  */
+  YYSYMBOL_INT = 76,                       /* INT  */
+  YYSYMBOL_REAL = 77,                      /* REAL  */
+  YYSYMBOL_CHAR = 78,                      /* CHAR  */
+  YYSYMBOL_ESC_CHAR = 79,                  /* ESC_CHAR  */
+  YYSYMBOL_STR = 80,                       /* STR  */
+  YYSYMBOL_COMMENT = 81,                   /* COMMENT  */
+  YYSYMBOL_YYACCEPT = 82,                  /* $accept  */
+  YYSYMBOL_root = 83,                      /* root  */
+  YYSYMBOL_program = 84,                   /* program  */
+  YYSYMBOL_program_heading = 85,           /* program_heading  */
+  YYSYMBOL_routine = 86,                   /* routine  */
+  YYSYMBOL_routine_head = 87,              /* routine_head  */
+  YYSYMBOL_label_part = 88,                /* label_part  */
+  YYSYMBOL_const_part = 89,                /* const_part  */
+  YYSYMBOL_const_expr_list = 90,           /* const_expr_list  */
+  YYSYMBOL_const_expr = 91,                /* const_expr  */
+  YYSYMBOL_const_value = 92,               /* const_value  */
+  YYSYMBOL_type_part = 93,                 /* type_part  */
+  YYSYMBOL_type_dec_list = 94,             /* type_dec_list  */
+  YYSYMBOL_type_def = 95,                  /* type_def  */
+  YYSYMBOL_type_dec = 96,                  /* type_dec  */
+  YYSYMBOL_simple_type = 97,               /* simple_type  */
+  YYSYMBOL_sys_type = 98,                  /* sys_type  */
+  YYSYMBOL_range_type = 99,                /* range_type  */
+  YYSYMBOL_array_type = 100,               /* array_type  */
+  YYSYMBOL_record_type = 101,              /* record_type  */
+  YYSYMBOL_var_part = 102,                 /* var_part  */
+  YYSYMBOL_var_dec_list = 103,             /* var_dec_list  */
+  YYSYMBOL_var_dec = 104,                  /* var_dec  */
+  YYSYMBOL_id_list = 105,                  /* id_list  */
+  YYSYMBOL_routine_part = 106,             /* routine_part  */
+  YYSYMBOL_routine_body = 107              /* routine_body  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -507,18 +697,18 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   6
+#define YYLAST   94
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  6
+#define YYNTOKENS  82
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  26
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  8
+#define YYNRULES  51
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  13
+#define YYNSTATES  86
 
-#define YYMAXUTOK   260
+#define YYMAXUTOK   336
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -558,14 +748,26 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81
 };
 
 #if YYDEBUG
   /* YYRLINEYYN -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    43,    43,    45,    47,    49,    51,    52,    54
+       0,    97,    97,    99,   101,   103,   105,   107,   109,   110,
+     112,   113,   115,   117,   118,   119,   120,   121,   122,   124,
+     125,   127,   128,   130,   132,   133,   134,   136,   137,   138,
+     139,   141,   142,   143,   144,   145,   147,   148,   149,   150,
+     151,   153,   155,   157,   158,   160,   161,   163,   165,   166,
+     168,   170
 };
 #endif
 
@@ -581,9 +783,26 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "REV_PROGRAM", "IDT",
-  "OP_SEMICOLON", "$accept", "root", "program", "program_heading",
-  "program_block", "statement_list", "statement", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "REV_AND", "REV_ARRAY",
+  "REV_BEGIN", "REV_BREAK", "REV_CASE", "REV_CONST", "REV_CONTINUE",
+  "REV_DEFAULT", "REV_DIV", "REV_DO", "REV_DOWNTO", "REV_ELSE", "REV_END",
+  "REV_EXIT", "REV_FILE", "REV_FOR", "REV_FORWARD", "REV_FUNCTION",
+  "REV_GOTO", "REV_IF", "REV_IN", "REV_LABEL", "REV_MOD", "REV_NIL",
+  "REV_NOT", "REV_OF", "REV_OR", "REV_PACKED", "REV_PROCEDURE",
+  "REV_PROGRAM", "REV_RECORD", "REV_REPEAT", "REV_SET", "REV_SIZEOF",
+  "REV_THEN", "REV_TO", "REV_TYPE", "REV_UNTIL", "REV_VAR", "REV_WHILE",
+  "REV_WITH", "REV_XOR", "OP_ADD", "OP_SUB", "OP_MUL", "OP_DIV", "OP_EQ",
+  "OP_LT", "OP_GT", "OP_LBRAC", "OP_RBRAC", "OP_PERIOD", "OP_COMMA",
+  "OP_COLON", "OP_SEMICOLON", "OP_AT", "OP_CARET", "OP_LPAREN",
+  "OP_RPAREN", "OP_NE", "OP_LEQ", "OP_GEQ", "OP_ASSIGN", "OP_RANGE",
+  "TYPE_INT", "TYPE_REAL", "TYPE_CHAR", "TYPE_BOOL", "TYPE_STRING",
+  "BOOL_TRUE", "BOOL_FALSE", "IDT", "SIGN", "INT", "REAL", "CHAR",
+  "ESC_CHAR", "STR", "COMMENT", "$accept", "root", "program",
+  "program_heading", "routine", "routine_head", "label_part", "const_part",
+  "const_expr_list", "const_expr", "const_value", "type_part",
+  "type_dec_list", "type_def", "type_dec", "simple_type", "sys_type",
+  "range_type", "array_type", "record_type", "var_part", "var_dec_list",
+  "var_dec", "id_list", "routine_part", "routine_body", YY_NULLPTR
 };
 
 static const char *
@@ -598,11 +817,19 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_int16 yytoknum[] =
 {
-       0,   256,   257,   258,   259,   260
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
+     305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
+     315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
+     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
+     335,   336
 };
 #endif
 
-#define YYPACT_NINF (-4)
+#define YYPACT_NINF (-70)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -616,8 +843,15 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -2,     1,    -4,    -1,    -4,    -4,    -4,    -4,     2,
-      -4,     0,    -4
+     -24,   -69,    13,   -70,   -70,   -33,   -70,   -36,   -70,    12,
+     -70,   -70,   -70,   -52,    -1,   -22,   -52,   -70,   -30,    14,
+     -66,   -70,    -2,   -30,   -70,   -16,   -70,   -70,   -70,   -70,
+     -70,   -70,   -70,     2,    -4,   -70,   -70,   -16,   -70,   -39,
+     -70,   -70,     8,   -16,   -66,   -16,   -70,   -70,   -70,   -70,
+     -70,     5,     9,    20,   -70,   -70,   -70,   -70,   -70,   -70,
+       7,    -4,   -37,   -12,    19,   -40,    15,   -27,   -70,   -70,
+      23,    34,   -70,     6,   -70,   -70,   -66,   -70,   -70,    60,
+     -66,   -70,   -70,    -4,   -70,   -70
 };
 
   /* YYDEFACTSTATE-NUM -- Default reduction number in state STATE-NUM.
@@ -625,20 +859,31 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     0,     4,     1,     7,     3,     5,
-       8,     0,     6
+       0,     0,     0,     2,     7,     0,     1,     0,    51,     9,
+       4,     3,     5,     0,    20,     0,     8,    11,     0,    44,
+       0,    10,     0,    19,    22,     0,    50,    17,    18,    13,
+      14,    15,    16,     0,     0,    21,    49,    43,    46,     0,
+       6,    12,     0,     0,     0,     0,    33,    34,    32,    31,
+      35,    28,     0,     0,    24,    27,    30,    25,    26,    45,
+       0,     0,     0,     0,     0,     0,     0,     0,    23,    48,
+       0,     0,    42,     0,    29,    40,     0,    36,    47,     0,
+       0,    37,    39,     0,    38,    41
 };
 
   /* YYPGOTONTERM-NUM.  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,    -4,    -4,    -4,    -4
+     -70,   -70,   -70,   -70,   -70,   -70,   -70,   -70,   -70,    74,
+     -19,   -70,   -70,    68,   -57,    30,   -70,   -70,   -70,   -70,
+     -70,    50,   -35,    49,   -70,   -70
 };
 
   /* YYDEFGOTONTERM-NUM.  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4,     8,     9,    11
+      -1,     2,     3,     4,     7,     8,     9,    14,    16,    17,
+      52,    19,    23,    24,    53,    54,    55,    56,    57,    58,
+      26,    37,    38,    39,    40,    12
 };
 
   /* YYTABLEYYPACT[STATE-NUM] -- What to do in state STATE-NUM.  If
@@ -646,32 +891,67 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,     5,     0,     7,    12,    10
+      42,    33,    59,    72,    70,     5,    27,    28,     1,    44,
+      29,    30,    31,     6,    32,    60,    60,    61,    11,    76,
+      13,    74,    15,    45,    10,    64,    85,    20,    59,    43,
+      46,    47,    48,    49,    50,    27,    28,    51,    18,    29,
+      30,    31,    44,    32,    22,    27,    28,    34,    77,    29,
+      30,    31,    80,    32,    81,    25,    45,    82,    36,    41,
+      62,    84,    36,    46,    47,    48,    49,    50,    27,    28,
+      51,    66,    29,    30,    31,    67,    32,    68,    27,    28,
+      78,    69,    29,    30,    31,    73,    32,    79,    83,    75,
+      21,    35,    71,    63,    65
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     4,    -1,     5,     5,     4
+       4,    20,    37,    15,    61,    74,    72,    73,    32,    46,
+      76,    77,    78,     0,    80,    55,    55,    56,    54,    46,
+       8,    61,    74,    60,    57,    44,    83,    49,    63,    33,
+      67,    68,    69,    70,    71,    72,    73,    74,    39,    76,
+      77,    78,    46,    80,    74,    72,    73,    49,    67,    76,
+      77,    78,    46,    80,    73,    41,    60,    76,    74,    57,
+      52,    80,    74,    67,    68,    69,    70,    71,    72,    73,
+      74,    66,    76,    77,    78,    66,    80,    57,    72,    73,
+      57,    74,    76,    77,    78,    66,    80,    53,    28,    74,
+      16,    23,    62,    43,    45
 };
 
   /* YYSTOSSTATE-NUM -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     7,     8,     9,     4,     0,     5,    10,    11,
-       4,    12,     5
+       0,    32,    83,    84,    85,    74,     0,    86,    87,    88,
+      57,    54,   107,     8,    89,    74,    90,    91,    39,    93,
+      49,    91,    74,    94,    95,    41,   102,    72,    73,    76,
+      77,    78,    80,    92,    49,    95,    74,   103,   104,   105,
+     106,    57,     4,    33,    46,    60,    67,    68,    69,    70,
+      71,    74,    92,    96,    97,    98,    99,   100,   101,   104,
+      55,    56,    52,   103,    92,   105,    66,    66,    57,    74,
+      96,    97,    15,    66,    61,    74,    46,    92,    57,    53,
+      46,    92,    92,    28,    92,    96
 };
 
   /* YYR1YYN -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,     6,     7,     8,     9,    10,    11,    11,    12
+       0,    82,    83,    84,    85,    86,    87,    88,    89,    89,
+      90,    90,    91,    92,    92,    92,    92,    92,    92,    93,
+      93,    94,    94,    95,    96,    96,    96,    97,    97,    97,
+      97,    98,    98,    98,    98,    98,    99,    99,    99,    99,
+      99,   100,   101,   102,   102,   103,   103,   104,   105,   105,
+     106,   107
 };
 
   /* YYR2YYN -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     3,     2,     1,     3,     0,     1
+       0,     2,     1,     3,     3,     2,     5,     0,     2,     0,
+       2,     1,     4,     1,     1,     1,     1,     1,     1,     2,
+       0,     2,     1,     4,     1,     1,     1,     1,     1,     3,
+       1,     1,     1,     1,     1,     1,     3,     4,     5,     4,
+       3,     6,     3,     2,     0,     2,     1,     4,     3,     1,
+       0,     0
 };
 
 
@@ -1249,49 +1529,307 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 43 "pascal.y"
+#line 97 "pascal.y"
                {ast_root = (yyvsp[0].program); ast_root->prt(0);}
-#line 1255 "pascal.cpp"
+#line 1535 "pascal.cpp"
     break;
 
   case 3:
-#line 45 "pascal.y"
-                                                      {(yyval.program)=new Program((yyvsp[-2].ph),(yyvsp[0].pb));}
-#line 1261 "pascal.cpp"
+#line 99 "pascal.y"
+                                             {(yyval.program)=new Program((yyvsp[-2].programh),(yyvsp[-1].rout));}
+#line 1541 "pascal.cpp"
     break;
 
   case 4:
-#line 47 "pascal.y"
-                                  {(yyval.ph)=new ProgramHeading((yyvsp[0].idt));}
-#line 1267 "pascal.cpp"
+#line 101 "pascal.y"
+                                               {(yyval.programh)=new ProgramHeading((yyvsp[-1].idt));}
+#line 1547 "pascal.cpp"
     break;
 
   case 5:
-#line 49 "pascal.y"
-                               {(yyval.pb)=new ProgramBlock((yyvsp[0].stml));}
-#line 1273 "pascal.cpp"
+#line 103 "pascal.y"
+                                    {(yyval.rout)=new Routine((yyvsp[-1].routineh), (yyvsp[0].routineb));}
+#line 1553 "pascal.cpp"
     break;
 
   case 6:
-#line 51 "pascal.y"
-                                                       {(yyval.stml)=(yyvsp[-2].stml);(yyval.stml)->add_statement((yyvsp[-1].stm));}
-#line 1279 "pascal.cpp"
+#line 105 "pascal.y"
+                                                                     {(yyval.routineh)=new RoutineHead((yyvsp[-4].labelp),(yyvsp[-3].constp),(yyvsp[-2].typep),(yyvsp[-1].varp),(yyvsp[0].routinep));}
+#line 1559 "pascal.cpp"
     break;
 
   case 7:
-#line 52 "pascal.y"
-                                                        {(yyval.stml)=new StatementList();}
-#line 1285 "pascal.cpp"
+#line 107 "pascal.y"
+             {(yyval.labelp)=new LabelPart();}
+#line 1565 "pascal.cpp"
     break;
 
   case 8:
-#line 54 "pascal.y"
-                {(yyval.stm)=new Statement((yyvsp[0].idt));}
-#line 1291 "pascal.cpp"
+#line 109 "pascal.y"
+                                       {(yyval.constp)=new ConstPart((yyvsp[0].constel));}
+#line 1571 "pascal.cpp"
+    break;
+
+  case 9:
+#line 110 "pascal.y"
+                                       {(yyval.constp)=new ConstPart();}
+#line 1577 "pascal.cpp"
+    break;
+
+  case 10:
+#line 112 "pascal.y"
+                                             {(yyval.constel)=(yyvsp[-1].constel); (yyval.constel)->add((yyvsp[0].conste));}
+#line 1583 "pascal.cpp"
+    break;
+
+  case 11:
+#line 113 "pascal.y"
+                                             {(yyval.constel)=new ConstExprList(); (yyval.constel)->add((yyvsp[0].conste));}
+#line 1589 "pascal.cpp"
+    break;
+
+  case 12:
+#line 115 "pascal.y"
+                                                {(yyval.conste)=new ConstExpr((yyvsp[-3].idt),(yyvsp[-1].constv));}
+#line 1595 "pascal.cpp"
+    break;
+
+  case 13:
+#line 117 "pascal.y"
+                  {(yyval.constv)=new ConstValue((yyvsp[0].num));}
+#line 1601 "pascal.cpp"
+    break;
+
+  case 14:
+#line 118 "pascal.y"
+                   {(yyval.constv)=new ConstValue((yyvsp[0].real));}
+#line 1607 "pascal.cpp"
+    break;
+
+  case 15:
+#line 119 "pascal.y"
+                   {(yyval.constv)=new ConstValue((yyvsp[0].chr));}
+#line 1613 "pascal.cpp"
+    break;
+
+  case 16:
+#line 120 "pascal.y"
+                  {std::string tmp = (yyvsp[0].str); (yyval.constv)=new ConstValue(tmp);}
+#line 1619 "pascal.cpp"
+    break;
+
+  case 17:
+#line 121 "pascal.y"
+                        {(yyval.constv)=new ConstValue(ConstValue::TRUE);}
+#line 1625 "pascal.cpp"
+    break;
+
+  case 18:
+#line 122 "pascal.y"
+                         {(yyval.constv)=new ConstValue(ConstValue::FALSE);}
+#line 1631 "pascal.cpp"
+    break;
+
+  case 19:
+#line 124 "pascal.y"
+                                   {(yyval.typep)=new TypePart((yyvsp[0].tdl));}
+#line 1637 "pascal.cpp"
+    break;
+
+  case 20:
+#line 125 "pascal.y"
+                                   {(yyval.typep)=new TypePart();}
+#line 1643 "pascal.cpp"
+    break;
+
+  case 21:
+#line 127 "pascal.y"
+                                       {(yyval.tdl)=(yyvsp[-1].tdl); (yyval.tdl)->add((yyvsp[0].typedefi));}
+#line 1649 "pascal.cpp"
+    break;
+
+  case 22:
+#line 128 "pascal.y"
+                                       {(yyval.tdl)=new TypeDecList(); (yyval.tdl)->add((yyvsp[0].typedefi));}
+#line 1655 "pascal.cpp"
+    break;
+
+  case 23:
+#line 130 "pascal.y"
+                                           {(yyval.typedefi)=new TypeDef((yyvsp[-3].idt),(yyvsp[-1].typedec));}
+#line 1661 "pascal.cpp"
+    break;
+
+  case 24:
+#line 132 "pascal.y"
+                       {(yyval.typedec)=new TypeDec((yyvsp[0].simplet));}
+#line 1667 "pascal.cpp"
+    break;
+
+  case 25:
+#line 133 "pascal.y"
+                         {(yyval.typedec)=new TypeDec((yyvsp[0].arrayt));}
+#line 1673 "pascal.cpp"
+    break;
+
+  case 26:
+#line 134 "pascal.y"
+                          {(yyval.typedec)=new TypeDec((yyvsp[0].recordt));}
+#line 1679 "pascal.cpp"
+    break;
+
+  case 27:
+#line 136 "pascal.y"
+                       {(yyval.simplet)=new SimpleType((yyvsp[0].syst));}
+#line 1685 "pascal.cpp"
+    break;
+
+  case 28:
+#line 137 "pascal.y"
+                  {(yyval.simplet)=new SimpleType((yyvsp[0].idt));}
+#line 1691 "pascal.cpp"
+    break;
+
+  case 29:
+#line 138 "pascal.y"
+                                          {(yyval.simplet)=new SimpleType((yyvsp[-1].idl));}
+#line 1697 "pascal.cpp"
+    break;
+
+  case 30:
+#line 139 "pascal.y"
+                         {(yyval.simplet)=new SimpleType((yyvsp[0].ranget));}
+#line 1703 "pascal.cpp"
+    break;
+
+  case 31:
+#line 141 "pascal.y"
+                     {(yyval.syst)=new SysType(SysType::BOOLEAN);}
+#line 1709 "pascal.cpp"
+    break;
+
+  case 32:
+#line 142 "pascal.y"
+                        {(yyval.syst)=new SysType(SysType::CHAR);}
+#line 1715 "pascal.cpp"
+    break;
+
+  case 33:
+#line 143 "pascal.y"
+                       {(yyval.syst)=new SysType(SysType::INTEGER);}
+#line 1721 "pascal.cpp"
+    break;
+
+  case 34:
+#line 144 "pascal.y"
+                        {(yyval.syst)=new SysType(SysType::REAL);}
+#line 1727 "pascal.cpp"
+    break;
+
+  case 35:
+#line 145 "pascal.y"
+                          {(yyval.syst)=new SysType(SysType::STRING);}
+#line 1733 "pascal.cpp"
+    break;
+
+  case 36:
+#line 147 "pascal.y"
+                                              {(yyval.ranget)=new RangeType((yyvsp[-2].constv),(yyvsp[0].constv),false,false);}
+#line 1739 "pascal.cpp"
+    break;
+
+  case 37:
+#line 148 "pascal.y"
+                                                      {(yyval.ranget)=new RangeType((yyvsp[-2].constv),(yyvsp[0].constv), true,false);}
+#line 1745 "pascal.cpp"
+    break;
+
+  case 38:
+#line 149 "pascal.y"
+                                                             {(yyval.ranget)=new RangeType((yyvsp[-3].constv),(yyvsp[0].constv), true,true);}
+#line 1751 "pascal.cpp"
+    break;
+
+  case 39:
+#line 150 "pascal.y"
+                                                      {(yyval.ranget)=new RangeType((yyvsp[-3].constv),(yyvsp[0].constv), false,true);}
+#line 1757 "pascal.cpp"
+    break;
+
+  case 40:
+#line 151 "pascal.y"
+                               {(yyval.ranget)=new RangeType((yyvsp[-2].idt), (yyvsp[0].idt));}
+#line 1763 "pascal.cpp"
+    break;
+
+  case 41:
+#line 153 "pascal.y"
+                                                                     {(yyval.arrayt)=new ArrayType((yyvsp[-3].simplet),(yyvsp[0].typedec));}
+#line 1769 "pascal.cpp"
+    break;
+
+  case 42:
+#line 155 "pascal.y"
+                                              {(yyval.recordt)=new RecordType((yyvsp[-1].vdl));}
+#line 1775 "pascal.cpp"
+    break;
+
+  case 43:
+#line 157 "pascal.y"
+                                {(yyval.varp)=new VarPart((yyvsp[0].vdl));}
+#line 1781 "pascal.cpp"
+    break;
+
+  case 44:
+#line 158 "pascal.y"
+                                {(yyval.varp)=new VarPart();}
+#line 1787 "pascal.cpp"
+    break;
+
+  case 45:
+#line 160 "pascal.y"
+                                    {(yyval.vdl)=(yyvsp[-1].vdl); (yyval.vdl)->add((yyvsp[0].vard));}
+#line 1793 "pascal.cpp"
+    break;
+
+  case 46:
+#line 161 "pascal.y"
+                      {(yyval.vdl)=new VarDecList(); (yyval.vdl)->add((yyvsp[0].vard));}
+#line 1799 "pascal.cpp"
+    break;
+
+  case 47:
+#line 163 "pascal.y"
+                                                 {(yyval.vard)=new VarDec((yyvsp[-3].idl), (yyvsp[-1].typedec));}
+#line 1805 "pascal.cpp"
+    break;
+
+  case 48:
+#line 165 "pascal.y"
+                               {(yyval.idl)=(yyvsp[-2].idl); (yyval.idl)->add((yyvsp[0].idt));}
+#line 1811 "pascal.cpp"
+    break;
+
+  case 49:
+#line 166 "pascal.y"
+                  {(yyval.idl)=new IDList(); (yyval.idl)->add((yyvsp[0].idt));}
+#line 1817 "pascal.cpp"
+    break;
+
+  case 50:
+#line 168 "pascal.y"
+               {(yyval.routinep)=new RoutinePart();}
+#line 1823 "pascal.cpp"
+    break;
+
+  case 51:
+#line 170 "pascal.y"
+               {(yyval.routineb)=new RoutineBody();}
+#line 1829 "pascal.cpp"
     break;
 
 
-#line 1295 "pascal.cpp"
+#line 1833 "pascal.cpp"
 
       default: break;
     }
@@ -1490,7 +2028,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 56 "pascal.y"
+#line 171 "pascal.y"
 
 
 int main() {

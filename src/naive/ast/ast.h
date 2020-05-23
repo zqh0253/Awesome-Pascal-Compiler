@@ -21,11 +21,6 @@ class RoutinePart;
 class ConstExpr;
 class ConstExprList;
 class ConstValue;
-    class Integer;
-    class Real;
-    class Char;
-    class String;
-    class SysCon;
 class TypeDecList;
 class TypeDec;
 class TypeDef;
@@ -194,60 +189,45 @@ class ConstExpr : public Node {
 class ConstValue : public Node {
     // Integer | Real | Char | String | SYS_CON
     public:
-        ConstValue(){
-            this->is_leaf = false;
+        enum {INTEGER, REAL, CHAR, STRING, SYSCON} type;
+        enum SYSCON {FALSE, TRUE, MAXINT} sys_con;
+        ConstValue(int i){
+            this->type = INTEGER;
+            this->integer = i;
+            this->is_leaf = true;
+            this->name = "ConstValue";
+        }
+        ConstValue(float f){
+            this->type = REAL;
+            this->real = f;
+            this->is_leaf = true;
+            this->name = "ConstValue";
+        }
+        ConstValue(char c){
+            this->type = CHAR;
+            this->ch = c;
+            this->is_leaf = true;
+            this->name = "ConstValue";
+        }
+        ConstValue(std::string s){
+            this->type = STRING;
+            this->str = s;
+            this->is_leaf = true;
+            this->name = "ConstValue";
+        }
+        ConstValue(enum SYSCON sc){
+            this->type = SYSCON;
+            this->sys_con = sc;
+            this->is_leaf = true;
             this->name = "ConstValue";
         }
         ~ConstValue() {}
-        std::vector<Node *> get_descendants();
-};
 
-class Integer : public ConstValue {
-    public:
-        Integer(int _num):integer(_num) {
-            this->is_leaf = true;
-            this->name = "Integer";
-        }
-        ~Integer() {}
-
-        const int integer;
-        std::vector<Node *> get_descendants();
-};
-
-class Real : public ConstValue {
-    public:
-        Real(float _real):real(_real) {
-            this->is_leaf = true;
-            this->name = "Real";
-        }
-        ~Real() {}
-
-        const float real;
-        std::vector<Node *> get_descendants();
-};
-
-class Char : public ConstValue {
-    public:
-        Char(char _chr):chr(_chr) {
-            this->is_leaf = true;
-            this->name = "Char";
-        }
-        ~Char() {}
-
-        const char chr;
-        std::vector<Node *> get_descendants();
-};
-
-class SysCon : public ConstValue {
-    // {0: "maxint", 1: "true", 2: "false"}
-    public:
-        SysCon(int _type):type(_type) {
-            this->is_leaf = true;
-            this->name = "SysCon";
-        }
-        ~SysCon() {}
-
-        int type;
+        int integer;
+        float real;
+        char ch;
+        std::string str;
+        
         std::vector<Node *> get_descendants();
 };
 
@@ -324,7 +304,7 @@ class TypeDec : public Node {
 
 class SimpleType : public Node {
     public:
-        enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE} type;
+        enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE, STRING} type;
         SimpleType(SysType * st):sys_type(st) {
             this->type = SYS_TYPE;
             this->is_leaf = false;
@@ -356,8 +336,9 @@ class SimpleType : public Node {
 
 class SysType : public Node {
     public:
-        enum type {BOOLEAN, CHAR, INTEGER, REAL} type;
-        SysType() {
+        enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING} type;
+        SysType(enum t type) {
+            this->type = type;
             this->is_leaf = true;
             this->name = "SysType";
         }
@@ -447,14 +428,14 @@ class VarDecList : public Node {
 class VarDec : public Node {
     // IDList COLON TypeDec SEMI
     public:
-        VarDec(IDList * il, VarDec * vd): id_list(il), var_dec(vd) {
+        VarDec(IDList * il, TypeDec * td): id_list(il), type_dec(td) {
             this->is_leaf = false;
             this->name = "VarDec";
         }    
         ~VarDec() {}
 
         IDList * id_list;
-        VarDec * var_dec;
+        TypeDec * type_dec;
         std::vector<Node *> get_descendants();
 };
 
