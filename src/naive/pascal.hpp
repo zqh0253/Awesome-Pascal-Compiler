@@ -102,43 +102,47 @@ extern int yydebug;
     REV_WHILE = 297,               /* REV_WHILE  */
     REV_WITH = 298,                /* REV_WITH  */
     REV_XOR = 299,                 /* REV_XOR  */
-    OP_ADD = 300,                  /* OP_ADD  */
-    OP_SUB = 301,                  /* OP_SUB  */
-    OP_MUL = 302,                  /* OP_MUL  */
-    OP_DIV = 303,                  /* OP_DIV  */
-    OP_EQ = 304,                   /* OP_EQ  */
-    OP_LT = 305,                   /* OP_LT  */
-    OP_GT = 306,                   /* OP_GT  */
-    OP_LBRAC = 307,                /* OP_LBRAC  */
-    OP_RBRAC = 308,                /* OP_RBRAC  */
-    OP_PERIOD = 309,               /* OP_PERIOD  */
-    OP_COMMA = 310,                /* OP_COMMA  */
-    OP_COLON = 311,                /* OP_COLON  */
-    OP_SEMICOLON = 312,            /* OP_SEMICOLON  */
-    OP_AT = 313,                   /* OP_AT  */
-    OP_CARET = 314,                /* OP_CARET  */
-    OP_LPAREN = 315,               /* OP_LPAREN  */
-    OP_RPAREN = 316,               /* OP_RPAREN  */
-    OP_NE = 317,                   /* OP_NE  */
-    OP_LEQ = 318,                  /* OP_LEQ  */
-    OP_GEQ = 319,                  /* OP_GEQ  */
-    OP_ASSIGN = 320,               /* OP_ASSIGN  */
-    OP_RANGE = 321,                /* OP_RANGE  */
-    TYPE_INT = 322,                /* TYPE_INT  */
-    TYPE_REAL = 323,               /* TYPE_REAL  */
-    TYPE_CHAR = 324,               /* TYPE_CHAR  */
-    TYPE_BOOL = 325,               /* TYPE_BOOL  */
-    TYPE_STRING = 326,             /* TYPE_STRING  */
-    BOOL_TRUE = 327,               /* BOOL_TRUE  */
-    BOOL_FALSE = 328,              /* BOOL_FALSE  */
-    IDT = 329,                     /* IDT  */
-    SIGN = 330,                    /* SIGN  */
-    INT = 331,                     /* INT  */
-    REAL = 332,                    /* REAL  */
-    CHAR = 333,                    /* CHAR  */
-    ESC_CHAR = 334,                /* ESC_CHAR  */
-    STR = 335,                     /* STR  */
-    COMMENT = 336                  /* COMMENT  */
+    REV_READ = 300,                /* REV_READ  */
+    REV_WRITE = 301,               /* REV_WRITE  */
+    REV_WRITELN = 302,             /* REV_WRITELN  */
+    OP_ADD = 303,                  /* OP_ADD  */
+    OP_SUB = 304,                  /* OP_SUB  */
+    OP_MOD = 305,                  /* OP_MOD  */
+    OP_MUL = 306,                  /* OP_MUL  */
+    OP_DIV = 307,                  /* OP_DIV  */
+    OP_EQ = 308,                   /* OP_EQ  */
+    OP_LT = 309,                   /* OP_LT  */
+    OP_GT = 310,                   /* OP_GT  */
+    OP_LBRAC = 311,                /* OP_LBRAC  */
+    OP_RBRAC = 312,                /* OP_RBRAC  */
+    OP_PERIOD = 313,               /* OP_PERIOD  */
+    OP_COMMA = 314,                /* OP_COMMA  */
+    OP_COLON = 315,                /* OP_COLON  */
+    OP_SEMICOLON = 316,            /* OP_SEMICOLON  */
+    OP_AT = 317,                   /* OP_AT  */
+    OP_CARET = 318,                /* OP_CARET  */
+    OP_LPAREN = 319,               /* OP_LPAREN  */
+    OP_RPAREN = 320,               /* OP_RPAREN  */
+    OP_NE = 321,                   /* OP_NE  */
+    OP_LEQ = 322,                  /* OP_LEQ  */
+    OP_GEQ = 323,                  /* OP_GEQ  */
+    OP_ASSIGN = 324,               /* OP_ASSIGN  */
+    OP_RANGE = 325,                /* OP_RANGE  */
+    TYPE_INT = 326,                /* TYPE_INT  */
+    TYPE_REAL = 327,               /* TYPE_REAL  */
+    TYPE_CHAR = 328,               /* TYPE_CHAR  */
+    TYPE_BOOL = 329,               /* TYPE_BOOL  */
+    TYPE_STRING = 330,             /* TYPE_STRING  */
+    BOOL_TRUE = 331,               /* BOOL_TRUE  */
+    BOOL_FALSE = 332,              /* BOOL_FALSE  */
+    IDT = 333,                     /* IDT  */
+    SIGN = 334,                    /* SIGN  */
+    INT = 335,                     /* INT  */
+    REAL = 336,                    /* REAL  */
+    CHAR = 337,                    /* CHAR  */
+    ESC_CHAR = 338,                /* ESC_CHAR  */
+    STR = 339,                     /* STR  */
+    COMMENT = 340                  /* COMMENT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -157,6 +161,7 @@ Program* program;
 ProgramHeading* programh;
 Routine* rout;
 ID* idt;
+IDDotted* idd;
 IDList* idl;
 RoutineHead* routineh;
 RoutineBody* routineb;
@@ -178,8 +183,33 @@ RecordType* recordt;
 SimpleType* simplet;
 VarDecList* vdl;
 VarDec* vard;
+SubProgram* subp;
+Parameters* param;
+ParaDecList* paradl;
+ParaTypeList* paratl;
+Statement* stmt;
+StatementList* stmtlst;
+AssignStmt* assignstmt;
+ProcStmt* procstmt;
+CompoundStmt* compoundstmt;
+IfStmt* ifstmt;
+RepeatStmt* repeatstmt;
+WhileStmt* whilestmt;
+ForStmt* forstmt;
+CaseStmt* casestmt;
+GotoStmt* gotostmt;
+Expression* texpression;
+Expr* texpr;
+Term* tterm;
+ArgsList* argslist;
+ExprList* exprlist;
+SysProc* sysproc;
+Factor* tfactor;
+ElseClause* elseclause;
+CaseExprList* caseexprlst;
+CaseExpr* caseexpr;
 
-#line 183 "pascal.hpp"
+#line 213 "pascal.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

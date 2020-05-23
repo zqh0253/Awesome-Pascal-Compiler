@@ -64,11 +64,15 @@ REV_VAR var
 REV_WHILE while
 REV_WITH with
 REV_XOR xor
+REV_READ read
+REV_WRITE write
+REV_WRITELN writeln
 
 OP_ADD "+"
 OP_SUB "-"
 OP_MUL "*"
 OP_DIV "/"
+OP_MOD "%"
 OP_EQ "="
 OP_LT "<"
 OP_GT ">"
@@ -176,6 +180,7 @@ COMMENT "{"[^\}]*"}"
 {OP_GEQ} {return OP_GEQ;}
 {OP_ASSIGN} {return OP_ASSIGN;}
 {OP_RANGE} {return OP_RANGE;}
+{OP_MOD} {return OP_MOD;}
 
 {TYPE_INT} {return TYPE_INT;}
 {TYPE_REAL} {return TYPE_REAL;}
@@ -224,7 +229,7 @@ COMMENT "{"[^\}]*"}"
 " "|\t {}
 
 . {
-    printf("unknown character %d\n", (int) yytext[0]);
+    printf("unknown character %c %d\n",yytext[0], (int) yytext[0]);
     return yytext[0];
 }
 

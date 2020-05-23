@@ -50,11 +50,15 @@ class ForStmt;
 class CaseStmt;
 class GotoStmt;
 class Expression;
+class Expr;
+class Term;
 class ArgsList;
 class ExprList;
 class SysProc;
 class Factor;
 class ElseClause;
+class CaseExprList;
+class CaseExpr;
 
 class Node {
     public:
@@ -581,47 +585,47 @@ class Statement : public Node {
     public:
         enum {ASSIGN, PROC, COMPOUND, IF, REPEAT, WHILE, FOR, CASE, GOTO} type;
         Statement (AssignStmt * as) : assign_stmt(as){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = ASSIGN;
             this->name = "Statement";
         }
         Statement (ProcStmt * ps) : proc_stmt(ps){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = PROC;
             this->name = "Statement";
         }
         Statement (CompoundStmt * cs) : compound_stmt(cs){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = COMPOUND;
             this->name = "Statement";
         }
         Statement (IfStmt * is) : if_stmt(is){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = IF;
             this->name = "Statement";
         }
         Statement (RepeatStmt * rs) : repeat_stmt(rs){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = REPEAT;
             this->name = "Statement";
         }
         Statement (WhileStmt * ws) : while_stmt(ws){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = WHILE;
             this->name = "Statement";
         }
         Statement (ForStmt * fs) : for_stmt(fs){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = FOR;
             this->name = "Statement";
         }
         Statement (CaseStmt * cs) : case_stmt(cs){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = CASE;
             this->name = "Statement";
         }
         Statement (GotoStmt * gs) : goto_stmt(gs){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->type = GOTO;
             this->name = "Statement";
         }
@@ -637,6 +641,61 @@ class Statement : public Node {
         GotoStmt * goto_stmt;
 
         void set_anchor(int a);
+        std::vector<Node *> get_descendants();
+};
+
+class CaseStmt : public Node {
+    public:
+        CaseStmt(Expression * e, CaseExprList * c):expr(e), case_expr_list(c){
+            this->is_leaf = false;
+            this->name = "Case Statement";
+        }
+        ~CaseStmt() {}
+        Expression * expr;
+        CaseExprList * case_expr_list;
+        std::vector<Node *> get_descendants();
+};
+
+class CaseExprList : public Node {
+    public:
+        CaseExprList () {
+            this->is_leaf = false;
+            this->name = "CaseExprList";
+        }
+        ~CaseExprList () {}
+
+        std::vector<CaseExpr *> case_expr_list;
+        void add(CaseExpr *);
+        std::vector<Node *> get_descendants();
+};
+
+class CaseExpr : public Node {
+    public:
+        enum o {CONST, IDENTIFY} type;
+        CaseExpr (ConstValue * cv, Statement * s): const_value(cv), stmt(s){
+            this->is_leaf = false;
+            this->name = "CaseExpr";
+            this->type = CONST;
+        }
+        CaseExpr (IDDotted * _id, Statement * s):idd(_id), stmt(s){
+            this->is_leaf = false;
+            this->name = "CaseExpr";
+            this->type = IDENTIFY;
+        }
+        ConstValue * const_value;
+        IDDotted * idd;
+        Statement * stmt;
+        std::vector<Node *> get_descendants();
+};
+
+class GotoStmt : public Node {
+    public:
+        GotoStmt(int i):destination(i) {
+            this->is_leaf = true;
+            this->name = "Goto Statement";
+        }
+
+        int destination;
         std::vector<Node *> get_descendants();
 };
 
@@ -691,6 +750,8 @@ class ProcStmt : public Node {
             this->type = SYS_PROC_WITH_EXPR;
         }
         ProcStmt(SysProc * sp, Factor * f): sys_proc(sp), factor(f) {
+
+        //SHOULD check the sysproc is READ only!
             this->is_leaf = false;
             this->name = "Proc Statement";
             this->type = READ_FACTOR;
@@ -742,6 +803,8 @@ class RepeatStmt : public Node {
 
         StatementList * stmt_list;
         Expression * expr;
+
+        std::vector<Node *> get_descendants();
 };
 
 class WhileStmt : public Node {
@@ -758,20 +821,18 @@ class WhileStmt : public Node {
 
 class ForStmt : public Node {
     public:
-        ForStmt (IDDotted * i, Expression * e1, Expression * e2, enum d di, Statement * s): idd(i), expr1(e1), expr2(e2), direction(di), stmt(s) {
+        enum d {TO, DOWNTO} direction;
+        ForStmt (IDDotted * i, Expression * e1, Expression * e2, Statement * s, enum d di): idd(i), expr1(e1), expr2(e2), direction(di), stmt(s) {
             this->is_leaf = false;
             this->name = "For Statement";
         }
 
         IDDotted * idd;
         Expression * expr1, * expr2;
-        enum d {TO, DOWNTO} direction;
         Statement * stmt;
 
         std::vector<Node *> get_descendants();
 };
-
-
 
 class SysProc : public Node {
     public:
@@ -798,18 +859,136 @@ class IDDotted : public Node {
 };
 
 class Expression : public Node {
+    public:
+        enum o {GE, GT, LE, LT, EQ, NE, SINGLE} op;
+        Expression (Expression * e1, enum o _op, Expr * e2): expression(e1), expr(e2), op(_op) {
+            this->is_leaf = false;
+            this->name = "Expression";
+        }
+        Expression (Expr * e) : expr(e) {
+            this->is_leaf = false;
+            this->name = "Expression";
+            op = SINGLE;
+        }
+        
+        Expression * expression;
+        Expr * expr;
 
+        std::vector<Node *> get_descendants();
+};
+
+class Expr : public Node {
+    public:
+        enum o {PULS, MINUS, OR, SINGLE} op;
+        Expr (Expr * e, enum o _op, Term * t): expr(e), term(t), op(_op) {
+            this->is_leaf = false;
+            this->name = "Expr";
+        }
+        Expr (Term *t) : term(t) {
+            this->is_leaf = false;
+            this->name = "Expr";
+            op = SINGLE;
+        }
+
+        Expr * expr;
+        Term * term;
+
+        std::vector<Node *> get_descendants();
+};
+
+class Term : public Node {
+    public:
+        enum o {MUL, DIV, MOD, AND, SINGLE} op;
+        Term (Term * t, enum o _op, Factor * f) : term(t), factor(f), op(_op) {
+            this->is_leaf = false;
+            this->name = "Term";
+        }
+        Term (Factor * f) : factor(f) {
+            this->is_leaf = false;
+            this->name = "Term"; 
+            op = SINGLE;
+        }
+
+        Term * term;
+        Factor * factor;
+
+        std::vector<Node *> get_descendants();
+};
+
+class Factor : public Node {
+    public:
+        enum t {FUNC_WITH_NO_ARGS, 
+                FUNC,
+                CONST_VALUE, 
+                EXPRESSION,
+                NOT_FACTOR,
+                MINUS_FACTOR,
+                ARRAY,
+                MEMBER
+        } type;
+        Factor (ID * i) : id1(i) {
+            this->is_leaf = false;
+            this->name = "Factor";
+            type = FUNC_WITH_NO_ARGS;
+        }
+        Factor (ID * i, ArgsList * al) : id1(i), args_list(al) {
+            this->is_leaf = false;
+            this->name = "Factor";
+            type = FUNC;
+        }
+        Factor (ConstValue * cv) : const_value(cv) {
+            this->is_leaf = false;
+            this->name = "Factor";
+            type = CONST_VALUE;
+        }
+        Factor (Expression * e) : expr(e) {
+            this->is_leaf = false;
+            this->name = "Factor";
+            type = EXPRESSION;
+        }
+        Factor (Factor * f, enum t ty) : factor(f), type(ty) {
+            this->is_leaf = false;
+            this->name = "Factor";
+        }
+        Factor (IDDotted * i, Expression * e) : idd(i), expr(e) {
+            this->is_leaf = false;
+            this->name = "Factor";
+            type = ARRAY;
+        }
+        Factor (IDDotted * i) : idd(i){
+            this->is_leaf = false;
+            this->name = "Factor";
+            type = MEMBER;
+        }
+        ~Factor() {}
+        ID * id1;
+        IDDotted * idd;
+        ArgsList * args_list;
+        ConstValue * const_value;
+        Expression * expr;
+        Factor * factor;
+
+        std::vector<Node *> get_descendants();
 };
 
 class ArgsList : public Node {
+    public:
+        ArgsList () {}
+        ~ArgsList () {}
 
+        std::vector<Expression *> args_list;
+        void add(Expression *);
+        std::vector<Node *> get_descendants();
 };
 
 class ExprList: public Node {
+    public:
+        ExprList () {}
+        ~ExprList () {}
 
+        std::vector<Expression *> expr_list;
+        void add(Expression *);
+        std::vector<Node *> get_descendants();
 };
 
 #endif
-
-// TODO: ADD virtual function, name to each class
-// TODO: template class
