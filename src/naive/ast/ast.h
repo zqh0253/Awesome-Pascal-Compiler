@@ -10,6 +10,7 @@ class Program;
 class ProgramHeading;
 class Routine;
 class ID;
+class IDDotted; // For example, a.teacher.house.block.name. This feature is not supported by the document provided by the instructor.
 class IDList;
 class RoutineHead;
 class RoutineBody;
@@ -38,6 +39,7 @@ class ParaDecList;
 class ParaTypeList;
 
 class Statement;
+class StatementList;
 class AssignStmt;
 class ProcStmt;
 class CompoundStmt;
@@ -48,6 +50,11 @@ class ForStmt;
 class CaseStmt;
 class GotoStmt;
 class Expression;
+class ArgsList;
+class ExprList;
+class SysProc;
+class Factor;
+class ElseClause;
 
 class Node {
     public:
@@ -536,14 +543,37 @@ class ParaTypeList : public Node {
 
 class RoutineBody : public Node {
     public:
-        RoutineBody(){
+        RoutineBody(CompoundStmt * cs): compound_stmt(cs){
             this->is_leaf = false;
             this->name = "RoutineBody";
         }
         ~RoutineBody() {}
 
-        std::vector<Statement *> statement_list;
+        CompoundStmt * compound_stmt;
+        std::vector<Node *> get_descendants();
+};
+
+class CompoundStmt : public Node {
+    public:
+        CompoundStmt(StatementList * sl):stmt_list(sl){
+            this->is_leaf = false;
+            this->name = "Compound statement";
+        }
+
+        StatementList * stmt_list;
+        std::vector<Node *> get_descendants();
+};
+
+class StatementList : public Node {
+    public:
+        StatementList () {
+            this->is_leaf = false;
+            this->name = "Statement List";
+        }
+
+        std::vector<Statement *> stmt_list;
         void add(Statement *);
+
         std::vector<Node *> get_descendants();
 };
 
@@ -612,14 +642,170 @@ class Statement : public Node {
 
 class AssignStmt : public Node {
     public:
-        // single : a := 1;
-        // array  : a[1] := 1;
-        // member : a.score := 1; 
-        enum {SINGLE, ARRAY, MEMBER} type;
-        
+        // single : a := 1; OR a.member := 1;
+        // array  : a[1] := 1; 
+        enum {SINGLE, ARRAY} type;
+        AssignStmt (IDDotted * i, Expression * e): idd(i), e1(e){
+            this->is_leaf = false;
+            this->name = "Assign Statement";
+            this->type = SINGLE;
+        }
+        AssignStmt (IDDotted * i, Expression * _e1, Expression * _e2) : idd(i), e1(_e1), e2(_e2){
+            this->is_leaf = false;
+            this->name = "Assign Statement";
+            this->type = ARRAY;
+        } 
+        ~AssignStmt () {}
+        IDDotted * idd;
+        Expression * e1,* e2;
+
+        std::vector<Node *> get_descendants();
+};
+
+class ProcStmt : public Node {
+    public:
+        enum { SINGLE_ID,               // ID
+                ID_WITH_ARGS,           // ID LP args_list RP
+                SYS_PROC,               // SYS_PROC
+                SYS_PROC_WITH_EXPR,     // SYS_PROC LP expr_list RP
+                READ_FACTOR             // If the sys_proc is read
+             } type;
+        ProcStmt(ID * _id): id(_id) {
+            this->is_leaf = false;
+            this->name = "Proc Statement";
+            this->type = SINGLE_ID;
+        }
+        ProcStmt(ID * _id, ArgsList * al): id(_id), args_list(al) {
+            this->is_leaf = false;
+            this->name = "Proc Statement";
+            this->type = ID_WITH_ARGS;
+        }
+        ProcStmt(SysProc * sp): sys_proc(sp) {
+            this->is_leaf = false;
+            this->name = "Proc Statement";
+            this->type = SYS_PROC;
+        }
+        ProcStmt(SysProc * sp, ExprList * el): sys_proc(sp), expr_list(el) {
+            this->is_leaf = false;
+            this->name = "Proc Statement";
+            this->type = SYS_PROC_WITH_EXPR;
+        }
+        ProcStmt(SysProc * sp, Factor * f): sys_proc(sp), factor(f) {
+            this->is_leaf = false;
+            this->name = "Proc Statement";
+            this->type = READ_FACTOR;
+        }
+        ~ProcStmt() {}
+
+        ID * id;
+        ArgsList * args_list;
+        SysProc * sys_proc;
+        ExprList * expr_list;
+        Factor * factor;
+        std::vector<Node *> get_descendants();
+};
+
+class IfStmt : public Node {
+    public:
+        IfStmt (Expression * e, Statement * s, ElseClause * ec): expr(e), stmt(s), else_clause(ec) {
+            this->is_leaf = false;
+            this->name = "If statement";
+        }
+
+        Expression * expr;
+        Statement * stmt;
+        ElseClause * else_clause;
+        std::vector<Node *> get_descendants();
+};
+
+class ElseClause : public Node {
+    public:
+        ElseClause () {
+            this->is_leaf = true;
+            this->name = "Else Clause";
+        }
+        ElseClause (Statement * s):stmt(s) {
+            this->is_leaf = false;
+            this->name = "Else Clause";
+        }
+
+        Statement * stmt;
+        std::vector<Node *> get_descendants();
+};
+
+class RepeatStmt : public Node {
+    public:
+        RepeatStmt (StatementList * sl, Expression * e) : stmt_list(sl), expr(e) {
+            this->is_leaf = false;
+            this->name = "Repeat Statement";
+        }
+
+        StatementList * stmt_list;
+        Expression * expr;
+};
+
+class WhileStmt : public Node {
+    public:
+        WhileStmt (Expression * e, Statement * s) : expr(e), stmt(s) {
+            this->is_leaf = false;
+            this->name = "While Statement";
+        }
+        Expression * expr;
+        Statement * stmt;
+
+        std::vector<Node *> get_descendants();
+};
+
+class ForStmt : public Node {
+    public:
+        ForStmt (IDDotted * i, Expression * e1, Expression * e2, enum d di, Statement * s): idd(i), expr1(e1), expr2(e2), direction(di), stmt(s) {
+            this->is_leaf = false;
+            this->name = "For Statement";
+        }
+
+        IDDotted * idd;
+        Expression * expr1, * expr2;
+        enum d {TO, DOWNTO} direction;
+        Statement * stmt;
+
+        std::vector<Node *> get_descendants();
+};
+
+
+
+class SysProc : public Node {
+    public:
+        enum t {WRITE, WRITELN, READ} type;
+        SysProc (enum t ty): type(ty) {
+            this->is_leaf = true;
+            this->name = "SysProc";
+        }
+        ~SysProc() {}
+
+        std::vector<Node *> get_descendants();
+};
+
+class IDDotted : public Node {
+    public:
+        IDDotted() {
+            this->is_leaf = false;
+            this->name = "ID_dotted";
+        }
+
+        std::vector<ID *> id_list;
+        void add(ID *);
+        std::vector<Node *> get_descendants();
 };
 
 class Expression : public Node {
+
+};
+
+class ArgsList : public Node {
+
+};
+
+class ExprList: public Node {
 
 };
 
