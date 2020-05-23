@@ -18,11 +18,20 @@ char chr;
 int num;
 double real;
 Program* program;
-ProgramHeading* ph;
-ProgramBlock* pb;
+ProgramHeading* programh;
+Routine* rout;
 ID* idt;
-Statement* stm;
-StatementList* stml;
+IDList* idl;
+RoutineHead* routineh;
+RoutineBody* routineb;
+LabelPart* labelp;
+ConstPart* constp;
+TypePart* typep;
+VarPart* varp;
+RoutinePart* routinep;
+ConstExpr* conste;
+ConstExprList* constel;
+
 char *str;
 }
 

@@ -34,6 +34,8 @@ class RangeType;
 class ArrayType;
 class RecordType;
 class SimpleType;
+class VarDecList;
+class VarDec;
 
 class Node {
     public:
@@ -76,11 +78,15 @@ class ID : public Node {
 
 class IDList : public Node {
     public:
-        IDList (){}
+        IDList (){
+            this->is_leaf = false;
+            this->name = "IDList";
+        }
         ~IDList (){}
 
         std::vector<ID *> ID_list;
         void add(ID *);
+        std::vector<Node *> get_descendants();
 };
 
 class ProgramHeading : public Node {
@@ -113,7 +119,10 @@ class Routine : public Node {
 class RoutineHead : public Node {
     public:
         RoutineHead(LabelPart * lp, ConstPart * cp, TypePart * tp, VarPart * vp, RoutinePart * rp): 
-            label_part(lp), const_part(cp), type_part(tp), var_part(vp), routine_part(rp) {}
+            label_part(lp), const_part(cp), type_part(tp), var_part(vp), routine_part(rp) {
+            this->is_leaf = false;
+            this->name = "RoutineHead";
+        }
         ~RoutineHead() {}
 
         LabelPart * label_part;
@@ -121,180 +130,352 @@ class RoutineHead : public Node {
         TypePart * type_part;
         VarPart * var_part;
         RoutinePart * routine_part;
+
+        std::vector<Node *> get_descendants();
 };
 
 class LabelPart : public Node {
     // Empty class
     public:
-        LabelPart(){}
+        LabelPart(){
+            this->is_leaf = true;
+            this->name = "LabelPart";
+        }
         ~LabelPart(){}
+
+        std::vector<Node *> get_descendants();
 };
 
 class ConstPart : public Node {
     public:
-        ConstPart(ConstExprList * cel): const_expr_list(cel){}
+        ConstPart():is_empty(true) {
+            this->is_leaf = true;
+            this->name = "ConstPart";
+        }
+        ConstPart(ConstExprList * cel): const_expr_list(cel), is_empty(false){
+            this->is_leaf = false;
+            this->name = "ConstPart";
+        }
         ~ConstPart(){}
 
         ConstExprList* const_expr_list;
+        bool is_empty;
+        std::vector<Node *> get_descendants();
 };
 
 class ConstExprList : public Node {
     public:
-        ConstExprList() {}
+        ConstExprList() {
+            this->is_leaf = false;
+            this->name = "ConstExprList";
+        }
         ~ConstExprList() {}
 
         std::vector<ConstExpr *> const_expr_list;
 
         void add(ConstExpr * ce);
+        std::vector<Node *> get_descendants();
 };
 
 class ConstExpr : public Node {
     // NAME EQUAL const_value SEMI
     public:
-        ConstExpr(ConstValue * cv): const_value(cv) {}
+        ConstExpr(ID * _id, ConstValue * cv): id(_id), const_value(cv) {
+            this->is_leaf = false;
+            this->name = "ConstExpr";
+        }
         ~ConstExpr() {}
 
+        ID * id;
         ConstValue * const_value;
+        std::vector<Node *> get_descendants();
 };
 
 class ConstValue : public Node {
     // Integer | Real | Char | String | SYS_CON
     public:
-        ConstValue(){}
+        ConstValue(){
+            this->is_leaf = false;
+            this->name = "ConstValue";
+        }
         ~ConstValue() {}
+        std::vector<Node *> get_descendants();
 };
 
 class Integer : public ConstValue {
     public:
-        Integer(int _num):integer(_num) {}
+        Integer(int _num):integer(_num) {
+            this->is_leaf = true;
+            this->name = "Integer";
+        }
         ~Integer() {}
 
         const int integer;
+        std::vector<Node *> get_descendants();
 };
 
 class Real : public ConstValue {
     public:
-        Real(float _real):real(_real) {}
+        Real(float _real):real(_real) {
+            this->is_leaf = true;
+            this->name = "Real";
+        }
         ~Real() {}
 
         const float real;
+        std::vector<Node *> get_descendants();
 };
 
 class Char : public ConstValue {
     public:
-        Char(char _chr):chr(_chr) {}
+        Char(char _chr):chr(_chr) {
+            this->is_leaf = true;
+            this->name = "Char";
+        }
         ~Char() {}
 
         const char chr;
+        std::vector<Node *> get_descendants();
 };
 
 class SysCon : public ConstValue {
     // {0: "maxint", 1: "true", 2: "false"}
     public:
-        SysCon(int _type):type(_type) {}
+        SysCon(int _type):type(_type) {
+            this->is_leaf = true;
+            this->name = "SysCon";
+        }
         ~SysCon() {}
 
         int type;
+        std::vector<Node *> get_descendants();
 };
 
 class TypePart : public Node {
     // TYPE TypeDeclList | epsilon
     public:
-        TypePart(TypeDecList * tdl): type_dec_list(tdl){}
+        TypePart():is_empty(true) {
+            this->is_leaf = true;
+            this->name = "TypePart";
+        }
+        TypePart(TypeDecList * tdl): type_dec_list(tdl), is_empty(false){
+            this->is_leaf = false;
+            this->name = "TyepPart";
+        }
         ~TypePart(){}
 
         TypeDecList * type_dec_list;
+        bool is_empty;
+        std::vector<Node *> get_descendants();
 };
 
 class TypeDecList : public Node {
     public:
-        TypeDecList() {}
+        TypeDecList() {
+            this->is_leaf = false;
+            this->name = "TypeDecList";
+        }
         ~TypeDecList() {}
 
         std::vector<TypeDef *> type_definition_list;
         void add(TypeDef * td);
+        std::vector<Node *> get_descendants();
 };
 
 class TypeDef : public Node {
     // NAME EQUAL TypeDec SEMI
     public:
-        TypeDef(TypeDec * td):type_dec(td) {}
+        TypeDef(ID * _id, TypeDec * td):id(_id), type_dec(td) {
+            this->is_leaf = false;
+            this->name = "TypeDef";
+        }
         ~TypeDef() {}
 
+        ID * id;
         TypeDec * type_dec;
+        std::vector<Node *> get_descendants();
 };
 
 class TypeDec : public Node {
     public:
         enum type {SIMPLE, ARRAY, RECORD} type;
-        TypeDec() {}
-        TypeDec(SimpleType * st):simple_type(st) {}
-        TypeDec(ArrayType * at):array_type(at) {}
-        TypeDec(RecordType * rt):record_type(rt) {}
+        TypeDec(SimpleType * st):simple_type(st) {
+            this->type = SIMPLE;
+            this->is_leaf = false;
+            this->name = "TypeDec";
+        }
+        TypeDec(ArrayType * at):array_type(at) {
+            this->type = ARRAY;
+            this->is_leaf = false;
+            this->name = "TypeDec";
+        }
+        TypeDec(RecordType * rt):record_type(rt) {
+            this->type = RECORD;
+            this->is_leaf = false;
+            this->name = "TypeDec";
+        }
         ~TypeDec() {}
 
         SimpleType * simple_type;
         ArrayType * array_type;
         RecordType * record_type;
+        std::vector<Node *> get_descendants();
 };
 
 class SimpleType : public Node {
     public:
         enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE} type;
-        SimpleType() {}
-        SimpleType(SysType * st):sys_type(st) {}
-        SimpleType(ID * _id):id(_id) {}
-        SimpleType(IDList * il):id_list(il) {}
-        SimpleType(RangeType * rt):range_type(rt) {}
+        SimpleType(SysType * st):sys_type(st) {
+            this->type = SYS_TYPE;
+            this->is_leaf = false;
+            this->name = "SimpleType";
+        }
+        SimpleType(ID * _id):id(_id) {
+            this->type = IDENTIFY;
+            this->is_leaf = false;
+            this->name = "SimpleType";
+        }
+        SimpleType(IDList * il):id_list(il) {
+            this->type = IDLIST;
+            this->is_leaf = false;
+            this->name = "SimpleType";
+        }
+        SimpleType(RangeType * rt):range_type(rt) {
+            this->type = RANGE;
+            this->is_leaf = false;
+            this->name = "SimpleType";
+        }
         ~SimpleType() {}
 
         SysType * sys_type;
         ID * id;
         IDList * id_list;
         RangeType * range_type;
+        std::vector<Node *> get_descendants();
 };
 
 class SysType : public Node {
     public:
-        enum type {BOOLEAN, CHAR, INTEGER, REAL};
-        SysType() {}
+        enum type {BOOLEAN, CHAR, INTEGER, REAL} type;
+        SysType() {
+            this->is_leaf = true;
+            this->name = "SysType";
+        }
         ~SysType() {}
 
-        static std::string type_name[4];
-        // TODO: to initialize type_name
+        std::vector<Node *> get_descendants();
 };
 
 class RangeType : public Node {
     public:
-        RangeType(ID * id1, ID * id2): left_id(id1), right_id(id2) {}
-        RangeType(ConstValue * lc, ConstValue * rc, bool lm, bool rm): left_const(lc), right_const(rc), left_minus(lm), right_minus(rm) {}
+        enum type {IDENTIFY, CONST} type;
+        RangeType(ID * id1, ID * id2): left_id(id1), right_id(id2) {
+            this->type = IDENTIFY;
+            this->is_leaf = false;
+            this->name = "RangeType";
+        }
+        RangeType(ConstValue * lc, ConstValue * rc, bool lm, bool rm): left_const(lc), right_const(rc), left_minus(lm), right_minus(rm) {
+            this->type = CONST;
+            this->is_leaf = false;
+            this->name = "RangeType";
+        }
         ~RangeType() {}
 
         ID * left_id, * right_id;
         ConstValue * left_const, * right_const;
         bool left_minus, right_minus;
+        std::vector<Node *> get_descendants();
 };
 
 class ArrayType : public Node {
     // ARRAY (SimpleType) OF TypeDec
     public:
-        ArrayType(SimpleType * st, TypeDec * td): simple_type(st), type_dec(td) {}
+        ArrayType(SimpleType * st, TypeDec * td): simple_type(st), type_dec(td) {
+            this->is_leaf = false;
+            this->name = "ArrayType";
+        }
         ~ArrayType() {}
 
         SimpleType * simple_type;
         TypeDec * type_dec; 
+        std::vector<Node *> get_descendants();
+};
+
+class RecordType : public Node {
+    // RECORD VarDecList END
+    public:
+        RecordType(VarDecList * vdl):record_dec_list(vdl){
+            this->is_leaf = false;
+            this->name = "RecordType";
+        }
+        ~RecordType() {}
+
+        VarDecList * record_dec_list;
+        std::vector<Node *> get_descendants();
 };
 
 class VarPart : public Node {
+    public:
+        VarPart():is_empty(true) {
+            this->is_leaf = true;
+            this->name = "VarPart";
+        }
+        VarPart(VarDecList * vdl):var_dec_list(vdl), is_empty(false) {
+            this->is_leaf = false;
+            this->name = "VarPart";
+        }
+        ~VarPart() {}
 
+        bool is_empty;
+        VarDecList * var_dec_list;
+        std::vector<Node *> get_descendants();
+};
+
+class VarDecList : public Node {
+    public:
+        VarDecList(){
+            this->is_leaf = false;
+            this->name = "VarDecList";
+        }
+        ~VarDecList(){}
+
+        std::vector<VarDec *> var_dec_list;
+        void add(VarDec *);
+        std::vector<Node *> get_descendants();
+};
+
+class VarDec : public Node {
+    // IDList COLON TypeDec SEMI
+    public:
+        VarDec(IDList * il, VarDec * vd): id_list(il), var_dec(vd) {
+            this->is_leaf = false;
+            this->name = "VarDec";
+        }    
+        ~VarDec() {}
+
+        IDList * id_list;
+        VarDec * var_dec;
+        std::vector<Node *> get_descendants();
 };
 
 class RoutinePart : public Node {
-
+    public:
+        RoutinePart(){
+            this->is_leaf = true;
+            this->name = "RoutinePart";
+        }
+        ~RoutinePart() {}
+        std::vector<Node *> get_descendants();
 };
 
 class RoutineBody : public Node {
-
+    public:
+        RoutineBody(){
+            this->is_leaf = true;
+            this->name = "RoutineBody";
+        }
+        ~RoutineBody() {}
+        std::vector<Node *> get_descendants();
 };
 #endif
 
