@@ -1,6 +1,6 @@
 # Awesome-Pascal-Compiler
 
-### How TO Run
+### How To Run
 + Since we are in development stage, I put the code in [src/naive](https://github.com/zqh0253/Awesome-Pascal-Compiler/tree/master/src/naive).
 +  To compile through `Bison` and `flex`, simply run:
 ```shell
@@ -41,5 +41,5 @@ bash ./comp.sh
 
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-               佛祖保佑         永无BUG
+            Buddha blessed     BUG gone
 ```
