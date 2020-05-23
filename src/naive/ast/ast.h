@@ -17,7 +17,6 @@ class LabelPart;
 class ConstPart; 
 class TypePart; 
 class VarPart; 
-class RoutinePart;
 class ConstExpr;
 class ConstExprList;
 class ConstValue;
@@ -31,6 +30,24 @@ class RecordType;
 class SimpleType;
 class VarDecList;
 class VarDec;
+
+class RoutinePart;
+class SubProgram;
+class Parameters;
+class ParaDecList;
+class ParaTypeList;
+
+class Statement;
+class AssignStmt;
+class ProcStmt;
+class CompoundStmt;
+class IfStmt;
+class RepeatStmt;
+class WhileStmt;
+class ForStmt;
+class CaseStmt;
+class GotoStmt;
+class Expression;
 
 class Node {
     public:
@@ -442,22 +459,170 @@ class VarDec : public Node {
 class RoutinePart : public Node {
     public:
         RoutinePart(){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->name = "RoutinePart";
         }
         ~RoutinePart() {}
+
+        std::vector<SubProgram *> func_and_proc;
+        void add(SubProgram *);
         std::vector<Node *> get_descendants();
 };
+
+class SubProgram : public Node {
+    public:
+        enum t {FUNCTION, PROCEDURE} type;
+        SubProgram (ID * _id, Parameters * p, SimpleType * st, Routine * rt): id(_id), parameters(p), simple_type(st), routine(rt) {
+            this->is_leaf = false;
+            this->name = "Subprogram";
+            this->type = FUNCTION;
+        }
+        SubProgram (ID * _id, Parameters * p, Routine * rt): id(_id), parameters(p), routine(rt) {
+            this->is_leaf = false;
+            this->name = "Subprogram";
+            this->type = PROCEDURE;
+        }
+        ~SubProgram () {}
+
+        ID * id;
+        Parameters * parameters;
+        SimpleType * simple_type;
+        Routine* routine;
+        std::vector<Node *> get_descendants();
+};
+
+class Parameters : public Node {
+    public:
+        Parameters () {
+            this->is_leaf = true;
+            this->name = "Parameters";
+        }
+        Parameters (ParaDecList * pdl) : para_dec_list(pdl) {
+            this->is_leaf = false;
+            this->name = "Parameters";
+        }
+        ~Parameters () {}
+
+        ParaDecList * para_dec_list;
+        std::vector<Node *> get_descendants();
+};
+
+class ParaDecList : public Node {
+    public:
+        ParaDecList () {
+            this->is_leaf = false;
+            this->name = "ParaDecList";
+        }
+        ~ParaDecList () {}
+
+        std::vector<ParaTypeList *> para_dec_list;
+        void add(ParaTypeList *);
+        std::vector<Node *> get_descendants();
+};
+
+class ParaTypeList : public Node {
+    public:
+        ParaTypeList(IDList * il, SimpleType * st):id_list(il), simple_type(st){
+            this->is_leaf = false;
+            this->name = "ParaTypeList";
+        }
+        ~ParaTypeList() {}
+
+        IDList * id_list;
+        SimpleType * simple_type;
+        std::vector<Node *> get_descendants();
+};
+
 
 class RoutineBody : public Node {
     public:
         RoutineBody(){
-            this->is_leaf = true;
+            this->is_leaf = false;
             this->name = "RoutineBody";
         }
         ~RoutineBody() {}
+
+        std::vector<Statement *> statement_list;
+        void add(Statement *);
         std::vector<Node *> get_descendants();
 };
+
+class Statement : public Node {
+    public:
+        enum {ASSIGN, PROC, COMPOUND, IF, REPEAT, WHILE, FOR, CASE, GOTO} type;
+        Statement (AssignStmt * as) : assign_stmt(as){
+            this->is_leaf = true;
+            this->type = ASSIGN;
+            this->name = "Statement";
+        }
+        Statement (ProcStmt * ps) : proc_stmt(ps){
+            this->is_leaf = true;
+            this->type = PROC;
+            this->name = "Statement";
+        }
+        Statement (CompoundStmt * cs) : compound_stmt(cs){
+            this->is_leaf = true;
+            this->type = COMPOUND;
+            this->name = "Statement";
+        }
+        Statement (IfStmt * is) : if_stmt(is){
+            this->is_leaf = true;
+            this->type = IF;
+            this->name = "Statement";
+        }
+        Statement (RepeatStmt * rs) : repeat_stmt(rs){
+            this->is_leaf = true;
+            this->type = REPEAT;
+            this->name = "Statement";
+        }
+        Statement (WhileStmt * ws) : while_stmt(ws){
+            this->is_leaf = true;
+            this->type = WHILE;
+            this->name = "Statement";
+        }
+        Statement (ForStmt * fs) : for_stmt(fs){
+            this->is_leaf = true;
+            this->type = FOR;
+            this->name = "Statement";
+        }
+        Statement (CaseStmt * cs) : case_stmt(cs){
+            this->is_leaf = true;
+            this->type = CASE;
+            this->name = "Statement";
+        }
+        Statement (GotoStmt * gs) : goto_stmt(gs){
+            this->is_leaf = true;
+            this->type = GOTO;
+            this->name = "Statement";
+        }
+        int anchor = -1;
+        AssignStmt * assign_stmt;
+        ProcStmt * proc_stmt;
+        CompoundStmt * compound_stmt;
+        IfStmt * if_stmt;
+        RepeatStmt * repeat_stmt;
+        WhileStmt * while_stmt;
+        ForStmt * for_stmt;
+        CaseStmt * case_stmt;
+        GotoStmt * goto_stmt;
+
+        void set_anchor(int a);
+        std::vector<Node *> get_descendants();
+};
+
+class AssignStmt : public Node {
+    public:
+        // single : a := 1;
+        // array  : a[1] := 1;
+        // member : a.score := 1; 
+        enum {SINGLE, ARRAY, MEMBER} type;
+        
+};
+
+class Expression : public Node {
+
+};
+
 #endif
 
 // TODO: ADD virtual function, name to each class
