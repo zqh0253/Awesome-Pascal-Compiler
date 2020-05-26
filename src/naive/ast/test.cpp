@@ -11,7 +11,7 @@ int main(){
     std::string s2 = "s2";
     ID id2(s2);
     ProgramHeading ph(&id2);
-    
+    sti = 0
     Program p(&ph, &pb);
     p.prt(0);
 }
