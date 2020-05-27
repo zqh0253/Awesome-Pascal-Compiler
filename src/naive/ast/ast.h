@@ -4,6 +4,7 @@
 #include<string>
 #include<vector>
 #include<iostream>
+#include "sem/sem.h"
 
 class Node;
 class Program;
@@ -70,6 +71,8 @@ class Node {
 
         virtual std::vector<Node *> get_descendants() = 0;
         void prt(int step);
+
+        virtual void sem_analyze(SemanticAnalyzer *sa, CodeGenerator *gt);
 };
 
 class Program : public Node {
