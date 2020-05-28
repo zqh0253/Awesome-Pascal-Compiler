@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "gen/code_generator.h"
 
 #define TAB(n) for (int i=0;i<n;i++) std::cout<<" "
 
@@ -15,11 +16,23 @@ void Node::prt(int step){
     //std::cout << "}" << std::endl;
 }
 
+void Node::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void Node::sem_analyze(sem::SemanticAnalyzer *ca) {
+
+}
+
 std::vector<Node *> Program::get_descendants(){
     std::vector<Node *> list;
     list.push_back(this->program_heading);
     list.push_back(this->routine);
     return list;
+}
+
+std::string &Program::get_program_name() {
+	return program_heading->program_ID->idt;
 }
 
 std::vector<Node *> ID::get_descendants(){

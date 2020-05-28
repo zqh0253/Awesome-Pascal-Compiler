@@ -37,19 +37,25 @@ namespace sem {
 		~SemType() = default;
 	};
 
+	extern SemType *IntTy;
+	extern SemType *VoidTy;
+	extern SemType *RealTy;
+	extern SemType *BoolTy;
+	extern SemType *CharTy;
+	extern SemType *ConstIntTy;
+	extern SemType *ConstVoidTy;
+	extern SemType *ConstRealTy;
+	extern SemType *ConstBoolTy;
+	extern SemType *ConstCharTy;
+
 	class Range : SemType {
 	public:
-		Range() = default;
-
 		int begin, end;
-
 		~Range() = default;
 	};
 
 	class Array : SemType {
 	public:
-		Array() = default;
-
 		int begin, end;
 		SemType *el_type;
 
@@ -58,14 +64,12 @@ namespace sem {
 
 	class String : SemType {
 	public:
-		String() = default;
 		int size;
 		~String() = default;
 	};
 
 	class Record : SemType {
 	public:
-		Record() = default;
 		std::string llvm_name;
 		~Record() = default;
 	};
@@ -85,7 +89,9 @@ namespace sem {
 	class SemanticAnalyzer {
 	public:
 		SemanticAnalyzer() = default;
-
+		SemanticAnalyzer(std::string &name) {
+			this->name = name;
+		}
 		std::string name;
 		std::map<std::string, SemType *> vars;
 		// std::map<std::string, > consts;

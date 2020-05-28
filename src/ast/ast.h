@@ -62,20 +62,23 @@ class CaseExprList;
 class CaseExpr;
 
 class CodeGenerator;
-class SemanticAnalyzer;
+namespace sem {
+	class SemanticAnalyzer;
+}
 
 class Node {
 public:
     Node() = default;
     ~Node() = default;
 
-    bool is_leaf, is_root;
+    bool is_leaf;
     std::string name;
 
     virtual std::vector<Node *> get_descendants() = 0;
     void prt(int step);
-    virtual void codegen(CodeGenerator *cg) {}
-	virtual void sem_analyze(SemanticAnalyzer *ca) {}
+    virtual bool is_root() { return false; }
+    virtual void codegen(CodeGenerator *cg);
+	virtual void sem_analyze(sem::SemanticAnalyzer *ca);
 };
 
 class Program : public Node {
@@ -89,8 +92,9 @@ public:
     ProgramHeading * program_heading;
     Routine * routine;
 
+	bool is_root() override { return true; }
     std::vector<Node *> get_descendants() override;
-
+    std::string &get_program_name();
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -234,6 +238,8 @@ public:
     std::vector<Node *> get_descendants() override;
 
 	void codegen(CodeGenerator *cg) override;
+
+	void sem_analyze(sem::SemanticAnalyzer *ca) override;
 };
 
 class ConstValue : public Node {

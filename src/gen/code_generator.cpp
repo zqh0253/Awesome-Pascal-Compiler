@@ -1,24 +1,38 @@
 #include "code_generator.h"
 
+#include <iostream>
+
 void CodeGenerator::gencode(Node *root) {
 	// 初始化 LLVM
-	this->context = new llvm::LLVMContext;
-	this->module = new llvm::Module("main", *this->context);
-	this->ir_builder = new llvm::IRBuilder<>(*this->context);
-
-	root->codegen(this);
-}
-
-void CodeGenerator::pre_gencode(Node *n) {
-	for (auto child: n->get_descendants()) {
-		child->codegen(this);
+	if (this->context == nullptr) {
+		this->context = new llvm::LLVMContext;
+		this->ir_builder = new llvm::IRBuilder<>(*this->context);
 	}
-	n->sem_analyze(top_sem());
+//	std::cout << "Begin generating code ..." << std::endl;
+	if (root && root->is_root()) {
+		root->codegen(this);
+	}
+//	std::cout << "End generating code !" << std::endl;
+	llvm::llvm_shutdown();
 }
 
-//void CodeGenerator::set_local_variable() {
-//
-//}
+void CodeGenerator::gencode_children(Node *root) {
+	if (!root) return;
+	for (auto child: root->get_descendants()) {
+		if (child)
+			child->codegen(this);
+	}
+	root->sem_analyze(local_sem());
+}
+
+llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, std::string &name) {
+	return new llvm::AllocaInst(type, type->getPrimitiveSizeInBits(), name, local_bb());
+}
+
+llvm::Instruction *CodeGenerator::store_local_variable(std::string &name, llvm::Value *val) {
+	llvm::Value *v = local_bb()->getValueSymbolTable()->lookup(name);
+	return new llvm::StoreInst(val, v, false, local_bb());
+}
 
 llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	llvm::Constant *ret = nullptr;
@@ -34,7 +48,7 @@ llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 		ret = llvm::ConstantInt::get(getIntTy(), 0x7fffffff);
 	} else if (c->type == ConstValue::TRUE) {
 		ret = llvm::ConstantInt::get(getBoolTy(), true);
-	} else if (c->type == ConstValue::MAXINT) {
+	} else if (c->type == ConstValue::FALSE) {
 		ret = llvm::ConstantInt::get(getBoolTy(), false);
 	}
 	return ret;
@@ -73,59 +87,71 @@ llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
 	return ret;
 }
 
+
+
 /* ----- Code Generation ----- */
 void Program::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+	// 初始化 Module 和 main 函数
+	std::string &program_name = get_program_name();
+	cg->add_module(program_name);
+	std::string func_name = "main";
+	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
+	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::InternalLinkage,
+	                                              func_name, cg->cur_module);
+	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context,
+			CodeGenerator::get_entry_name(func_name), func);
+	cg->push_block(bb, func_name);
+
+	cg->gencode_children(this);
+
+	cg->cur_module->print(llvm::outs(), nullptr);
 }
 
 void ProgramHeading::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
-	std::string &program_name = program_ID->name;
-	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
-	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::InternalLinkage, program_name, cg->module);
-	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context, CodeGenerator::get_entry_name(program_name), func);
-	cg->ir_builder->SetInsertPoint(bb);
+
 }
 
 void Routine::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+	cg->gencode_children(this);
 }
 
 void RoutineHead::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+	cg->gencode_children(this);
 }
 
 void LabelPart::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+//	cg->gencode_children(this);
 }
 
 void ConstPart::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+	cg->gencode_children(this);
 }
 
 void ConstExprList::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+	cg->gencode_children(this);
 }
 
 void ConstExpr::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+	cg->gencode_children(this);
 	std::string &const_name = id->idt;
-	sem::SemType *const_type = cg->top_sem()->vars[const_name];
+
+	sem::SemType *const_type = cg->local_sem()->vars[const_name];
 	llvm::Type *llvm_type = cg->to_llvm_type(const_type);
 	llvm::Value *llvm_value = cg->to_llvm_constant(const_value);
 
+	cg->alloc_local_variable(llvm_type, const_name);
+	cg->store_local_variable(const_name, llvm_value);
 }
 
 void TypePart::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+//	cg->gencode_children(this);
 }
 
 void TypeDecList::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
+//	cg->gencode_children(this);
 }
 
 void TypeDef::codegen(CodeGenerator *cg) {
-	cg->pre_gencode(this);
-
-	std::string &type_name = id->idt;
+//	cg->gencode_children(this);
+//	std::string &type_name = id->idt;
 }

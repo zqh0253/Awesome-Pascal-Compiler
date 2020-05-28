@@ -6,14 +6,14 @@
 
 class MyBlock {
 public:
-	llvm::BasicBlock *block;
+	llvm::BasicBlock *bb;
 	sem::SemanticAnalyzer *sa;
 	MyBlock() {
-		block = nullptr;
+		bb = nullptr;
 		sa = nullptr;
 	}
-	MyBlock(llvm::BasicBlock *block, sem::SemanticAnalyzer *sa) {
-		this->block = block;
+	MyBlock(llvm::BasicBlock *bb, sem::SemanticAnalyzer *sa) {
+		this->bb = bb;
 		this->sa = sa;
 	}
 
