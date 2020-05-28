@@ -24,6 +24,7 @@ public:
     SemType(){}
     int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
     bool is_const;
+    int get_type();
     ~SemType(){}
 };
 
