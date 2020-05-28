@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgen.a  CMakeFiles/gen.dir/code_generator.cpp.o CMakeFiles/gen.dir/my_block.cpp.o
+/usr/bin/ranlib libgen.a

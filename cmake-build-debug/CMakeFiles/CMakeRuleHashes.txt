@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+85808b6ce77dc5688093d4ebf7a9ec8d src/parser/pascal.cpp
+2c3bbcad6ccc5422b8b4d6913fbd0b96 src/parser/scanner.cpp
+df4b2663201eeb90977e458531ba6d06 test/CMakeFiles/apc-test

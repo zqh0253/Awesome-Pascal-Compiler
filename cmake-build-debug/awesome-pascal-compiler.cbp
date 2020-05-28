@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="awesome-pascal-compiler"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\local\;CMake Files\..\..\..\..\usr\local\opt\;CMake Files\..\..\..\..\usr\local\opt\llvm\;CMake Files\..\..\..\..\usr\local\opt\llvm\lib\;CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\;CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\llvm\;CMake Files\src\;CMake Files\src\ast\;CMake Files\src\gen\;CMake Files\src\parser\;CMake Files\src\sem\;CMake Files\test\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="intrinsics_gen">
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 intrinsics_gen"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="apc">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/apc" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 apc"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="apc/fast">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/apc" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 apc/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ast">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/libast.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/ast/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 ast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ast/fast">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/libast.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/ast/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 ast/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/ast/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gen">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/libgen.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 gen"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gen/fast">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/libgen.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 gen/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/gen/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="parser">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/libparser.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 parser"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="parser/fast">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/libparser.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 parser/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sem">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/libsem.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/sem/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 sem"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sem/fast">
+				<Option output="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/libsem.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/opt/llvm/include"/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/."/>
+					<Add directory="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/sem/."/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="."/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 sem/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/sem/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="apc-test">
+				<Option working_dir="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/test"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/test/Makefile&quot;  VERBOSE=1 apc-test"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/pascal.cpp">
+			<Option target="parser"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/pascal.cpp.rule">
+			<Option target="parser"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/pascal.hpp">
+			<Option target="parser"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/scanner.cpp">
+			<Option target="parser"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/cmake-build-debug/src/parser/scanner.cpp.rule">
+			<Option target="parser"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/ast/ast.cpp">
+			<Option target="ast"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/ast/ast.h">
+			<Option target="ast"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/code_generator.cpp">
+			<Option target="gen"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/code_generator.h">
+			<Option target="gen"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/my_block.cpp">
+			<Option target="gen"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/my_block.h">
+			<Option target="gen"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/main.cpp">
+			<Option target="apc"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/sem/sem.cpp">
+			<Option target="sem"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/sem/sem.h">
+			<Option target="sem"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/../../../../usr/local/opt/llvm/lib/cmake/llvm/LLVM-Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\llvm\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/../../../../usr/local/opt/llvm/lib/cmake/llvm/LLVMConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\llvm\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/../../../../usr/local/opt/llvm/lib/cmake/llvm/LLVMConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\llvm\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/../../../../usr/local/opt/llvm/lib/cmake/llvm/LLVMExports-release.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\llvm\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/../../../../usr/local/opt/llvm/lib/cmake/llvm/LLVMExports.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\opt\llvm\lib\cmake\llvm\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/ast/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\ast\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/gen/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\gen\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/parser/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\parser\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/src/sem/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\sem\"/>
+		</Unit>
+		<Unit filename="/Users/chenzhuo/work/Awesome-Pascal-Compiler/test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\test\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
