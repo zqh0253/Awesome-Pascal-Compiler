@@ -15,28 +15,56 @@ namespace TypeList {
     const int STRING = 3;
     const int BOOL = 4;
     const int ARRAY = 5;
-    const int ENUM = 6;
+    const int Range = 6;
     const int RECORD = 7;
 }
 
 class SemType {
 public:
-	int base_type;
-    int is_const;
-	std::vector<SemType> advanced_type;
-    std::vector<std::string> val_name;
+    SemType(){}
+    int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
+    bool is_const;
+    ~SemType(){}
+};
+
+class Range : SemType {
+    Range(){}
+    int begin, end;
+    ~Range(){}
+};
+
+class Array : SemType {
+    Array(){}
+    int begin, end;
+    SemType *type;
+    ~Array(){}
+};
+
+class Record : SemType {
+    Record(){}
+    std::vector<std::string> names;
+    std::vector<SemType*> types;
+    ~Record(){}
 };
 
 /*******************函数信息******************/
+class FuncInfo{
+public:
+    FuncInfo(){}
+    SemType* ret;
+    std::vector<SemType*> types;
+    std::vector<std::string> names;
+    ~FuncInfo(){}
+};
 
 class SemanticAnalyzer {
 public:
     SemanticAnalyzer(){}
     std::string name;
-    std::map<std::string, SemType> vars;
+    std::map<std::string, SemType*> vars;
     // std::map<std::string, > consts;
     // std::map<std::string, > labels;
-    // std::map<std::string, > funcs;
+    std::map<std::string, FuncInfo*> funcs;
 
     ~SemanticAnalyzer(){}
 };
