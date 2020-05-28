@@ -61,935 +61,962 @@ class ElseClause;
 class CaseExprList;
 class CaseExpr;
 
+class CodeGenerator;
+class SemanticAnalyzer;
+
 class Node {
-    public:
-        Node(){}
-        ~Node() {}
+public:
+    Node() = default;
+    ~Node() = default;
 
-        bool is_leaf, is_root;
-        std::string name;
+    bool is_leaf, is_root;
+    std::string name;
 
-        virtual std::vector<Node *> get_descendants() = 0;
-        void prt(int step);
+    virtual std::vector<Node *> get_descendants() = 0;
+    void prt(int step);
+    virtual void codegen(CodeGenerator *cg) {}
+	virtual void sem_analyze(SemanticAnalyzer *ca) {}
 };
 
 class Program : public Node {
-    public:
-        Program(ProgramHeading* ph, Routine* rt): program_heading(ph), routine(rt) {
-            this->is_leaf = false;
-            this->name = "Program";
-        }
-        ~Program(){}
+public:
+    Program(ProgramHeading* ph, Routine* rt): program_heading(ph), routine(rt) {
+        this->is_leaf = false;
+        this->name = "Program";
+    }
+    ~Program() = default;
 
-        ProgramHeading * program_heading;
-        Routine * routine;
+    ProgramHeading * program_heading;
+    Routine * routine;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ID : public Node {
-    public:
-        ID (std::string _id) : idt(_id) {
-            this->is_leaf = true;
-            this->name = "ID";
-        }
-        ~ID() {}
+public:
+	ID (std::string &_id) : idt(_id) {
+        this->is_leaf = true;
+        this->name = "ID";
+    }
+    ~ID() = default;
 
-        std::string idt;
+    std::string idt;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class IDList : public Node {
-    public:
-        IDList (){
-            this->is_leaf = false;
-            this->name = "IDList";
-        }
-        ~IDList (){}
+public:
+    IDList (){
+        this->is_leaf = false;
+        this->name = "IDList";
+    }
+    ~IDList () = default;
 
-        std::vector<ID *> ID_list;
-        void add(ID *);
-        std::vector<Node *> get_descendants();
+    std::vector<ID *> ID_list;
+    void add(ID *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class ProgramHeading : public Node {
-    public:
-        ProgramHeading(ID * idt) : program_ID(idt) {
-            this->is_leaf = false;
-            this->name = "ProgramHeading";
-        }
-        ~ProgramHeading(){}
+public:
+	ProgramHeading(ID * idt) : program_ID(idt) {
+        this->is_leaf = false;
+        this->name = "ProgramHeading";
+    }
+    ~ProgramHeading() = default;
 
-        ID * program_ID;
+    ID * program_ID;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Routine : public Node {
-    public:
-        Routine(RoutineHead * rh, RoutineBody * rb): routine_head(rh), routine_body(rb) {
-            this->is_leaf = false;
-            this->name = "Routine";
-        }
-        ~Routine() {}
+public:
+    Routine(RoutineHead * rh, RoutineBody * rb): routine_head(rh), routine_body(rb) {
+        this->is_leaf = false;
+        this->name = "Routine";
+    }
+    ~Routine() = default;
 
-        RoutineHead * routine_head;
-        RoutineBody * routine_body;
+    RoutineHead * routine_head;
+    RoutineBody * routine_body;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class RoutineHead : public Node {
-    public:
-        RoutineHead(LabelPart * lp, ConstPart * cp, TypePart * tp, VarPart * vp, RoutinePart * rp): 
-            label_part(lp), const_part(cp), type_part(tp), var_part(vp), routine_part(rp) {
-            this->is_leaf = false;
-            this->name = "RoutineHead";
-        }
-        ~RoutineHead() {}
+public:
+    RoutineHead(LabelPart * lp, ConstPart * cp, TypePart * tp, VarPart * vp, RoutinePart * rp):
+        label_part(lp), const_part(cp), type_part(tp), var_part(vp), routine_part(rp) {
+        this->is_leaf = false;
+        this->name = "RoutineHead";
+    }
+    ~RoutineHead() = default;
 
-        LabelPart * label_part;
-        ConstPart * const_part;
-        TypePart * type_part;
-        VarPart * var_part;
-        RoutinePart * routine_part;
+    LabelPart * label_part;
+    ConstPart * const_part;
+    TypePart * type_part;
+    VarPart * var_part;
+    RoutinePart * routine_part;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class LabelPart : public Node {
-    // Empty class
-    public:
-        LabelPart(){
-            this->is_leaf = true;
-            this->name = "LabelPart";
-        }
-        ~LabelPart(){}
+// Empty class
+public:
+    LabelPart(){
+        this->is_leaf = true;
+        this->name = "LabelPart";
+    }
+    ~LabelPart() = default;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ConstPart : public Node {
-    public:
-        ConstPart():is_empty(true) {
-            this->is_leaf = true;
-            this->name = "ConstPart";
-        }
-        ConstPart(ConstExprList * cel): const_expr_list(cel), is_empty(false){
-            this->is_leaf = false;
-            this->name = "ConstPart";
-        }
-        ~ConstPart(){}
+public:
+    ConstPart():is_empty(true) {
+        this->is_leaf = true;
+        this->name = "ConstPart";
+    }
+    ConstPart(ConstExprList * cel): const_expr_list(cel), is_empty(false){
+        this->is_leaf = false;
+        this->name = "ConstPart";
+    }
+    ~ConstPart() = default;
 
-        ConstExprList* const_expr_list;
-        bool is_empty;
-        std::vector<Node *> get_descendants();
+    ConstExprList* const_expr_list;
+    bool is_empty;
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ConstExprList : public Node {
-    public:
-        ConstExprList() {
-            this->is_leaf = false;
-            this->name = "ConstExprList";
-        }
-        ~ConstExprList() {}
+public:
+    ConstExprList() {
+        this->is_leaf = false;
+        this->name = "ConstExprList";
+    }
+    ~ConstExprList() = default;
 
-        std::vector<ConstExpr *> const_expr_list;
+    std::vector<ConstExpr *> const_expr_list;
 
-        void add(ConstExpr * ce);
-        std::vector<Node *> get_descendants();
+    void add(ConstExpr * ce);
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ConstExpr : public Node {
-    // NAME EQUAL const_value SEMI
-    public:
-        ConstExpr(ID * _id, ConstValue * cv): id(_id), const_value(cv) {
-            this->is_leaf = false;
-            this->name = "ConstExpr";
-        }
-        ~ConstExpr() {}
+// NAME EQUAL const_value SEMI
+public:
+    ConstExpr(ID * _id, ConstValue * cv): id(_id), const_value(cv) {
+        this->is_leaf = false;
+        this->name = "ConstExpr";
+    }
+    ~ConstExpr() = default;
 
-        ID * id;
-        ConstValue * const_value;
-        std::vector<Node *> get_descendants();
+    ID * id;
+    ConstValue * const_value;
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ConstValue : public Node {
-    // Integer | Real | Char | String | SYS_CON
-    public:
-        enum {INTEGER, REAL, CHAR, STRING, SYSCON} type;
-        enum SYSCON {FALSE, TRUE, MAXINT} sys_con;
-        ConstValue(int i){
-            this->type = INTEGER;
-            this->integer = i;
-            this->is_leaf = true;
-            this->name = "ConstValue";
-        }
-        ConstValue(float f){
-            this->type = REAL;
-            this->real = f;
-            this->is_leaf = true;
-            this->name = "ConstValue";
-        }
-        ConstValue(char c){
-            this->type = CHAR;
-            this->ch = c;
-            this->is_leaf = true;
-            this->name = "ConstValue";
-        }
-        ConstValue(std::string s){
-            this->type = STRING;
-            this->str = s;
-            this->is_leaf = true;
-            this->name = "ConstValue";
-        }
-        ConstValue(enum SYSCON sc){
-            this->type = SYSCON;
-            this->sys_con = sc;
-            this->is_leaf = true;
-            this->name = "ConstValue";
-        }
-        ~ConstValue() {}
+// Integer | Real | Char | String | SYS_CON
+public:
+    enum {INTEGER, REAL, CHAR, STRING, SYSCON} type;
+    enum SYSCON {FALSE, TRUE, MAXINT} sys_con;
+    ConstValue(int i){
+        this->type = INTEGER;
+        this->integer = i;
+        this->is_leaf = true;
+        this->name = "ConstValue";
+    }
+    ConstValue(float f){
+        this->type = REAL;
+        this->real = f;
+        this->is_leaf = true;
+        this->name = "ConstValue";
+    }
+    ConstValue(char c){
+        this->type = CHAR;
+        this->ch = c;
+        this->is_leaf = true;
+        this->name = "ConstValue";
+    }
+    ConstValue(std::string s){
+        this->type = STRING;
+        this->str = s;
+        this->is_leaf = true;
+        this->name = "ConstValue";
+    }
+    ConstValue(enum SYSCON sc){
+        this->type = SYSCON;
+        this->sys_con = sc;
+        this->is_leaf = true;
+        this->name = "ConstValue";
+    }
+    ~ConstValue() = default;
 
-        int integer;
-        float real;
-        char ch;
-        std::string str;
-        
-        std::vector<Node *> get_descendants();
+    int integer;
+    float real;
+    char ch;
+    std::string str;
+
+    std::vector<Node *> get_descendants() override;
 };
 
 class TypePart : public Node {
-    // TYPE TypeDeclList | epsilon
-    public:
-        TypePart():is_empty(true) {
-            this->is_leaf = true;
-            this->name = "TypePart";
-        }
-        TypePart(TypeDecList * tdl): type_dec_list(tdl), is_empty(false){
-            this->is_leaf = false;
-            this->name = "TyepPart";
-        }
-        ~TypePart(){}
+// TYPE TypeDeclList | epsilon
+public:
+    TypePart():is_empty(true) {
+        this->is_leaf = true;
+        this->name = "TypePart";
+    }
+    TypePart(TypeDecList * tdl): type_dec_list(tdl), is_empty(false){
+        this->is_leaf = false;
+        this->name = "TyepPart";
+    }
+    ~TypePart() = default;
 
-        TypeDecList * type_dec_list;
-        bool is_empty;
-        std::vector<Node *> get_descendants();
+    TypeDecList * type_dec_list;
+    bool is_empty;
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class TypeDecList : public Node {
-    public:
-        TypeDecList() {
-            this->is_leaf = false;
-            this->name = "TypeDecList";
-        }
-        ~TypeDecList() {}
+public:
+    TypeDecList() {
+        this->is_leaf = false;
+        this->name = "TypeDecList";
+    }
+    ~TypeDecList() = default;
 
-        std::vector<TypeDef *> type_definition_list;
-        void add(TypeDef * td);
-        std::vector<Node *> get_descendants();
+    std::vector<TypeDef *> type_definition_list;
+    void add(TypeDef * td);
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class TypeDef : public Node {
-    // NAME EQUAL TypeDec SEMI
-    public:
-        TypeDef(ID * _id, TypeDec * td):id(_id), type_dec(td) {
-            this->is_leaf = false;
-            this->name = "TypeDef";
-        }
-        ~TypeDef() {}
+// NAME EQUAL TypeDec SEMI
+public:
+    TypeDef(ID * _id, TypeDec * td):id(_id), type_dec(td) {
+        this->is_leaf = false;
+        this->name = "TypeDef";
+    }
+    ~TypeDef() = default;
 
-        ID * id;
-        TypeDec * type_dec;
-        std::vector<Node *> get_descendants();
+    ID * id;
+    TypeDec * type_dec;
+    std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class TypeDec : public Node {
-    public:
-        enum type {SIMPLE, ARRAY, RECORD} type;
-        TypeDec(SimpleType * st):simple_type(st) {
-            this->type = SIMPLE;
-            this->is_leaf = false;
-            this->name = "TypeDec";
-        }
-        TypeDec(ArrayType * at):array_type(at) {
-            this->type = ARRAY;
-            this->is_leaf = false;
-            this->name = "TypeDec";
-        }
-        TypeDec(RecordType * rt):record_type(rt) {
-            this->type = RECORD;
-            this->is_leaf = false;
-            this->name = "TypeDec";
-        }
-        ~TypeDec() {}
+public:
+    enum type {SIMPLE, ARRAY, RECORD} type;
+    TypeDec(SimpleType * st):simple_type(st) {
+        this->type = SIMPLE;
+        this->is_leaf = false;
+        this->name = "TypeDec";
+    }
+    TypeDec(ArrayType * at):array_type(at) {
+        this->type = ARRAY;
+        this->is_leaf = false;
+        this->name = "TypeDec";
+    }
+    TypeDec(RecordType * rt):record_type(rt) {
+        this->type = RECORD;
+        this->is_leaf = false;
+        this->name = "TypeDec";
+    }
+    ~TypeDec() = default;
 
-        SimpleType * simple_type;
-        ArrayType * array_type;
-        RecordType * record_type;
-        std::vector<Node *> get_descendants();
+    SimpleType * simple_type;
+    ArrayType * array_type;
+    RecordType * record_type;
+    std::vector<Node *> get_descendants() override;
 };
 
 class SimpleType : public Node {
-    public:
-        enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE, STRING} type;
-        SimpleType(SysType * st):sys_type(st) {
-            this->type = SYS_TYPE;
-            this->is_leaf = false;
-            this->name = "SimpleType";
-        }
-        SimpleType(ID * _id):id(_id) {
-            this->type = IDENTIFY;
-            this->is_leaf = false;
-            this->name = "SimpleType";
-        }
-        SimpleType(IDList * il):id_list(il) {
-            this->type = IDLIST;
-            this->is_leaf = false;
-            this->name = "SimpleType";
-        }
-        SimpleType(RangeType * rt):range_type(rt) {
-            this->type = RANGE;
-            this->is_leaf = false;
-            this->name = "SimpleType";
-        }
-        ~SimpleType() {}
+public:
+    enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE, STRING} type;
+    SimpleType(SysType * st):sys_type(st) {
+        this->type = SYS_TYPE;
+        this->is_leaf = false;
+        this->name = "SimpleType";
+    }
+    SimpleType(ID * _id):id(_id) {
+        this->type = IDENTIFY;
+        this->is_leaf = false;
+        this->name = "SimpleType";
+    }
+    SimpleType(IDList * il):id_list(il) {
+        this->type = IDLIST;
+        this->is_leaf = false;
+        this->name = "SimpleType";
+    }
+    SimpleType(RangeType * rt):range_type(rt) {
+        this->type = RANGE;
+        this->is_leaf = false;
+        this->name = "SimpleType";
+    }
+    ~SimpleType() = default;
 
-        SysType * sys_type;
-        ID * id;
-        IDList * id_list;
-        RangeType * range_type;
-        std::vector<Node *> get_descendants();
+    SysType * sys_type;
+    ID * id;
+    IDList * id_list;
+    RangeType * range_type;
+    std::vector<Node *> get_descendants() override;
 };
 
 class SysType : public Node {
-    public:
-        enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING} type;
-        SysType(enum t type) {
-            this->type = type;
-            this->is_leaf = true;
-            this->name = "SysType";
-        }
-        ~SysType() {}
+public:
+    enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING} type;
+    SysType(enum t type) {
+        this->type = type;
+        this->is_leaf = true;
+        this->name = "SysType";
+    }
+    ~SysType() = default;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants();
 };
 
 class RangeType : public Node {
-    public:
-        enum type {IDENTIFY, CONST} type;
-        RangeType(ID * id1, ID * id2): left_id(id1), right_id(id2) {
-            this->type = IDENTIFY;
-            this->is_leaf = false;
-            this->name = "RangeType";
-        }
-        RangeType(ConstValue * lc, ConstValue * rc, bool lm, bool rm): left_const(lc), right_const(rc), left_minus(lm), right_minus(rm) {
-            this->type = CONST;
-            this->is_leaf = false;
-            this->name = "RangeType";
-        }
-        ~RangeType() {}
+public:
+    enum type {IDENTIFY, CONST} type;
+    RangeType(ID * id1, ID * id2): left_id(id1), right_id(id2) {
+        this->type = IDENTIFY;
+        this->is_leaf = false;
+        this->name = "RangeType";
+    }
+    RangeType(ConstValue * lc, ConstValue * rc, bool lm, bool rm): left_const(lc), right_const(rc), left_minus(lm), right_minus(rm) {
+        this->type = CONST;
+        this->is_leaf = false;
+        this->name = "RangeType";
+    }
+    ~RangeType() = default;
 
-        ID * left_id, * right_id;
-        ConstValue * left_const, * right_const;
-        bool left_minus, right_minus;
-        std::vector<Node *> get_descendants();
+    ID * left_id, * right_id;
+    ConstValue * left_const, * right_const;
+    bool left_minus, right_minus;
+    std::vector<Node *> get_descendants() override;
 };
 
 class ArrayType : public Node {
-    // ARRAY (SimpleType) OF TypeDec
-    public:
-        ArrayType(SimpleType * st, TypeDec * td): simple_type(st), type_dec(td) {
-            this->is_leaf = false;
-            this->name = "ArrayType";
-        }
-        ~ArrayType() {}
+// ARRAY (SimpleType) OF TypeDec
+public:
+    ArrayType(SimpleType * st, TypeDec * td): simple_type(st), type_dec(td) {
+        this->is_leaf = false;
+        this->name = "ArrayType";
+    }
+    ~ArrayType() = default;
 
-        SimpleType * simple_type;
-        TypeDec * type_dec; 
-        std::vector<Node *> get_descendants();
+    SimpleType * simple_type;
+    TypeDec * type_dec;
+    std::vector<Node *> get_descendants() override;
 };
 
 class RecordType : public Node {
-    // RECORD VarDecList END
-    public:
-        RecordType(VarDecList * vdl):record_dec_list(vdl){
-            this->is_leaf = false;
-            this->name = "RecordType";
-        }
-        ~RecordType() {}
+// RECORD VarDecList END
+public:
+    RecordType(VarDecList * vdl):record_dec_list(vdl){
+        this->is_leaf = false;
+        this->name = "RecordType";
+    }
+    ~RecordType() = default;
 
-        VarDecList * record_dec_list;
-        std::vector<Node *> get_descendants();
+    VarDecList * record_dec_list;
+    std::vector<Node *> get_descendants() override;
 };
 
 class VarPart : public Node {
-    public:
-        VarPart():is_empty(true) {
-            this->is_leaf = true;
-            this->name = "VarPart";
-        }
-        VarPart(VarDecList * vdl):var_dec_list(vdl), is_empty(false) {
-            this->is_leaf = false;
-            this->name = "VarPart";
-        }
-        ~VarPart() {}
+public:
+    VarPart():is_empty(true) {
+        this->is_leaf = true;
+        this->name = "VarPart";
+    }
+    VarPart(VarDecList * vdl):var_dec_list(vdl), is_empty(false) {
+        this->is_leaf = false;
+        this->name = "VarPart";
+    }
+    ~VarPart() = default;
 
-        bool is_empty;
-        VarDecList * var_dec_list;
-        std::vector<Node *> get_descendants();
+    bool is_empty;
+    VarDecList * var_dec_list;
+    std::vector<Node *> get_descendants() override;
 };
 
 class VarDecList : public Node {
-    public:
-        VarDecList(){
-            this->is_leaf = false;
-            this->name = "VarDecList";
-        }
-        ~VarDecList(){}
+public:
+    VarDecList(){
+        this->is_leaf = false;
+        this->name = "VarDecList";
+    }
+    ~VarDecList() = default;
 
-        std::vector<VarDec *> var_dec_list;
-        void add(VarDec *);
-        std::vector<Node *> get_descendants();
+    std::vector<VarDec *> var_dec_list;
+    void add(VarDec *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class VarDec : public Node {
-    // IDList COLON TypeDec SEMI
-    public:
-        VarDec(IDList * il, TypeDec * td): id_list(il), type_dec(td) {
-            this->is_leaf = false;
-            this->name = "VarDec";
-        }    
-        ~VarDec() {}
+// IDList COLON TypeDec SEMI
+public:
+    VarDec(IDList * il, TypeDec * td): id_list(il), type_dec(td) {
+        this->is_leaf = false;
+        this->name = "VarDec";
+    }
+    ~VarDec() = default;
 
-        IDList * id_list;
-        TypeDec * type_dec;
-        std::vector<Node *> get_descendants();
+    IDList * id_list;
+    TypeDec * type_dec;
+    std::vector<Node *> get_descendants() override;
 };
 
 class RoutinePart : public Node {
-    public:
-        RoutinePart(){
-            this->is_leaf = false;
-            this->name = "RoutinePart";
-        }
-        ~RoutinePart() {}
+public:
+    RoutinePart(){
+        this->is_leaf = false;
+        this->name = "RoutinePart";
+    }
+    ~RoutinePart() = default;
 
-        std::vector<SubProgram *> func_and_proc;
-        void add(SubProgram *);
-        std::vector<Node *> get_descendants();
+    std::vector<SubProgram *> func_and_proc;
+    void add(SubProgram *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class SubProgram : public Node {
-    public:
-        enum t {FUNCTION, PROCEDURE} type;
-        SubProgram (ID * _id, Parameters * p, SimpleType * st, Routine * rt): id(_id), parameters(p), simple_type(st), routine(rt) {
-            this->is_leaf = false;
-            this->name = "Subprogram";
-            this->type = FUNCTION;
-        }
-        SubProgram (ID * _id, Parameters * p, Routine * rt): id(_id), parameters(p), routine(rt) {
-            this->is_leaf = false;
-            this->name = "Subprogram";
-            this->type = PROCEDURE;
-        }
-        ~SubProgram () {}
+public:
+    enum t {FUNCTION, PROCEDURE} type;
+    SubProgram (ID * _id, Parameters * p, SimpleType * st, Routine * rt): id(_id), parameters(p), simple_type(st), routine(rt) {
+        this->is_leaf = false;
+        this->name = "Subprogram";
+        this->type = FUNCTION;
+    }
+    SubProgram (ID * _id, Parameters * p, Routine * rt): id(_id), parameters(p), routine(rt) {
+        this->is_leaf = false;
+        this->name = "Subprogram";
+        this->type = PROCEDURE;
+    }
+    ~SubProgram () = default;
 
-        ID * id;
-        Parameters * parameters;
-        SimpleType * simple_type;
-        Routine* routine;
-        std::vector<Node *> get_descendants();
+    ID * id;
+    Parameters * parameters;
+    SimpleType * simple_type;
+    Routine* routine;
+    std::vector<Node *> get_descendants() override;
 };
 
 class Parameters : public Node {
-    public:
-        Parameters () {
-            this->is_leaf = true;
-            this->name = "Parameters";
-        }
-        Parameters (ParaDecList * pdl) : para_dec_list(pdl) {
-            this->is_leaf = false;
-            this->name = "Parameters";
-        }
-        ~Parameters () {}
+public:
+    Parameters () {
+        this->is_leaf = true;
+        this->name = "Parameters";
+    }
+    Parameters (ParaDecList * pdl) : para_dec_list(pdl) {
+        this->is_leaf = false;
+        this->name = "Parameters";
+    }
+    ~Parameters () = default;
 
-        ParaDecList * para_dec_list;
-        std::vector<Node *> get_descendants();
+    ParaDecList * para_dec_list;
+    std::vector<Node *> get_descendants() override;
 };
 
 class ParaDecList : public Node {
-    public:
-        ParaDecList () {
-            this->is_leaf = false;
-            this->name = "ParaDecList";
-        }
-        ~ParaDecList () {}
+public:
+    ParaDecList () {
+        this->is_leaf = false;
+        this->name = "ParaDecList";
+    }
+    ~ParaDecList () = default;
 
-        std::vector<ParaTypeList *> para_dec_list;
-        void add(ParaTypeList *);
-        std::vector<Node *> get_descendants();
+    std::vector<ParaTypeList *> para_dec_list;
+    void add(ParaTypeList *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class ParaTypeList : public Node {
-    public:
-        ParaTypeList(IDList * il, SimpleType * st):id_list(il), simple_type(st){
-            this->is_leaf = false;
-            this->name = "ParaTypeList";
-        }
-        ~ParaTypeList() {}
+public:
+    ParaTypeList(IDList * il, SimpleType * st):id_list(il), simple_type(st){
+        this->is_leaf = false;
+        this->name = "ParaTypeList";
+    }
+    ~ParaTypeList() = default;
 
-        IDList * id_list;
-        SimpleType * simple_type;
-        std::vector<Node *> get_descendants();
+    IDList * id_list;
+    SimpleType * simple_type;
+    std::vector<Node *> get_descendants() override;
 };
 
 
 class RoutineBody : public Node {
-    public:
-        RoutineBody(CompoundStmt * cs): compound_stmt(cs){
-            this->is_leaf = false;
-            this->name = "RoutineBody";
-        }
-        ~RoutineBody() {}
+public:
+    RoutineBody(CompoundStmt * cs): compound_stmt(cs){
+        this->is_leaf = false;
+        this->name = "RoutineBody";
+    }
+    ~RoutineBody() = default;
 
-        CompoundStmt * compound_stmt;
-        std::vector<Node *> get_descendants();
+    CompoundStmt * compound_stmt;
+    std::vector<Node *> get_descendants() override;
 };
 
 class CompoundStmt : public Node {
-    public:
-        CompoundStmt(StatementList * sl):stmt_list(sl){
-            this->is_leaf = false;
-            this->name = "Compound statement";
-        }
+public:
+    CompoundStmt(StatementList * sl):stmt_list(sl){
+        this->is_leaf = false;
+        this->name = "Compound statement";
+    }
 
-        StatementList * stmt_list;
-        std::vector<Node *> get_descendants();
+    StatementList * stmt_list;
+    std::vector<Node *> get_descendants() override;
 };
 
 class StatementList : public Node {
-    public:
-        StatementList () {
-            this->is_leaf = false;
-            this->name = "Statement List";
-        }
+public:
+    StatementList () {
+        this->is_leaf = false;
+        this->name = "Statement List";
+    }
 
-        std::vector<Statement *> stmt_list;
-        void add(Statement *);
+    std::vector<Statement *> stmt_list;
+    void add(Statement *);
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class Statement : public Node {
-    public:
-        enum {ASSIGN, PROC, COMPOUND, IF, REPEAT, WHILE, FOR, CASE, GOTO} type;
-        Statement (AssignStmt * as) : assign_stmt(as){
-            this->is_leaf = false;
-            this->type = ASSIGN;
-            this->name = "Statement";
-        }
-        Statement (ProcStmt * ps) : proc_stmt(ps){
-            this->is_leaf = false;
-            this->type = PROC;
-            this->name = "Statement";
-        }
-        Statement (CompoundStmt * cs) : compound_stmt(cs){
-            this->is_leaf = false;
-            this->type = COMPOUND;
-            this->name = "Statement";
-        }
-        Statement (IfStmt * is) : if_stmt(is){
-            this->is_leaf = false;
-            this->type = IF;
-            this->name = "Statement";
-        }
-        Statement (RepeatStmt * rs) : repeat_stmt(rs){
-            this->is_leaf = false;
-            this->type = REPEAT;
-            this->name = "Statement";
-        }
-        Statement (WhileStmt * ws) : while_stmt(ws){
-            this->is_leaf = false;
-            this->type = WHILE;
-            this->name = "Statement";
-        }
-        Statement (ForStmt * fs) : for_stmt(fs){
-            this->is_leaf = false;
-            this->type = FOR;
-            this->name = "Statement";
-        }
-        Statement (CaseStmt * cs) : case_stmt(cs){
-            this->is_leaf = false;
-            this->type = CASE;
-            this->name = "Statement";
-        }
-        Statement (GotoStmt * gs) : goto_stmt(gs){
-            this->is_leaf = false;
-            this->type = GOTO;
-            this->name = "Statement";
-        }
-        int anchor = -1;
-        AssignStmt * assign_stmt;
-        ProcStmt * proc_stmt;
-        CompoundStmt * compound_stmt;
-        IfStmt * if_stmt;
-        RepeatStmt * repeat_stmt;
-        WhileStmt * while_stmt;
-        ForStmt * for_stmt;
-        CaseStmt * case_stmt;
-        GotoStmt * goto_stmt;
+public:
+    enum {ASSIGN, PROC, COMPOUND, IF, REPEAT, WHILE, FOR, CASE, GOTO} type;
+    Statement (AssignStmt * as) : assign_stmt(as){
+        this->is_leaf = false;
+        this->type = ASSIGN;
+        this->name = "Statement";
+    }
+    Statement (ProcStmt * ps) : proc_stmt(ps){
+        this->is_leaf = false;
+        this->type = PROC;
+        this->name = "Statement";
+    }
+    Statement (CompoundStmt * cs) : compound_stmt(cs){
+        this->is_leaf = false;
+        this->type = COMPOUND;
+        this->name = "Statement";
+    }
+    Statement (IfStmt * is) : if_stmt(is){
+        this->is_leaf = false;
+        this->type = IF;
+        this->name = "Statement";
+    }
+    Statement (RepeatStmt * rs) : repeat_stmt(rs){
+        this->is_leaf = false;
+        this->type = REPEAT;
+        this->name = "Statement";
+    }
+    Statement (WhileStmt * ws) : while_stmt(ws){
+        this->is_leaf = false;
+        this->type = WHILE;
+        this->name = "Statement";
+    }
+    Statement (ForStmt * fs) : for_stmt(fs){
+        this->is_leaf = false;
+        this->type = FOR;
+        this->name = "Statement";
+    }
+    Statement (CaseStmt * cs) : case_stmt(cs){
+        this->is_leaf = false;
+        this->type = CASE;
+        this->name = "Statement";
+    }
+    Statement (GotoStmt * gs) : goto_stmt(gs){
+        this->is_leaf = false;
+        this->type = GOTO;
+        this->name = "Statement";
+    }
+    int anchor = -1;
+    AssignStmt * assign_stmt;
+    ProcStmt * proc_stmt;
+    CompoundStmt * compound_stmt;
+    IfStmt * if_stmt;
+    RepeatStmt * repeat_stmt;
+    WhileStmt * while_stmt;
+    ForStmt * for_stmt;
+    CaseStmt * case_stmt;
+    GotoStmt * goto_stmt;
 
-        void set_anchor(int a);
-        std::vector<Node *> get_descendants();
+    void set_anchor(int a);
+    std::vector<Node *> get_descendants() override;
 };
 
 class CaseStmt : public Node {
-    public:
-        CaseStmt(Expression * e, CaseExprList * c):expr(e), case_expr_list(c){
-            this->is_leaf = false;
-            this->name = "Case Statement";
-        }
-        ~CaseStmt() {}
-        Expression * expr;
-        CaseExprList * case_expr_list;
-        std::vector<Node *> get_descendants();
+public:
+    CaseStmt(Expression * e, CaseExprList * c):expr(e), case_expr_list(c){
+        this->is_leaf = false;
+        this->name = "Case Statement";
+    }
+    ~CaseStmt() = default;
+    Expression * expr;
+    CaseExprList * case_expr_list;
+    std::vector<Node *> get_descendants() override;
 };
 
 class CaseExprList : public Node {
-    public:
-        CaseExprList () {
-            this->is_leaf = false;
-            this->name = "CaseExprList";
-        }
-        ~CaseExprList () {}
+public:
+    CaseExprList () {
+        this->is_leaf = false;
+        this->name = "CaseExprList";
+    }
+    ~CaseExprList () = default;
 
-        std::vector<CaseExpr *> case_expr_list;
-        void add(CaseExpr *);
-        std::vector<Node *> get_descendants();
+    std::vector<CaseExpr *> case_expr_list;
+    void add(CaseExpr *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class CaseExpr : public Node {
-    public:
-        enum o {CONST, IDENTIFY} type;
-        CaseExpr (ConstValue * cv, Statement * s): const_value(cv), stmt(s){
-            this->is_leaf = false;
-            this->name = "CaseExpr";
-            this->type = CONST;
-        }
-        CaseExpr (IDDotted * _id, Statement * s):idd(_id), stmt(s){
-            this->is_leaf = false;
-            this->name = "CaseExpr";
-            this->type = IDENTIFY;
-        }
-        ConstValue * const_value;
-        IDDotted * idd;
-        Statement * stmt;
-        std::vector<Node *> get_descendants();
+public:
+    enum o {CONST, IDENTIFY} type;
+    CaseExpr (ConstValue * cv, Statement * s): const_value(cv), stmt(s){
+        this->is_leaf = false;
+        this->name = "CaseExpr";
+        this->type = CONST;
+    }
+    CaseExpr (IDDotted * _id, Statement * s):idd(_id), stmt(s){
+        this->is_leaf = false;
+        this->name = "CaseExpr";
+        this->type = IDENTIFY;
+    }
+    ConstValue * const_value;
+    IDDotted * idd;
+    Statement * stmt;
+    std::vector<Node *> get_descendants() override;
 };
 
 class GotoStmt : public Node {
-    public:
-        GotoStmt(int i):destination(i) {
-            this->is_leaf = true;
-            this->name = "Goto Statement";
-        }
+public:
+    GotoStmt(int i):destination(i) {
+        this->is_leaf = true;
+        this->name = "Goto Statement";
+    }
 
-        int destination;
-        std::vector<Node *> get_descendants();
+    int destination;
+    std::vector<Node *> get_descendants() override;
 };
 
 class AssignStmt : public Node {
-    public:
-        // single : a := 1; OR a.member := 1;
-        // array  : a[1] := 1; 
-        enum {SINGLE, ARRAY} type;
-        AssignStmt (IDDotted * i, Expression * e): idd(i), e1(e){
-            this->is_leaf = false;
-            this->name = "Assign Statement";
-            this->type = SINGLE;
-        }
-        AssignStmt (IDDotted * i, Expression * _e1, Expression * _e2) : idd(i), e1(_e1), e2(_e2){
-            this->is_leaf = false;
-            this->name = "Assign Statement";
-            this->type = ARRAY;
-        } 
-        ~AssignStmt () {}
-        IDDotted * idd;
-        Expression * e1,* e2;
+public:
+    // single : a := 1; OR a.member := 1;
+    // array  : a[1] := 1;
+    enum {SINGLE, ARRAY} type;
+    AssignStmt (IDDotted * i, Expression * e): idd(i), e1(e){
+        this->is_leaf = false;
+        this->name = "Assign Statement";
+        this->type = SINGLE;
+    }
+    AssignStmt (IDDotted * i, Expression * _e1, Expression * _e2) : idd(i), e1(_e1), e2(_e2){
+        this->is_leaf = false;
+        this->name = "Assign Statement";
+        this->type = ARRAY;
+    }
+    ~AssignStmt () = default;
+    IDDotted * idd;
+    Expression * e1,* e2;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class ProcStmt : public Node {
-    public:
-        enum { SINGLE_ID,               // ID
-                ID_WITH_ARGS,           // ID LP args_list RP
-                SYS_PROC,               // SYS_PROC
-                SYS_PROC_WITH_EXPR,     // SYS_PROC LP expr_list RP
-                READ_FACTOR             // If the sys_proc is read
-             } type;
-        ProcStmt(ID * _id): id(_id) {
-            this->is_leaf = false;
-            this->name = "Proc Statement";
-            this->type = SINGLE_ID;
-        }
-        ProcStmt(ID * _id, ArgsList * al): id(_id), args_list(al) {
-            this->is_leaf = false;
-            this->name = "Proc Statement";
-            this->type = ID_WITH_ARGS;
-        }
-        ProcStmt(SysProc * sp): sys_proc(sp) {
-            this->is_leaf = false;
-            this->name = "Proc Statement";
-            this->type = SYS_PROC;
-        }
-        ProcStmt(SysProc * sp, ExprList * el): sys_proc(sp), expr_list(el) {
-            this->is_leaf = false;
-            this->name = "Proc Statement";
-            this->type = SYS_PROC_WITH_EXPR;
-        }
-        ProcStmt(SysProc * sp, Factor * f): sys_proc(sp), factor(f) {
+public:
+    enum { SINGLE_ID,               // ID
+            ID_WITH_ARGS,           // ID LP args_list RP
+            SYS_PROC,               // SYS_PROC
+            SYS_PROC_WITH_EXPR,     // SYS_PROC LP expr_list RP
+            READ_FACTOR             // If the sys_proc is read
+         } type;
+    ProcStmt(ID * _id): id(_id) {
+        this->is_leaf = false;
+        this->name = "Proc Statement";
+        this->type = SINGLE_ID;
+    }
+    ProcStmt(ID * _id, ArgsList * al): id(_id), args_list(al) {
+        this->is_leaf = false;
+        this->name = "Proc Statement";
+        this->type = ID_WITH_ARGS;
+    }
+    ProcStmt(SysProc * sp): sys_proc(sp) {
+        this->is_leaf = false;
+        this->name = "Proc Statement";
+        this->type = SYS_PROC;
+    }
+    ProcStmt(SysProc * sp, ExprList * el): sys_proc(sp), expr_list(el) {
+        this->is_leaf = false;
+        this->name = "Proc Statement";
+        this->type = SYS_PROC_WITH_EXPR;
+    }
+    ProcStmt(SysProc * sp, Factor * f): sys_proc(sp), factor(f) {
 
-        //SHOULD check the sysproc is READ only!
-            this->is_leaf = false;
-            this->name = "Proc Statement";
-            this->type = READ_FACTOR;
-        }
-        ~ProcStmt() {}
+    //SHOULD check the sysproc is READ only!
+        this->is_leaf = false;
+        this->name = "Proc Statement";
+        this->type = READ_FACTOR;
+    }
+    ~ProcStmt() = default;
 
-        ID * id;
-        ArgsList * args_list;
-        SysProc * sys_proc;
-        ExprList * expr_list;
-        Factor * factor;
-        std::vector<Node *> get_descendants();
+    ID * id;
+    ArgsList * args_list;
+    SysProc * sys_proc;
+    ExprList * expr_list;
+    Factor * factor;
+    std::vector<Node *> get_descendants() override;
 };
 
 class IfStmt : public Node {
-    public:
-        IfStmt (Expression * e, Statement * s, ElseClause * ec): expr(e), stmt(s), else_clause(ec) {
-            this->is_leaf = false;
-            this->name = "If statement";
-        }
+public:
+    IfStmt (Expression * e, Statement * s, ElseClause * ec): expr(e), stmt(s), else_clause(ec) {
+        this->is_leaf = false;
+        this->name = "If statement";
+    }
 
-        Expression * expr;
-        Statement * stmt;
-        ElseClause * else_clause;
-        std::vector<Node *> get_descendants();
+    Expression * expr;
+    Statement * stmt;
+    ElseClause * else_clause;
+    std::vector<Node *> get_descendants() override;
 };
 
 class ElseClause : public Node {
-    public:
-        ElseClause () {
-            this->is_leaf = true;
-            this->name = "Else Clause";
-        }
-        ElseClause (Statement * s):stmt(s) {
-            this->is_leaf = false;
-            this->name = "Else Clause";
-        }
+public:
+    ElseClause () {
+        this->is_leaf = true;
+        this->name = "Else Clause";
+    }
+    ElseClause (Statement * s):stmt(s) {
+        this->is_leaf = false;
+        this->name = "Else Clause";
+    }
 
-        Statement * stmt;
-        std::vector<Node *> get_descendants();
+    Statement * stmt;
+    std::vector<Node *> get_descendants() override;
 };
 
 class RepeatStmt : public Node {
-    public:
-        RepeatStmt (StatementList * sl, Expression * e) : stmt_list(sl), expr(e) {
-            this->is_leaf = false;
-            this->name = "Repeat Statement";
-        }
+public:
+    RepeatStmt (StatementList * sl, Expression * e) : stmt_list(sl), expr(e) {
+        this->is_leaf = false;
+        this->name = "Repeat Statement";
+    }
 
-        StatementList * stmt_list;
-        Expression * expr;
+    StatementList * stmt_list;
+    Expression * expr;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class WhileStmt : public Node {
-    public:
-        WhileStmt (Expression * e, Statement * s) : expr(e), stmt(s) {
-            this->is_leaf = false;
-            this->name = "While Statement";
-        }
-        Expression * expr;
-        Statement * stmt;
+public:
+    WhileStmt (Expression * e, Statement * s) : expr(e), stmt(s) {
+        this->is_leaf = false;
+        this->name = "While Statement";
+    }
+    Expression * expr;
+    Statement * stmt;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class ForStmt : public Node {
-    public:
-        enum d {TO, DOWNTO} direction;
-        ForStmt (IDDotted * i, Expression * e1, Expression * e2, Statement * s, enum d di): idd(i), expr1(e1), expr2(e2), direction(di), stmt(s) {
-            this->is_leaf = false;
-            this->name = "For Statement";
-        }
+public:
+    enum d {TO, DOWNTO} direction;
+    ForStmt (IDDotted * i, Expression * e1, Expression * e2, Statement * s, enum d di): idd(i), expr1(e1), expr2(e2), direction(di), stmt(s) {
+        this->is_leaf = false;
+        this->name = "For Statement";
+    }
 
-        IDDotted * idd;
-        Expression * expr1, * expr2;
-        Statement * stmt;
+    IDDotted * idd;
+    Expression * expr1, * expr2;
+    Statement * stmt;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class SysProc : public Node {
-    public:
-        enum t {WRITE, WRITELN, READ} type;
-        SysProc (enum t ty): type(ty) {
-            this->is_leaf = true;
-            this->name = "SysProc";
-        }
-        ~SysProc() {}
+public:
+    enum t {WRITE, WRITELN, READ} type;
+    SysProc (enum t ty): type(ty) {
+        this->is_leaf = true;
+        this->name = "SysProc";
+    }
+    ~SysProc() = default;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class IDDotted : public Node {
-    public:
-        IDDotted() {
-            this->is_leaf = false;
-            this->name = "ID_dotted";
-        }
+public:
+    IDDotted() {
+        this->is_leaf = false;
+        this->name = "ID_dotted";
+    }
 
-        std::vector<ID *> id_list;
-        void add(ID *);
-        std::vector<Node *> get_descendants();
+    std::vector<ID *> id_list;
+    void add(ID *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class Expression : public Node {
-    public:
-        enum o {GE, GT, LE, LT, EQ, NE, SINGLE} op;
-        Expression (Expression * e1, enum o _op, Expr * e2): expression(e1), expr(e2), op(_op) {
-            this->is_leaf = false;
-            this->name = "Expression";
-        }
-        Expression (Expr * e) : expr(e) {
-            this->is_leaf = false;
-            this->name = "Expression";
-            op = SINGLE;
-        }
-        
-        Expression * expression;
-        Expr * expr;
+public:
+    enum o {GE, GT, LE, LT, EQ, NE, SINGLE} op;
+    Expression (Expression * e1, enum o _op, Expr * e2): expression(e1), expr(e2), op(_op) {
+        this->is_leaf = false;
+        this->name = "Expression";
+    }
+    Expression (Expr * e) : expr(e) {
+        this->is_leaf = false;
+        this->name = "Expression";
+        op = SINGLE;
+    }
 
-        std::vector<Node *> get_descendants();
+    Expression * expression;
+    Expr * expr;
+
+    std::vector<Node *> get_descendants() override;
 };
 
 class Expr : public Node {
-    public:
-        enum o {PULS, MINUS, OR, SINGLE} op;
-        Expr (Expr * e, enum o _op, Term * t): expr(e), term(t), op(_op) {
-            this->is_leaf = false;
-            this->name = "Expr";
-        }
-        Expr (Term *t) : term(t) {
-            this->is_leaf = false;
-            this->name = "Expr";
-            op = SINGLE;
-        }
+public:
+    enum o {PULS, MINUS, OR, SINGLE} op;
+    Expr (Expr * e, enum o _op, Term * t): expr(e), term(t), op(_op) {
+        this->is_leaf = false;
+        this->name = "Expr";
+    }
+    Expr (Term *t) : term(t) {
+        this->is_leaf = false;
+        this->name = "Expr";
+        op = SINGLE;
+    }
 
-        Expr * expr;
-        Term * term;
+    Expr * expr;
+    Term * term;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class Term : public Node {
-    public:
-        enum o {MUL, DIV, MOD, AND, SINGLE} op;
-        Term (Term * t, enum o _op, Factor * f) : term(t), factor(f), op(_op) {
-            this->is_leaf = false;
-            this->name = "Term";
-        }
-        Term (Factor * f) : factor(f) {
-            this->is_leaf = false;
-            this->name = "Term"; 
-            op = SINGLE;
-        }
+public:
+    enum o {MUL, DIV, MOD, AND, SINGLE} op;
+    Term (Term * t, enum o _op, Factor * f) : term(t), factor(f), op(_op) {
+        this->is_leaf = false;
+        this->name = "Term";
+    }
+    Term (Factor * f) : factor(f) {
+        this->is_leaf = false;
+        this->name = "Term";
+        op = SINGLE;
+    }
 
-        Term * term;
-        Factor * factor;
+    Term * term;
+    Factor * factor;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class Factor : public Node {
-    public:
-        enum t {FUNC_WITH_NO_ARGS, 
-                FUNC,
-                CONST_VALUE, 
-                EXPRESSION,
-                NOT_FACTOR,
-                MINUS_FACTOR,
-                ARRAY,
-                MEMBER
-        } type;
-        Factor (ID * i) : id1(i) {
-            this->is_leaf = false;
-            this->name = "Factor";
-            type = FUNC_WITH_NO_ARGS;
-        }
-        Factor (ID * i, ArgsList * al) : id1(i), args_list(al) {
-            this->is_leaf = false;
-            this->name = "Factor";
-            type = FUNC;
-        }
-        Factor (ConstValue * cv) : const_value(cv) {
-            this->is_leaf = false;
-            this->name = "Factor";
-            type = CONST_VALUE;
-        }
-        Factor (Expression * e) : expr(e) {
-            this->is_leaf = false;
-            this->name = "Factor";
-            type = EXPRESSION;
-        }
-        Factor (Factor * f, enum t ty) : factor(f), type(ty) {
-            this->is_leaf = false;
-            this->name = "Factor";
-        }
-        Factor (IDDotted * i, Expression * e) : idd(i), expr(e) {
-            this->is_leaf = false;
-            this->name = "Factor";
-            type = ARRAY;
-        }
-        Factor (IDDotted * i) : idd(i){
-            this->is_leaf = false;
-            this->name = "Factor";
-            type = MEMBER;
-        }
-        ~Factor() {}
-        ID * id1;
-        IDDotted * idd;
-        ArgsList * args_list;
-        ConstValue * const_value;
-        Expression * expr;
-        Factor * factor;
+public:
+    enum t {FUNC_WITH_NO_ARGS,
+            FUNC,
+            CONST_VALUE,
+            EXPRESSION,
+            NOT_FACTOR,
+            MINUS_FACTOR,
+            ARRAY,
+            MEMBER
+    } type;
+    Factor (ID * i) : id1(i) {
+        this->is_leaf = false;
+        this->name = "Factor";
+        type = FUNC_WITH_NO_ARGS;
+    }
+    Factor (ID * i, ArgsList * al) : id1(i), args_list(al) {
+        this->is_leaf = false;
+        this->name = "Factor";
+        type = FUNC;
+    }
+    Factor (ConstValue * cv) : const_value(cv) {
+        this->is_leaf = false;
+        this->name = "Factor";
+        type = CONST_VALUE;
+    }
+    Factor (Expression * e) : expr(e) {
+        this->is_leaf = false;
+        this->name = "Factor";
+        type = EXPRESSION;
+    }
+    Factor (Factor * f, enum t ty) : factor(f), type(ty) {
+        this->is_leaf = false;
+        this->name = "Factor";
+    }
+    Factor (IDDotted * i, Expression * e) : idd(i), expr(e) {
+        this->is_leaf = false;
+        this->name = "Factor";
+        type = ARRAY;
+    }
+    Factor (IDDotted * i) : idd(i){
+        this->is_leaf = false;
+        this->name = "Factor";
+        type = MEMBER;
+    }
+    ~Factor() = default;
+    ID * id1;
+    IDDotted * idd;
+    ArgsList * args_list;
+    ConstValue * const_value;
+    Expression * expr;
+    Factor * factor;
 
-        std::vector<Node *> get_descendants();
+    std::vector<Node *> get_descendants() override;
 };
 
 class ArgsList : public Node {
-    public:
-        ArgsList () {}
-        ~ArgsList () {}
+public:
+    ArgsList () = default;
+    ~ArgsList () = default;
 
-        std::vector<Expression *> args_list;
-        void add(Expression *);
-        std::vector<Node *> get_descendants();
+    std::vector<Expression *> args_list;
+    void add(Expression *);
+    std::vector<Node *> get_descendants() override;
 };
 
 class ExprList: public Node {
-    public:
-        ExprList () {}
-        ~ExprList () {}
+public:
+    ExprList () = default;
+    ~ExprList () = default;
 
-        std::vector<Expression *> expr_list;
-        void add(Expression *);
-        std::vector<Node *> get_descendants();
+    std::vector<Expression *> expr_list;
+    void add(Expression *);
+    std::vector<Node *> get_descendants() override;
 };
 
 #endif

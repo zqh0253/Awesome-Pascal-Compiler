@@ -1,13 +1,13 @@
 #ifndef SEM_H_
 #define SEM_H_
 
-#include<string>
-#include<vector>
-#include<iostream>
+#include <string>
+#include <vector>
+#include <iostream>
 #include <map>
 
 /*******************变量类型******************/
-namespace TypeList {
+namespace sem {
 	const int VOID = -1;
 	const int INT = 0;
 	const int REAL = 1;
@@ -15,59 +15,86 @@ namespace TypeList {
 	const int STRING = 3;
 	const int BOOL = 4;
 	const int ARRAY = 5;
-	const int Range = 6;
+	const int RANGE = 6;
 	const int RECORD = 7;
-}
 
-class SemType {
-public:
-	SemType() = default;
-	int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
-	bool is_const;
-	int get_type() { return type; }
-	~SemType() = default;
-};
 
-class Range : SemType {
-	Range() = default;
-	int begin, end;
-	~Range() = default;
-};
+	class SemType {
+	public:
+		SemType(int type) {
+			this->type = type;
+			this->is_const = false;
+		}
 
-class Array : SemType {
-	Array() = default;
-	int begin, end;
-	SemType *type;
-	~Array() = default;
-};
+		SemType(int type, int is_const) {
+			this->type = type;
+			this->is_const = is_const;
+		}
 
-class Record : SemType {
-	Record() = default;
-	std::vector<std::string> names;
-	std::vector<SemType*> types;
-	~Record() = default;
-};
+		int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
+		bool is_const;
+
+		~SemType() = default;
+	};
+
+	class Range : SemType {
+	public:
+		Range() = default;
+
+		int begin, end;
+
+		~Range() = default;
+	};
+
+	class Array : SemType {
+	public:
+		Array() = default;
+
+		int begin, end;
+		SemType *el_type;
+
+		~Array() = default;
+	};
+
+	class String : SemType {
+	public:
+		String() = default;
+		int size;
+		~String() = default;
+	};
+
+	class Record : SemType {
+	public:
+		Record() = default;
+		std::string llvm_name;
+		~Record() = default;
+	};
 
 /*******************函数信息******************/
-class FuncInfo {
-public:
-	FuncInfo() = default;
-	SemType* ret;
-	std::vector<SemType*> types;
-	std::vector<std::string> names;
-	~FuncInfo() = default;
-};
+	class FuncInfo {
+	public:
+		FuncInfo() = default;
 
-class SemanticAnalyzer {
-public:
-	SemanticAnalyzer() = default;
-	std::string name;
-	std::map<std::string, SemType*> vars;
-	// std::map<std::string, > consts;
-	// std::map<std::string, > labels;
-	std::map<std::string, FuncInfo*> funcs;
+		SemType *ret;
+		std::vector<SemType *> types;
+		std::vector<std::string> names;
 
-	~SemanticAnalyzer() = default;
-};
+		~FuncInfo() = default;
+	};
 
+	class SemanticAnalyzer {
+	public:
+		SemanticAnalyzer() = default;
+
+		std::string name;
+		std::map<std::string, SemType *> vars;
+		// std::map<std::string, > consts;
+		// std::map<std::string, > labels;
+		std::map<std::string, FuncInfo *> funcs;
+
+		SemanticAnalyzer *last;
+
+		~SemanticAnalyzer() = default;
+	};
+}
 #endif

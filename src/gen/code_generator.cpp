@@ -6,117 +6,126 @@ void CodeGenerator::gencode(Node *root) {
 	this->module = new llvm::Module("main", *this->context);
 	this->ir_builder = new llvm::IRBuilder<>(*this->context);
 
-//	root->codegen(this);
+	root->codegen(this);
+}
+
+void CodeGenerator::pre_gencode(Node *n) {
+	for (auto child: n->get_descendants()) {
+		child->codegen(this);
+	}
+	n->sem_analyze(top_sem());
 }
 
 //void CodeGenerator::set_local_variable() {
 //
 //}
 
-//llvm::Constant *CodeGenerator::get_constant() {
-//	return nullptr;
-//}
-//
-//
-//llvm::Value* Program::codegen(CodeGenerator *cg) {
-//	program_heading->codegen(cg);
-//	routine->codegen(cg);
-//
-//	return nullptr;
-//}
-//
-//llvm::Value* ProgramHeading::codegen(CodeGenerator *cg) {
-//	std::string &program_name = program_ID->name;
-//	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
-//	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::InternalLinkage, program_name, cg->module);
-//	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context, CodeGenerator::get_entry_name(program_name), func);
-//	cg->ir_builder->SetInsertPoint(bb);
-//
-//	return nullptr;
-//}
-//
-//llvm::Value* Routine::codegen(CodeGenerator *cg) {
-//	routine_head->codegen(cg);
-//	routine_body->codegen(cg);
-//	return nullptr;
-//}
-//
-//llvm::Value* RoutineHead::codegen(CodeGenerator *cg) {
-//	for (auto child: get_descendants()) {
-//		child->codegen(cg);
-//	}
-//	this->sem_analyze(cg->top_sem());
-//
-//
-//	return nullptr;
-//}
-//
-//llvm::Value* LabelPart::codegen(CodeGenerator *cg) {
-//
-//	this->sem_analyze(cg->top_sem());
-//
-//	return nullptr;
-//}
-//
-//llvm::Value* ConstPart::codegen(CodeGenerator *cg) {
-//	if (!is_empty) {
-//		const_expr_list->codegen(cg);
-//	}
-//	this->sem_analyze(cg->top_sem());
-//	return nullptr;
-//}
-//
-//llvm::Value* ConstExprList::codegen(CodeGenerator *cg) {
-//	for (auto child: const_expr_list) {
-//		child->codegen(cg);
-//	}
-//	this->sem_analyze(cg->top_sem());
-//	return nullptr;
-//}
-//
-//llvm::Value* ConstExpr::codegen(CodeGenerator *cg) {
-//	this->sem_analyze(cg->top_sem());
-//	std::string &const_name = id->idt;
-//
-//	switch (const_value->type) {
-//		case ConstValue::INTEGER:
-//
-//			break;
-//		case ConstValue::REAL:
-//			break;
-//		case ConstValue::CHAR:
-//			break;
-//		case ConstValue::STRING:
-//			break;
-//		case ConstValue::SYSCON:
-//			break;
-//	}
-//	return nullptr;
-//}
-//
-//llvm::Value* TypePart::codegen(CodeGenerator *cg) {
-//	if (!is_empty) {
-//		type_dec_list->codegen(cg);
-//	}
-//	this->sem_analyze(cg->top_sem());
-//	return nullptr;
-//}
-//
-//llvm::Value* TypeDecList::codegen(CodeGenerator *cg) {
-//	for (auto type_decl: type_definition_list) {
-//		type_decl->codegen(cg);
-//	}
-//	this->sem_analyze(cg->top_sem());
-//	return nullptr;
-//}
-//
-//llvm::Value* TypeDef::codegen(CodeGenerator *cg) {
-//	for (auto child: get_descendants()) {
-//		child->codegen(cg);
-//	}
-//	this->sem_analyze(cg->top_sem());
-//
-//	std::string &type_name = id->idt;
-//
-//	return nullptr;
-//}
+llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
+	llvm::Constant *ret = nullptr;
+	if (c->type == ConstValue::INTEGER) {
+		ret = llvm::ConstantInt::get(getIntTy(), c->integer);
+	} else if (c->type == ConstValue::REAL) {
+		ret = llvm::ConstantFP::get(getRealTy(), c->real);
+	} else if (c->type == ConstValue::CHAR) {
+		ret = llvm::ConstantInt::get(getCharTy(), c->ch);
+	} else if (c->type == ConstValue::STRING) {
+//		ret = new llvm::StringLiteral(c->str);
+	} else if (c->type == ConstValue::MAXINT) {
+		ret = llvm::ConstantInt::get(getIntTy(), 0x7fffffff);
+	} else if (c->type == ConstValue::TRUE) {
+		ret = llvm::ConstantInt::get(getBoolTy(), true);
+	} else if (c->type == ConstValue::MAXINT) {
+		ret = llvm::ConstantInt::get(getBoolTy(), false);
+	}
+	return ret;
+}
+
+llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
+	llvm::Type *ret = nullptr;
+	if (type->type == sem::VOID) {
+		ret = getVoidTy();
+	} else if (type->type == sem::INT) {
+		ret = getIntTy();
+	} else if (type->type == sem::REAL) {
+		ret = getRealTy();
+	} else if (type->type == sem::CHAR) {
+		ret = getCharTy();
+	} else if (type->type == sem::BOOL) {
+		ret = getBoolTy();
+	} else if (type->type == sem::STRING) {
+		sem::String *s = (sem::String *)type;
+		ret = getStringTy(s->size);
+	} else if (type->type == sem::ARRAY) {
+		sem::Array *a = (sem::Array *)type;
+		ret = getArrayTy(to_llvm_type(a->el_type), a->end - a->begin);
+	} else if (type->type == sem::RANGE) {
+		ret = getStructTy("range");
+		if (ret == nullptr) {
+			std::vector<llvm::Type*> types;
+			types.push_back(llvm::Type::getInt32Ty(*context));
+			types.push_back(llvm::Type::getInt32Ty(*context));
+			ret = createStructTy(types, "range");
+		}
+	} else if (type->type == sem::RECORD) {
+		sem::Record *r = (sem::Record *)type;
+		ret = getStructTy(r->llvm_name);
+	}
+	return ret;
+}
+
+/* ----- Code Generation ----- */
+void Program::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void ProgramHeading::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+	std::string &program_name = program_ID->name;
+	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
+	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::InternalLinkage, program_name, cg->module);
+	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context, CodeGenerator::get_entry_name(program_name), func);
+	cg->ir_builder->SetInsertPoint(bb);
+}
+
+void Routine::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void RoutineHead::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void LabelPart::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void ConstPart::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void ConstExprList::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void ConstExpr::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+	std::string &const_name = id->idt;
+	sem::SemType *const_type = cg->top_sem()->vars[const_name];
+	llvm::Type *llvm_type = cg->to_llvm_type(const_type);
+	llvm::Value *llvm_value = cg->to_llvm_constant(const_value);
+
+}
+
+void TypePart::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void TypeDecList::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+}
+
+void TypeDef::codegen(CodeGenerator *cg) {
+	cg->pre_gencode(this);
+
+	std::string &type_name = id->idt;
+}
