@@ -5,3 +5,4 @@
 src/naive/build/
 *.doc
 .idea/
+/cmake-build-debug/
