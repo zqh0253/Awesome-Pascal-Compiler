@@ -27,9 +27,9 @@ namespace sem {
 		int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
 		bool is_const;
 
-		// virtual ~SemType() = default;
         virtual void display();
-		virtual ~SemType(){std::cout << "Type is over" << std::endl;}
+		virtual ~SemType() = default;
+		// virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
 
 	extern SemType *IntTy;
@@ -50,8 +50,8 @@ namespace sem {
 
 		int begin, end;
 
-		// ~Range() = default;
-        ~Range(){std::cout << "Range is over" << std::endl;}
+		~Range() = default;
+        // ~Range(){std::cout << "Range is over" << std::endl;}
 	};
 
 	class Array : public SemType {
@@ -62,8 +62,8 @@ namespace sem {
 		int begin, end;
 		SemType *el_type;
 
-		// ~Array() = default;
-        ~Array(){std::cout << "Array is over" << std::endl;}
+		~Array() = default;
+        // ~Array(){std::cout << "Array is over" << std::endl;}
 	};
 
 	class String : public SemType {
@@ -71,8 +71,8 @@ namespace sem {
 		String(int _size):SemType(STRING),size(_size){}
 		String(int _size, int _is_const):SemType(STRING,_is_const),size(_size){}
 		int size;
-		// ~String() = default;
-        ~String(){std::cout << "String is over" << std::endl;}
+		~String() = default;
+        // ~String(){std::cout << "String is over" << std::endl;}
 	};
 
 	class Record : public SemType {
