@@ -70,7 +70,8 @@ namespace sem {
 
 	class Record : SemType {
 	public:
-		std::string llvm_name;
+		std::string type_name;
+		std::map<std::string, std::pair<SemType*, int>> types;
 		~Record() = default;
 	};
 
@@ -96,8 +97,8 @@ namespace sem {
 		std::map<std::string, SemType *> vars;
 		// std::map<std::string, > consts;
 		// std::map<std::string, > labels;
+		std::map<std::string, SemType*> types;
 		std::map<std::string, FuncInfo *> funcs;
-
 		SemanticAnalyzer *last;
 
 		~SemanticAnalyzer() = default;

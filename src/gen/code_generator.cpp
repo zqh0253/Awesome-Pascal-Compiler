@@ -144,14 +144,49 @@ void ConstExpr::codegen(CodeGenerator *cg) {
 }
 
 void TypePart::codegen(CodeGenerator *cg) {
-//	cg->gencode_children(this);
+	cg->gencode_children(this);
 }
 
 void TypeDecList::codegen(CodeGenerator *cg) {
-//	cg->gencode_children(this);
+	cg->gencode_children(this);
 }
 
 void TypeDef::codegen(CodeGenerator *cg) {
-//	cg->gencode_children(this);
+	cg->gencode_children(this);
 //	std::string &type_name = id->idt;
 }
+
+void TypeDec::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void SimpleType::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void ArrayType::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void RecordType::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+	std::vector<std::string> names;
+	std::vector<llvm::Type*> types;
+	for (auto var_dec: record_dec_list->var_dec_list) {
+		llvm::Type *type = cg->to_llvm_type(var_dec->type_dec->sem_type);
+		for (auto var: var_dec->id_list->ID_list) {
+			names.push_back(var->idt);
+			types.push_back(type);
+		}
+	}
+	cg->createStructTy(types, );
+}
+
+void VarDecList::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void VarDec::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+

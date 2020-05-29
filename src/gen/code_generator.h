@@ -113,6 +113,10 @@ public:
 		return cur_module->getTypeByName(name);
 	}
 
+	llvm::Type *createStructTy(std::vector<llvm::Type *> types) {
+		return llvm::StructType::create(*context, types);
+	}
+
 	llvm::Type *createStructTy(std::vector<llvm::Type *> types, llvm::StringRef name) {
 		return llvm::StructType::create(*context, types, name);
 	}

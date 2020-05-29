@@ -362,6 +362,10 @@ public:
     ArrayType * array_type;
     RecordType * record_type;
     std::vector<Node *> get_descendants() override;
+
+    sem::SemType *sem_type;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class SimpleType : public Node {
@@ -394,6 +398,8 @@ public:
     IDList * id_list;
     RangeType * range_type;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class SysType : public Node {
@@ -442,6 +448,8 @@ public:
     SimpleType * simple_type;
     TypeDec * type_dec;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class RecordType : public Node {
@@ -455,6 +463,8 @@ public:
 
     VarDecList * record_dec_list;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class VarPart : public Node {
@@ -485,6 +495,8 @@ public:
     std::vector<VarDec *> var_dec_list;
     void add(VarDec *);
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class VarDec : public Node {
@@ -499,6 +511,8 @@ public:
     IDList * id_list;
     TypeDec * type_dec;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class RoutinePart : public Node {
