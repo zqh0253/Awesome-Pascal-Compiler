@@ -120,8 +120,8 @@ namespace sem {
 			return this->name + "_" + local_name;
 		}
 
-		SemType *last_record(){
-			return types[RECORD_FIRST_NAME+std::to_string(num)];
+		Record *last_record(){
+			return (Record*)types[RECORD_FIRST_NAME+std::to_string(num)];
 		}
 
 		SemanticAnalyzer *last_sem();

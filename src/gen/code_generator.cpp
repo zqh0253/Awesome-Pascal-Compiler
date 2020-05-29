@@ -157,7 +157,13 @@ void TypeDecList::codegen(CodeGenerator *cg) {
 
 void TypeDef::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-//	std::string &type_name = id->idt;
+	if (type_dec->type == TypeDec::RECORD) {
+		// 在 LLVM 中重命名 Record
+		sem::Record *record = (sem::Record *)cg->local_sem()->types[id->idt];
+		llvm::StructType *t = cg->getStructTy(record->global_name());
+		record->type_name = id->idt;
+		t->setName(record->global_name());
+	}
 }
 
 void TypeDec::codegen(CodeGenerator *cg) {
@@ -174,17 +180,12 @@ void ArrayType::codegen(CodeGenerator *cg) {
 
 void RecordType::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-//	sem::Record *record = cg->local_sem()->last_record();
+	sem::Record *record = cg->local_sem()->last_record();
 	std::vector<llvm::Type*> types;
-//	for (auto re)
-//	for (auto var_dec: record_dec_list->var_dec_list) {
-//		llvm::Type *type = cg->to_llvm_type(var_dec->type_dec->sem_type);
-//		for (auto var: var_dec->id_list->ID_list) {
-//			names.push_back(var->idt);
-//			types.push_back(type);
-//		}
-//	}
-//	cg->createStructTy(types, record->global_name());
+	for (auto var: record->types) {
+		types.push_back(cg->to_llvm_type(var.second));
+	}
+	cg->createStructTy(types, record->global_name());
 }
 
 void VarDecList::codegen(CodeGenerator *cg) {
