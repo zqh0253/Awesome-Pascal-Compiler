@@ -334,7 +334,7 @@ public:
     ID * id;
     TypeDec * type_dec;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -363,8 +363,8 @@ public:
     RecordType * record_type;
     std::vector<Node *> get_descendants() override;
 
-    sem::SemType *sem_type;
-
+    sem::SemType *sem_type = nullptr;
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -397,8 +397,9 @@ public:
     ID * id;
     IDList * id_list;
     RangeType * range_type;
+    sem::SemType *sem_type;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -447,8 +448,9 @@ public:
 
     SimpleType * simple_type;
     TypeDec * type_dec;
+    sem::SemType *sem_type;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -462,8 +464,9 @@ public:
     ~RecordType() = default;
 
     VarDecList * record_dec_list;
+    sem::SemType *sem_type;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -513,7 +516,7 @@ public:
     IDList * id_list;
     TypeDec * type_dec;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 

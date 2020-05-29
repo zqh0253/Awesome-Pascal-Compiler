@@ -15,17 +15,20 @@ namespace sem {
 	const int VOID = 3;
 	const int BOOL = 4;
 	const int STRING = 5;
-	const int ARRAY = 6;
-	const int RANGE = 7;
+	const int RANGE = 6;
+	const int ARRAY = 7;
 	const int RECORD = 8;
 
 	/*
 	* 用于区分实际实体
-	* 0-4 为基本类型
-	* 5-9 为基本类型的常量形式
+	* 0-5 为基本类型
+	* 6-11 为基本类型的常量形式
 	*/
-	const int CONST = 5;
+	const int CONST = 6;
 	extern std::string RECORD_FIRST_NAME;
+	extern std::string STRING_FIRST_NAME;
+	extern std::string RANGE_FIRST_NAME;
+	extern std::string ARRAY_FIRST_NAME;
 
 	class SemanticAnalyzer;
 	class SemType {
@@ -38,10 +41,16 @@ namespace sem {
 
         virtual void display();
 		virtual ~SemType() = default;
+		virtual bool operator==(SemType &t){
+			return (type== t.type && is_const == t.is_const);
+		}
 		// virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
 	// 全局变量
 	extern SemType *Entity_List[20];
+	extern std::map<std::string, SemType *> Global_Types;
+	// 用于处理Clobal_Types的函数
+	// bool register_in(std::string name, sem::SemType *ret);
 
 	class Range : public SemType {
 	public:
@@ -77,6 +86,7 @@ namespace sem {
 
 	class Record : public SemType {
 	public:
+		Record(std::string name, SemanticAnalyzer *ca):SemType(sem::RECORD),type_name(name),local(ca){}
 		std::string type_name;
 		SemanticAnalyzer *local;
 		std::vector<std::pair<std::string, SemType*>> types;
@@ -117,16 +127,27 @@ namespace sem {
 		}
 
 		Record *last_record(){
-			return (Record*)types[RECORD_FIRST_NAME+std::to_string(num)];
+			return (Record*)types[RECORD_FIRST_NAME+std::to_string(num-1)];
 		}
 
 		SemanticAnalyzer *last_sem();
 		SemanticAnalyzer *global_sem();
 
 		void display();
+		sem::SemType *find_var(std::string name);
 
 		// ~SemanticAnalyzer() = default;
-		~SemanticAnalyzer(){}
+		~SemanticAnalyzer(){this->display();}
+	};
+
+	class SemEXception{
+	public:
+		SemEXception(std::string str):sem_e(str){}
+		virtual std::string what(){
+			return sem_e;
+		}
+	private:
+		std::string sem_e;
 	};
 
 	// 初始化函数
