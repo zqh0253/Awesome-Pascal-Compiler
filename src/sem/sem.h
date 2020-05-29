@@ -135,8 +135,8 @@ namespace sem {
 		SemanticAnalyzer *global_sem();
 
 		void display(int i);
-		SemType *find_var(std::string name);
-		SemType *find_type(std::string name);
+		SemType *find_var(std::string &name);
+		SemType *find_type(std::string &name);
 
 		// ~SemanticAnalyzer() = default;
 		~SemanticAnalyzer(){this->display(0);}

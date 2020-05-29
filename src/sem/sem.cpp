@@ -84,14 +84,14 @@ sem::SemanticAnalyzer *sem::SemanticAnalyzer::global_sem() {
 	return cg->global_sem();
 }
 
-sem::SemType *sem::SemanticAnalyzer::find_var(std::string name){
+sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
 	if (this->vars.count(name)) return this->vars[name];
 	else if(this->global_sem()->vars.count(name)) return this->global_sem()->vars[name];
 	else throw sem::SemEXception("Type: variable "+name+" has not be defined!");
 	return nullptr;
 }
 
-sem::SemType *sem::SemanticAnalyzer::find_type(std::string name){
+sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 	if (this->types.count(name)) return this->types[name];
 	else if(this->global_sem()->types.count(name)) return this->global_sem()->types[name];
 	else throw sem::SemEXception("Type: variable "+name+" has not be defined!");
