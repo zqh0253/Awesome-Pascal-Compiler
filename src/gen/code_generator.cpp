@@ -8,21 +8,21 @@ void CodeGenerator::gencode(Node *root) {
 		this->context = new llvm::LLVMContext;
 		this->ir_builder = new llvm::IRBuilder<>(*this->context);
 	}
-//	std::cout << "Begin generating code ..." << std::endl;
+	std::cout << "Begin generating code ..." << std::endl;
 	if (root && root->is_root()) {
 		root->codegen(this);
 	}
-//	std::cout << "End generating code !" << std::endl;
+	std::cout << "End generating code !" << std::endl;
 	llvm::llvm_shutdown();
 }
 
-void CodeGenerator::gencode_children(Node *root) {
-	if (!root) return;
-	for (auto child: root->get_descendants()) {
+void CodeGenerator::gencode_children(Node *n) {
+	if (!n) return;
+	for (auto child: n->get_descendants()) {
 		if (child)
 			child->codegen(this);
 	}
-	root->sem_analyze(local_sem());
+	n->sem_analyze(local_sem());
 }
 
 llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, std::string &name) {
@@ -43,12 +43,12 @@ llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	} else if (c->type == ConstValue::CHAR) {
 		ret = llvm::ConstantInt::get(getCharTy(), c->ch);
 	} else if (c->type == ConstValue::STRING) {
-//		ret = new llvm::StringLiteral(c->str);
-	} else if (c->type == ConstValue::MAXINT) {
+		ret = llvm::ConstantDataArray::getString(*context, c->str);
+	} else if (c->type == ConstValue::SYSCON && c->sys_con == ConstValue::MAXINT) {
 		ret = llvm::ConstantInt::get(getIntTy(), 0x7fffffff);
-	} else if (c->type == ConstValue::TRUE) {
+	} else if (c->type == ConstValue::SYSCON && c->sys_con == ConstValue::TRUE) {
 		ret = llvm::ConstantInt::get(getBoolTy(), true);
-	} else if (c->type == ConstValue::FALSE) {
+	} else if (c->type == ConstValue::SYSCON && c->sys_con == ConstValue::FALSE) {
 		ret = llvm::ConstantInt::get(getBoolTy(), false);
 	}
 	return ret;
@@ -121,6 +121,7 @@ void Routine::codegen(CodeGenerator *cg) {
 
 void RoutineHead::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
+	this->sem_analyze(cg->local_sem());
 }
 
 void LabelPart::codegen(CodeGenerator *cg) {
@@ -138,7 +139,8 @@ void ConstExprList::codegen(CodeGenerator *cg) {
 void ConstExpr::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 	std::string &const_name = id->idt;
-
+//	std::cout << const_name << std::endl;
+//	std::cout << const_value->type << std::endl;
 	sem::SemType *const_type = cg->local_sem()->vars[const_name];
 	llvm::Type *llvm_type = cg->to_llvm_type(const_type);
 	llvm::Value *llvm_value = cg->to_llvm_constant(const_value);
@@ -194,4 +196,16 @@ void VarDecList::codegen(CodeGenerator *cg) {
 
 void VarDec::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
+}
+
+void VarPart::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+	if (!is_empty) {
+		for (auto var: var_dec_list->var_dec_list) {
+			llvm::Type *type = cg->to_llvm_type(var->type_dec->sem_type);
+			for (auto id: var->id_list->ID_list) {
+				cg->alloc_local_variable(type, id->idt);
+			}
+		}
+	}
 }

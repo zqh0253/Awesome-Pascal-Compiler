@@ -55,12 +55,12 @@ void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 	} else if (const_value->type == ConstValue::CHAR) {
 		const_type = sem::ConstCharTy;
 	} else if (const_value->type == ConstValue::STRING) {
-//		ret = new llvm::StringLiteral(const_value->str);
-	} else if (const_value->type == ConstValue::MAXINT) {
+		const_type = new sem::String(const_value->str.size(), true);
+	} else if (const_value->type == ConstValue::SYSCON && const_value->sys_con == ConstValue::MAXINT) {
 		const_type = sem::ConstIntTy;
-	} else if (const_value->type == ConstValue::TRUE) {
+	} else if (const_value->type == ConstValue::SYSCON && const_value->sys_con == ConstValue::TRUE) {
 		const_type = sem::ConstBoolTy;
-	} else if (const_value->type == ConstValue::FALSE) {
+	} else if (const_value->type == ConstValue::SYSCON && const_value->sys_con == ConstValue::FALSE) {
 		const_type = sem::ConstBoolTy;
 	}
 	ca->vars[const_name] = const_type;

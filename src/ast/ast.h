@@ -482,6 +482,8 @@ public:
     bool is_empty;
     VarDecList * var_dec_list;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class VarDecList : public Node {

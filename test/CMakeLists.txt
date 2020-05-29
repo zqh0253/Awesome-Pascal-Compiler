@@ -6,6 +6,6 @@ add_custom_target(
 
 add_custom_target(
 		apc-test-gen
-		COMMAND apc < ${CMAKE_CURRENT_SOURCE_DIR}/pasfile/const.pas
+		COMMAND apc < ${CMAKE_CURRENT_SOURCE_DIR}/pasfile/gen.pas
 		DEPENDS apc
 )

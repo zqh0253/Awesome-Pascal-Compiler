@@ -217,7 +217,10 @@ COMMENT "{"[^\}]*"}"
     return CHAR;
 }
 {STR} {
-    yylval.str = yytext;
+    yylval.str = yytext + 1;
+    char *p = yylval.str;
+    while (*p++);
+    *(p-2) = 0;
     return STR;
 }
 
