@@ -9,16 +9,22 @@
 class CodeGenerator;
 /*******************变量类型******************/
 namespace sem {
-	const int VOID = -1;
 	const int INT = 0;
 	const int REAL = 1;
 	const int CHAR = 2;
-	const int STRING = 3;
+	const int VOID = 3;
 	const int BOOL = 4;
-	const int ARRAY = 5;
-	const int RANGE = 6;
-	const int RECORD = 7;
-	
+	const int STRING = 5;
+	const int ARRAY = 6;
+	const int RANGE = 7;
+	const int RECORD = 8;
+
+	/*
+	* 用于区分实际实体
+	* 0-4 为基本类型
+	* 5-9 为基本类型的常量形式
+	*/
+	const int CONST = 5;
 	extern std::string RECORD_FIRST_NAME;
 
 	class SemanticAnalyzer;
@@ -34,18 +40,8 @@ namespace sem {
 		virtual ~SemType() = default;
 		// virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
-
+	// 全局变量
 	extern SemType *Entity_List[20];
-	extern SemType *IntTy;
-	extern SemType *VoidTy;
-	extern SemType *RealTy;
-	extern SemType *BoolTy;
-	extern SemType *CharTy;
-	extern SemType *ConstIntTy;
-	extern SemType *ConstVoidTy;
-	extern SemType *ConstRealTy;
-	extern SemType *ConstBoolTy;
-	extern SemType *ConstCharTy;
 
 	class Range : public SemType {
 	public:
@@ -100,7 +96,7 @@ namespace sem {
 		~FuncInfo() = default;
 	};
 
-
+/*******************符号表******************/
 	class SemanticAnalyzer {
 	public:
 		int num=0;
@@ -127,7 +123,13 @@ namespace sem {
 		SemanticAnalyzer *last_sem();
 		SemanticAnalyzer *global_sem();
 
-		~SemanticAnalyzer() = default;
+		void display();
+
+		// ~SemanticAnalyzer() = default;
+		~SemanticAnalyzer(){}
 	};
+
+	// 初始化函数
+	void Init();
 }
 #endif
