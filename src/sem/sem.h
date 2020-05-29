@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 
+
 /*******************变量类型******************/
 namespace sem {
 	const int VOID = -1;
@@ -17,6 +18,8 @@ namespace sem {
 	const int ARRAY = 5;
 	const int RANGE = 6;
 	const int RECORD = 7;
+	
+	std::string RECORD_FIRST_NAME = "$record_";
 
 	class SemanticAnalyzer;
 	class SemType {
@@ -32,6 +35,7 @@ namespace sem {
 		// virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
 
+	extern SemType *Entity_List[20];
 	extern SemType *IntTy;
 	extern SemType *VoidTy;
 	extern SemType *RealTy;
@@ -79,7 +83,7 @@ namespace sem {
 	public:
 		std::string type_name;
 		SemanticAnalyzer *local;
-		std::map<std::string, std::pair<SemType*, int>> types;
+		std::vector<std::pair<std::string, SemType*>> types;
 		~Record() = default;
 	};
 
@@ -97,6 +101,7 @@ namespace sem {
 
 	class SemanticAnalyzer {
 	public:
+		int num=0;
 		SemanticAnalyzer() = default;
 		SemanticAnalyzer(std::string &name) {
 			this->name = name;
@@ -111,6 +116,10 @@ namespace sem {
 
 		std::string global_name(std::string &local_name) {
 			return this->name + "_" + local_name;
+		}
+
+		SemType *last_record(){
+			return types[RECORD_FIRST_NAME+std::to_string(num)];
 		}
 
 		~SemanticAnalyzer() = default;

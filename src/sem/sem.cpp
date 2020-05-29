@@ -24,7 +24,7 @@ void sem::SemType::display(){
     return;
 }
 
-void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
+void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca, CodeGenerator *cg) {
 	std::string &const_name = id->idt;
 	sem::SemType *const_type = nullptr;
 	if (const_value->type == ConstValue::INTEGER) {
