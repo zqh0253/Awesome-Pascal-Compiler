@@ -531,6 +531,8 @@ public:
     std::vector<SubProgram *> func_and_proc;
     void add(SubProgram *);
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class SubProgram : public Node {
@@ -553,6 +555,8 @@ public:
     SimpleType * simple_type;
     Routine* routine;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Parameters : public Node {

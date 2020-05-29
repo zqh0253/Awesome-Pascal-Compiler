@@ -14,10 +14,12 @@ void CodeGenerator::gencode(Node *root) {
 	}
 	std::cout << "End generating code !" << std::endl;
 	llvm::llvm_shutdown();
+	local_sem()->display();
 }
 
 void CodeGenerator::gencode_children(Node *n) {
 	if (!n) return;
+	std::cout << "Begin generating code for " << n->name << "(" << n << ")" << std::endl;
 	for (auto child: n->get_descendants()) {
 		if (child)
 			child->codegen(this);
@@ -96,18 +98,19 @@ void Node::codegen(CodeGenerator *cg) {
 
 void Program::codegen(CodeGenerator *cg) {
 	// 初始化 Module 和 main 函数
+	std::cout << "Begin generating code for " << name << "(" << this << ")" << std::endl;
 	std::string &program_name = get_program_name();
 	cg->add_module(program_name);
+//	std::cout << program_name << std::endl;
 	std::string func_name = "main";
 	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
 	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::InternalLinkage,
 	                                              func_name, cg->cur_module);
 	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context,
 			CodeGenerator::get_entry_name(func_name), func);
-	cg->push_block(bb, func_name);
-
+	cg->push_block(bb, new sem::SemanticAnalyzer(func_name));
+//	std::cout << "Begin generating code for " << name << "(" << this << ")" << std::endl;
 	cg->gencode_children(this);
-
 	cg->cur_module->print(llvm::outs(), nullptr);
 }
 
@@ -209,3 +212,13 @@ void VarPart::codegen(CodeGenerator *cg) {
 		}
 	}
 }
+
+void RoutinePart::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void SubProgram::codegen(CodeGenerator *cg) {
+
+}
+
+// Routine Body

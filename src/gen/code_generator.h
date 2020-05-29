@@ -29,14 +29,15 @@ public:
 	void gencode(Node *root);
 	void gencode_children(Node *root);
 
-	static std::string get_entry_name(std::string& s) {
+	static std::string get_entry_name(const std::string& s) {
 		return s + "_entry";
 	}
 
-	std::string local_func_name(std::string &name) {
+	std::string to_global_name(const std::string &name) {
 		return local_sem()->name + "_" + name;
 	}
 
+	// block
 	void push_block(MyBlock *block) {
 		if (block) {
 			block->sa->cg = this;
@@ -48,8 +49,8 @@ public:
 	void push_block(llvm::BasicBlock *bb, sem::SemanticAnalyzer *sa) {
 		push_block(new MyBlock(bb, sa));
 	}
-	void push_block(llvm::BasicBlock *bb, std::string &name) {
-		push_block(new MyBlock(bb, new sem::SemanticAnalyzer(name)));
+	void push_block(llvm::BasicBlock *bb, const std::string &name) {
+		push_block(new MyBlock(bb, new sem::SemanticAnalyzer(to_global_name(name))));
 	}
 	MyBlock *pop_block() {
 		MyBlock *top = local_block();
@@ -72,15 +73,15 @@ public:
 		modules[module->getName().str()] = module;
 		cur_module = module;
 	}
-	llvm::Module * get_module(std::string &name) {
+	llvm::Module * get_module(const std::string &name) {
 		llvm::Module *ret = nullptr;
 		if (modules.count(name)) {
 			ret = modules[name];
 		}
 		return ret;
 	}
-	llvm::Instruction *alloc_local_variable(llvm::Type *type, std::string &name);
-	llvm::Instruction *store_local_variable(std::string &name, llvm::Value *val);
+
+	// constant and type
 	llvm::Constant *to_llvm_constant(ConstValue *c);
 	llvm::Type *to_llvm_type(sem::SemType *type);
 
@@ -112,13 +113,33 @@ public:
 		return llvm::ArrayType::get(ElementType, NumElements);
 	}
 
-	llvm::StructType *getStructTy(llvm::StringRef name) {
+	llvm::StructType *getStructTy(const std::string &name) {
 		return cur_module->getTypeByName(name);
 	}
 
-	llvm::Type *createStructTy(std::vector<llvm::Type *> &types, llvm::StringRef name) {
+	llvm::Type *createStructTy(std::vector<llvm::Type *> &types, const std::string &name) {
 		return llvm::StructType::create(*context, types, name);
 	}
+
+	// function
+	llvm::Function *createFunction(const std::string &name, sem::FuncInfo *func) {
+		std::vector<llvm::Type*> arg_list;
+		llvm::FunctionType *func_type = llvm::FunctionType::get(to_llvm_type(func->ret), arg_list, false);
+		llvm::Function *llvm_func = llvm::Function::Create(func_type, llvm::GlobalValue::InternalLinkage,
+		                                                   to_global_name(name), cur_module);
+		llvm::BasicBlock *bb = llvm::BasicBlock::Create(*context, CodeGenerator::get_entry_name(name), llvm_func);
+		push_block(bb, name);
+		return llvm_func;
+	}
+
+	llvm::Function *getFunction(const std::string &name) {
+		return cur_module->getFunction(name);
+	}
+
+	// instruction
+	llvm::Instruction *alloc_local_variable(llvm::Type *type, std::string &name);
+	llvm::Instruction *store_local_variable(std::string &name, llvm::Value *val);
+
 };
 
 

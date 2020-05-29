@@ -213,6 +213,7 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 }
 
 void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
+	if (is_empty) return;
 	for(std::vector<VarDec *>::size_type i=0;i!=var_dec_list->var_dec_list.size();i++){
 		VarDec *temp = var_dec_list->var_dec_list[i];
 		if (temp->type_dec->sem_type == nullptr)

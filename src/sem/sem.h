@@ -110,7 +110,7 @@ namespace sem {
 	class SemanticAnalyzer {
 	public:
 		int num=0;
-		SemanticAnalyzer(std::string &name) {
+		SemanticAnalyzer(const std::string &name) {
 			this->name = name;
 		}
 		unsigned int level;

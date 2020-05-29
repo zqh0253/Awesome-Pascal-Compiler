@@ -13,6 +13,11 @@ int main() {
     sem::Init();
 	std::cout << "========= Code Generation =========" << std::endl;
     CodeGenerator cg;
-    cg.gencode(ast_root);
+    try {
+	    cg.gencode(ast_root);
+    } catch (sem::SemEXception e) {
+		std::cout << e.what() << std::endl;
+		cg.local_sem()->display();
+    }
     return 0;
 }
