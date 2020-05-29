@@ -11,7 +11,6 @@
 class CodeGenerator {
 private:
 	std::vector<MyBlock*> block_stack;
-	int unnamed_record_cnt = 0;
 
 public:
 	llvm::LLVMContext *context = nullptr;
@@ -57,6 +56,7 @@ public:
 		return top;
 	}
 	sem::SemanticAnalyzer *local_sem() { return local_block()->sa; }
+	sem::SemanticAnalyzer *global_sem() { return global_block()->sa; }
 	llvm::BasicBlock *local_bb() { return local_block()->bb; }
 	MyBlock *local_block() { return get_block(block_stack.size() - 1); }
 	MyBlock *get_block(int index) { return block_stack[index]; }
@@ -114,16 +114,8 @@ public:
 		return cur_module->getTypeByName(name);
 	}
 
-	llvm::Type *createStructTy(std::vector<llvm::Type *> &types) {
-		return createStructTy(types, "$record_"+std::to_string(unnamed_record_cnt++));
-	}
-
 	llvm::Type *createStructTy(std::vector<llvm::Type *> &types, llvm::StringRef name) {
 		return llvm::StructType::create(*context, types, name);
-	}
-
-	void setNameForLastStructTy(llvm::StringRef new_name) {
-		getStructTy("$record_"+std::to_string(--unnamed_record_cnt))->setName(new_name);
 	}
 };
 
