@@ -9,7 +9,15 @@ TYPE
     rtype = RECORD
         a : INTEGER;
         b,c : REAL;
+        d : RECORD
+            a : INTEGER;
+            b,c : REAL;
+        END;
     END;
+VAR
+    b : test;
+    asd: rtype;
+    asdf: INTEGER;
 BEGIN
 
 END.

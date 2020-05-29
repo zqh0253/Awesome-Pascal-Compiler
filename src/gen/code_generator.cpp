@@ -14,7 +14,7 @@ void CodeGenerator::gencode(Node *root) {
 	}
 	std::cout << "End generating code !" << std::endl;
 	llvm::llvm_shutdown();
-	local_sem()->display();
+	local_sem()->display(0);
 }
 
 void CodeGenerator::gencode_children(Node *n) {

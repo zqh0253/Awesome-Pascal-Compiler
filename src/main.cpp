@@ -17,7 +17,7 @@ int main() {
 	    cg.gencode(ast_root);
     } catch (sem::SemEXception e) {
 		std::cout << e.what() << std::endl;
-		cg.local_sem()->display();
+		cg.local_sem()->display(0);
     }
     return 0;
 }

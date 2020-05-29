@@ -29,8 +29,8 @@ void sem::Init(){
 // 	else  return false;
 // }
 
-void sem::SemType::display(){
-    std::string TYPES_MAP[8]={"int","real","char","string","bool","array","range","record"};
+void sem::SemType::display(int i){
+    std::string TYPES_MAP[9]={"int","real","char","void","bool","string","range","array"};
     std::cout << TYPES_MAP[this->type];
     if (this->is_const)
         std::cout << " const" << std::endl;
@@ -39,18 +39,34 @@ void sem::SemType::display(){
     return;
 }
 
-void sem::SemanticAnalyzer::display(){
-	std::cout << "======= SEM OF "<< name <<" =======" << std::endl;
+void sem::Record::display(int i){
+	std::cout << "record";
+    if (this->is_const)
+        std::cout << " const" << std::endl;
+    else
+        std::cout << " not const" << std::endl;
+	for (int j=0;j<types.size();j++){
+		for (int j=0;j<i;j++) std::cout << "  ";
+		std::cout << "name:" << types[j].first << " type:";
+		types[j].second->display(i+1);
+	}
+	return;
+}
+
+void sem::SemanticAnalyzer::display(int i){
+	std::cout << "======= sem of "<< name <<" =======" << std::endl;
 	std::map<std::string, sem::SemType *>::iterator iter;
 	std::cout <<"All Types"<< std::endl;
 	for (iter = types.begin();iter !=  types.end();iter++){
-		std::cout << "new name:" << iter->first << " type:";
-		iter->second->display();
+		for (int j=0;j<i;j++) std::cout << "  ";
+		std::cout << "name:" << iter->first << " type:";
+		iter->second->display(i+1);
 	}
 	std::cout <<"All Vars"<< std::endl;
 	for (iter = vars.begin();iter !=  vars.end();iter++){
-		std::cout << "new name:" << iter->first << " type:";
-		iter->second->display();
+		for (int j=0;j<i;j++) std::cout << "  ";
+		std::cout << "name:" << iter->first << " type:";
+		iter->second->display(i+1);
 	}
 	std::cout << "======= end =======" << std::endl;
 	return;
@@ -71,6 +87,13 @@ sem::SemanticAnalyzer *sem::SemanticAnalyzer::global_sem() {
 sem::SemType *sem::SemanticAnalyzer::find_var(std::string name){
 	if (this->vars.count(name)) return this->vars[name];
 	else if(this->global_sem()->vars.count(name)) return this->global_sem()->vars[name];
+	else throw sem::SemEXception("Type: variable "+name+" has not be defined!");
+	return nullptr;
+}
+
+sem::SemType *sem::SemanticAnalyzer::find_type(std::string name){
+	if (this->types.count(name)) return this->types[name];
+	else if(this->global_sem()->types.count(name)) return this->global_sem()->types[name];
 	else throw sem::SemEXception("Type: variable "+name+" has not be defined!");
 	return nullptr;
 }
@@ -151,12 +174,12 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 		}
 	}
 	else if(type == SimpleType::IDENTIFY){
-		sem_type = ca->find_var(id->idt);
+		sem_type = ca->find_type(id->idt);
 	}
 	else if(type == SimpleType::IDLIST){
 		for(std::vector<ID *>::size_type i=0;i!=id_list->ID_list.size();i++){
 			if(id_list->ID_list[i] == id_list->ID_list[0]){
-				if (i==0) sem_type = ca->find_var(id_list->ID_list[0]->idt);
+				if (i==0) sem_type = ca->find_type(id_list->ID_list[0]->idt);
 			}
 			else throw sem::SemEXception("Type: "+id_list->name+" are not the same!");
 		}

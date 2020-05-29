@@ -39,7 +39,7 @@ namespace sem {
 		int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
 		bool is_const;
 
-        virtual void display();
+        virtual void display(int i);
 		virtual ~SemType() = default;
 		virtual bool operator==(SemType &t){
 			return (type== t.type && is_const == t.is_const);
@@ -90,6 +90,7 @@ namespace sem {
 		std::string type_name;
 		SemanticAnalyzer *local;
 		std::vector<std::pair<std::string, SemType*>> types;
+		void display(int i);
 		~Record() = default;
 		std::string global_name();
 	};
@@ -133,11 +134,12 @@ namespace sem {
 		SemanticAnalyzer *last_sem();
 		SemanticAnalyzer *global_sem();
 
-		void display();
-		sem::SemType *find_var(std::string name);
+		void display(int i);
+		SemType *find_var(std::string name);
+		SemType *find_type(std::string name);
 
 		// ~SemanticAnalyzer() = default;
-		~SemanticAnalyzer(){this->display();}
+		~SemanticAnalyzer(){this->display(0);}
 	};
 
 	class SemEXception{
