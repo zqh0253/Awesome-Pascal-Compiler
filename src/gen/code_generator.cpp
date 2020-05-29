@@ -90,6 +90,10 @@ llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
 
 
 /* ----- Code Generation ----- */
+void Node::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
 void Program::codegen(CodeGenerator *cg) {
 	// 初始化 Module 和 main 函数
 	std::string &program_name = get_program_name();
@@ -170,16 +174,17 @@ void ArrayType::codegen(CodeGenerator *cg) {
 
 void RecordType::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-	std::vector<std::string> names;
+//	sem::Record *record = cg->local_sem()->last_record();
 	std::vector<llvm::Type*> types;
-	for (auto var_dec: record_dec_list->var_dec_list) {
-		llvm::Type *type = cg->to_llvm_type(var_dec->type_dec->sem_type);
-		for (auto var: var_dec->id_list->ID_list) {
-			names.push_back(var->idt);
-			types.push_back(type);
-		}
-	}
-	cg->createStructTy(types);
+//	for (auto re)
+//	for (auto var_dec: record_dec_list->var_dec_list) {
+//		llvm::Type *type = cg->to_llvm_type(var_dec->type_dec->sem_type);
+//		for (auto var: var_dec->id_list->ID_list) {
+//			names.push_back(var->idt);
+//			types.push_back(type);
+//		}
+//	}
+//	cg->createStructTy(types, record->global_name());
 }
 
 void VarDecList::codegen(CodeGenerator *cg) {

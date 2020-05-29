@@ -78,7 +78,7 @@ public:
     void prt(int step);
     virtual bool is_root() { return false; }
     virtual void codegen(CodeGenerator *cg);
-	virtual void sem_analyze(sem::SemanticAnalyzer *ca, CodeGenerator *cg);
+	virtual void sem_analyze(sem::SemanticAnalyzer *ca);
 };
 
 class Program : public Node {
@@ -239,7 +239,7 @@ public:
 
 	void codegen(CodeGenerator *cg) override;
 
-	void sem_analyze(sem::SemanticAnalyzer *ca, CodeGenerator *cg) override;
+	void sem_analyze(sem::SemanticAnalyzer *ca) override;
 };
 
 class ConstValue : public Node {

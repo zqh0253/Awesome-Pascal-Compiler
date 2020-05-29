@@ -6,7 +6,7 @@
 #include <iostream>
 #include <map>
 
-
+class CodeGenerator;
 /*******************变量类型******************/
 namespace sem {
 	const int VOID = -1;
@@ -19,7 +19,7 @@ namespace sem {
 	const int RANGE = 6;
 	const int RECORD = 7;
 	
-	std::string RECORD_FIRST_NAME = "$record_";
+	extern std::string RECORD_FIRST_NAME;
 
 	class SemanticAnalyzer;
 	class SemType {
@@ -85,6 +85,7 @@ namespace sem {
 		SemanticAnalyzer *local;
 		std::vector<std::pair<std::string, SemType*>> types;
 		~Record() = default;
+		std::string global_name();
 	};
 
 /*******************函数信息******************/
@@ -99,20 +100,21 @@ namespace sem {
 		~FuncInfo() = default;
 	};
 
+
 	class SemanticAnalyzer {
 	public:
 		int num=0;
-		SemanticAnalyzer() = default;
 		SemanticAnalyzer(std::string &name) {
 			this->name = name;
 		}
+		unsigned int level;
+		CodeGenerator *cg;
 		std::string name;
 		std::map<std::string, SemType *> vars;
 		// std::map<std::string, > consts;
 		// std::map<std::string, > labels;
 		std::map<std::string, SemType*> types;
 		std::map<std::string, FuncInfo *> funcs;
-		SemanticAnalyzer *last;
 
 		std::string global_name(std::string &local_name) {
 			return this->name + "_" + local_name;
@@ -121,6 +123,9 @@ namespace sem {
 		SemType *last_record(){
 			return types[RECORD_FIRST_NAME+std::to_string(num)];
 		}
+
+		SemanticAnalyzer *last_sem();
+		SemanticAnalyzer *global_sem();
 
 		~SemanticAnalyzer() = default;
 	};

@@ -1,7 +1,9 @@
 #include "sem.h"
 #include "ast/ast.h"
+#include "gen/code_generator.h"
 
 namespace sem {
+	std::string RECORD_FIRST_NAME = "$record_";
 	SemType *IntTy = new SemType(INT);
 	SemType *VoidTy = new SemType(VOID);
 	SemType *RealTy = new SemType(REAL);
@@ -24,7 +26,26 @@ void sem::SemType::display(){
     return;
 }
 
-void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca, CodeGenerator *cg) {
+std::string sem::Record::global_name() {
+	return local->global_name(type_name);
+}
+
+sem::SemanticAnalyzer *sem::SemanticAnalyzer::last_sem() {
+	return cg->get_block(level-1)->sa;
+}
+
+sem::SemanticAnalyzer *sem::SemanticAnalyzer::global_sem() {
+	return cg->global_sem();
+}
+
+
+/* ------------ Semantic Analyze ------------ */
+void Node::sem_analyze(sem::SemanticAnalyzer *ca) {
+
+}
+
+
+void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 	std::string &const_name = id->idt;
 	sem::SemType *const_type = nullptr;
 	if (const_value->type == ConstValue::INTEGER) {

@@ -39,6 +39,8 @@ public:
 
 	void push_block(MyBlock *block) {
 		if (block) {
+			block->sa->cg = this;
+			block->sa->level = this->block_stack.size();
 			block_stack.push_back(block);
 			ir_builder->SetInsertPoint(block->bb);
 		}
