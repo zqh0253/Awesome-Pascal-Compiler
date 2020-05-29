@@ -14,6 +14,16 @@ namespace sem {
 	SemType *ConstCharTy = new SemType(CHAR, true);
 }
 
+void sem::SemType::display(){
+    std::string TYPES_MAP[8]={"int","real","char","string","bool","array","range","record"};
+    std::cout << "type is " << TYPES_MAP[this->type] << std::endl;
+    if (this->is_const)
+        std::cout << "var is const" << std::endl;
+    else
+        std::cout << "var is not const" << std::endl;
+    return;
+}
+
 void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 	std::string &const_name = id->idt;
 	sem::SemType *const_type = nullptr;

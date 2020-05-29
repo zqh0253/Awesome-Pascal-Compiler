@@ -21,20 +21,15 @@ namespace sem {
 
 	class SemType {
 	public:
-		SemType(int type) {
-			this->type = type;
-			this->is_const = false;
-		}
-
-		SemType(int type, int is_const) {
-			this->type = type;
-			this->is_const = is_const;
-		}
+		SemType(int _type):type(_type),is_const(false){}
+		SemType(int _type, int _is_const):type(_type),is_const(_is_const){}
 
 		int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
 		bool is_const;
 
-		~SemType() = default;
+		// virtual ~SemType() = default;
+        virtual void display();
+		virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
 
 	extern SemType *IntTy;
@@ -48,27 +43,39 @@ namespace sem {
 	extern SemType *ConstBoolTy;
 	extern SemType *ConstCharTy;
 
-	class Range : SemType {
+	class Range : public SemType {
 	public:
+		Range(int _begin, int _end):SemType(RANGE),begin(_begin),end(_end){}
+        Range(int _begin, int _end, int _is_const):SemType(RANGE, _is_const),begin(_begin),end(_end){}
+
 		int begin, end;
-		~Range() = default;
+
+		// ~Range() = default;
+        ~Range(){std::cout << "Range is over" << std::endl;}
 	};
 
-	class Array : SemType {
+	class Array : public SemType {
 	public:
+		Array(int _begin, int _end, SemType *_el_type):SemType(ARRAY),begin(_begin),end(_end),el_type(_el_type){}
+        Array(int _begin, int _end, SemType *_el_type, int _is_const):SemType(ARRAY, _is_const),begin(_begin),end(_end),el_type(_el_type){}
+
 		int begin, end;
 		SemType *el_type;
 
-		~Array() = default;
+		// ~Array() = default;
+        ~Array(){std::cout << "Array is over" << std::endl;}
 	};
 
-	class String : SemType {
+	class String : public SemType {
 	public:
+		String(int _size):SemType(STRING),size(_size){}
+		String(int _size, int _is_const):SemType(STRING,_is_const),size(_size){}
 		int size;
-		~String() = default;
+		// ~String() = default;
+        ~String(){std::cout << "String is over" << std::endl;}
 	};
 
-	class Record : SemType {
+	class Record : public SemType {
 	public:
 		std::string type_name;
 		std::map<std::string, std::pair<SemType*, int>> types;
