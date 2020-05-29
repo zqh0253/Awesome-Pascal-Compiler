@@ -212,14 +212,17 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 	return;
 }
 
-void VarDec::sem_analyze(sem::SemanticAnalyzer *ca){
-	for(std::vector<ID *>::size_type i=0;i!=id_list->ID_list.size();i++){
-		std::string namee = id_list->ID_list[i]->idt;
-		if (ca->vars.count(name))
-			throw sem::SemEXception("Def: Variable name "+name+" has a conflict!");
-		else if (type_dec->sem_type == nullptr)
-			throw sem::SemEXception("Def: Type "+type_dec->name+" is not exist!");
-		else ca->vars[name] = type_dec->sem_type;
+void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
+	for(std::vector<VarDec *>::size_type i=0;i!=var_dec_list->var_dec_list.size();i++){
+		VarDec *temp = var_dec_list->var_dec_list[i];
+		if (temp->type_dec->sem_type == nullptr)
+				throw sem::SemEXception("Def: Type "+temp->type_dec->name+" is not exist!");
+		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
+			std::string name = temp->id_list->ID_list[j]->idt;
+			if (ca->vars.count(name))
+				throw sem::SemEXception("Def: Variable name "+name+" has a conflict!");
+			else ca->vars[name] = temp->type_dec->sem_type;
+		}
 	}
 	return;
 }

@@ -485,7 +485,7 @@ public:
     bool is_empty;
     VarDecList * var_dec_list;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -516,7 +516,7 @@ public:
     IDList * id_list;
     TypeDec * type_dec;
     std::vector<Node *> get_descendants() override;
-    void sem_analyze(sem::SemanticAnalyzer *ca) override;
+
 	void codegen(CodeGenerator *cg) override;
 };
 
