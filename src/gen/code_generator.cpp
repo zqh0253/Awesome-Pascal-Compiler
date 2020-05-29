@@ -82,7 +82,7 @@ llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
 		}
 	} else if (type->type == sem::RECORD) {
 		sem::Record *r = (sem::Record *)type;
-		ret = getStructTy(r->llvm_name);
+		ret = getStructTy(r->local->global_name(r->type_name));
 	}
 	return ret;
 }
@@ -179,7 +179,7 @@ void RecordType::codegen(CodeGenerator *cg) {
 			types.push_back(type);
 		}
 	}
-	cg->createStructTy(types, );
+	cg->createStructTy(types);
 }
 
 void VarDecList::codegen(CodeGenerator *cg) {
@@ -189,4 +189,3 @@ void VarDecList::codegen(CodeGenerator *cg) {
 void VarDec::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 }
-

@@ -18,7 +18,7 @@ namespace sem {
 	const int RANGE = 6;
 	const int RECORD = 7;
 
-
+	class SemanticAnalyzer;
 	class SemType {
 	public:
 		SemType(int _type):type(_type),is_const(false){}
@@ -78,6 +78,7 @@ namespace sem {
 	class Record : public SemType {
 	public:
 		std::string type_name;
+		SemanticAnalyzer *local;
 		std::map<std::string, std::pair<SemType*, int>> types;
 		~Record() = default;
 	};
@@ -107,6 +108,10 @@ namespace sem {
 		std::map<std::string, SemType*> types;
 		std::map<std::string, FuncInfo *> funcs;
 		SemanticAnalyzer *last;
+
+		std::string global_name(std::string &local_name) {
+			return this->name + "_" + local_name;
+		}
 
 		~SemanticAnalyzer() = default;
 	};
