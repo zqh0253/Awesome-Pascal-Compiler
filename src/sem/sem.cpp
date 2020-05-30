@@ -325,7 +325,7 @@ void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 	// 需要判定左右是否一样
 	sem::SemType *check;
 	int n = idd->id_list.size()-1;
-	std::string name = idd->id_list[n]->idt;
+	std::string name = idd->id_list[0]->idt;
 	// 建立左值结构
 	check = ca->find_var(name);
 	left_value = new sem::LeftValue(name,check);
@@ -333,8 +333,12 @@ void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 	for(int i=0;i<n;i++){
 		sem::Record *temp = (sem::Record*) check;
 		name = idd->id_list[i]->idt;// 获取前一个的名字
-		left_value->locations.push_back(std::find(temp->names.begin(),temp->names.end(),name)-temp->names.begin());
-		check = ca->find_var(name);
+		std::vector<std::string>::iterator loc=std::find(temp->names.begin(),temp->names.end(),name);
+		if(loc == temp->names.end()){
+			left_value->locations.push_back(loc-temp->names.begin());
+			check = temp->types[name];
+		}
+		else throw sem::SemException("Var: Variable name " + name + " can't be found in record \"" + temp->type_name + "\"");
 	}
 	// array类型检测未完成
 	if (check->is_const) throw sem::SemException("Var: Const variable "+name+" can't be changed!");
