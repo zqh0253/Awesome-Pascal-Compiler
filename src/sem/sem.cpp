@@ -104,7 +104,7 @@ sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 	return nullptr;
 }
 
-bool sem::SemanticAnalyzer::is_availabel(std::string &name, std::string e){
+bool sem::SemanticAnalyzer::is_available(std::string &name, const std::string &e){
 	if (this->vars.count(name) && this->types.count(name) && this->funcs.count(name)){
 		throw sem::SemEXception(e);
 		return 0;
@@ -145,7 +145,7 @@ void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 
 void TypeDef::sem_analyze(sem::SemanticAnalyzer *ca){
 	/* 类型检查 */
-	if (! ca->is_availabel(id->idt,("TypeDef: Type name "+id->idt+" has a conflict!"))) return;
+	if (! ca->is_available(id->idt,("TypeDef: Type name "+id->idt+" has a conflict!"))) return;
 	/* 维护语义 */
 	ca->types[id->idt] = type_dec->sem_type;
 	return;
@@ -260,7 +260,7 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（当前语义块内部）
-			if (! ca->is_availabel(name,("VarDef: Variable name "+name+" has a conflict!"))) return;
+			if (! ca->is_available(name,("VarDef: Variable name "+name+" has a conflict!"))) return;
 			else ca->vars[name] = temp->type_dec->sem_type;
 		}
 	}
@@ -270,7 +270,7 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 void SubProgramHead::sem_analyze(sem::SemanticAnalyzer *ca){
 	// 检查命名是否合法
 	sem::FuncInfo *temp;
-	if (! ca->is_availabel(id->idt, ("FuncDef: Function name "+id->idt+" has a conflict!"))) return;
+	if (! ca->is_available(id->idt, ("FuncDef: Function name "+id->idt+" has a conflict!"))) return;
 	// 判断是否有参数
 	if (parameters->func_info == nullptr){
 		temp = new sem::FuncInfo();

@@ -146,7 +146,7 @@ namespace sem {
 		SemType *find_type(std::string &name);
 
 		// 检测本层内冲突
-		bool is_availabel(std::string &name, std::string e);
+		bool is_available(std::string &name, const std::string &e);
 
 		// ~SemanticAnalyzer() = default;
 		~SemanticAnalyzer(){this->display(0);}
