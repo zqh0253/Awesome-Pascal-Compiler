@@ -33,7 +33,8 @@ llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, std::st
 
 llvm::Instruction *CodeGenerator::store_local_variable(std::string &name, llvm::Value *val) {
 	llvm::Value *v = local_bb()->getValueSymbolTable()->lookup(name);
-	return new llvm::StoreInst(val, v, false, local_bb());
+	return ir_builder->CreateStore(val, v, false);
+//	return new llvm::StoreInst(val, v, false, local_bb());
 }
 
 llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
@@ -124,7 +125,6 @@ void Routine::codegen(CodeGenerator *cg) {
 
 void RoutineHead::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-	this->sem_analyze(cg->local_sem());
 }
 
 void LabelPart::codegen(CodeGenerator *cg) {
@@ -218,7 +218,32 @@ void RoutinePart::codegen(CodeGenerator *cg) {
 }
 
 void SubProgram::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
 }
 
 // Routine Body
+void RoutineBody::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void CompoundStmt::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void Statement::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void AssignStmt::codegen(CodeGenerator *cg) {
+//	cg->gencode_children(this);
+//	std::vector<ID*> &names = idd->id_list;
+//	llvm::Value *v = cg->local_bb()->getValueSymbolTable()->lookup(names[0]->idt);
+//	if (names.size() > 1) {
+//		sem::Record *t = (sem::Record *) cg->local_sem()->vars[names[0]->idt];
+//		for (int i = 1; i < names.size(); i++) {
+//			int idx = t->get_index_for_name();
+//		}
+//		llvm::GetElementPtrInst::Create(cg->to_llvm_type(t), v, , "ptr", cg->local_bb());
+//		v = cg->local_bb()->getValueSymbolTable()->lookup("ptr");
+//	}
+}

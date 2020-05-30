@@ -45,6 +45,7 @@ SimpleType* simplet;
 VarDecList* vdl;
 VarDec* vard;
 SubProgram* subp;
+SubProgramHead* subphead;
 Parameters* param;
 ParaDecList* paradl;
 ParaTypeList* paratl;
@@ -121,6 +122,7 @@ CaseExpr* caseexpr;
 %type <idd> IDD;
 
 %type <subp> sub_program;
+%type <subphead> sub_program_head;
 %type <param> parameters;
 %type <paradl> para_dec_list;
 %type <paratl> para_type_list;
@@ -226,8 +228,10 @@ routine_part : routine_part sub_program {$$=$1; $$->add($2);}
             | sub_program               {$$=new RoutinePart(); $$->add($1);}
             |                           {$$=new RoutinePart(); $$->is_leaf = true;}
 
-sub_program : REV_FUNCTION IDT parameters OP_COLON simple_type OP_SEMICOLON routine OP_SEMICOLON {$$=new SubProgram($2,$3,$5,$7);}
-            | REV_PROCEDURE IDT parameters OP_SEMICOLON routine OP_SEMICOLON {$$=new SubProgram($2,$3,$5);}
+sub_program : sub_program_head OP_SEMICOLON routine OP_SEMICOLON {$$=new SubProgram($1,$3);}
+
+sub_program_head : REV_FUNCTION IDT parameters OP_COLON simple_type {$$=new SubProgramHead($2,$3,$5);}
+                 | REV_PROCEDURE IDT parameters {$$=new SubProgramHead($2,$3);}
 
 parameters : OP_LPAREN para_dec_list OP_RPAREN  {$$=new Parameters($2);}
             |                                   {$$=new Parameters();}

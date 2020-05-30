@@ -35,6 +35,7 @@ class VarDec;
 
 class RoutinePart;
 class SubProgram;
+class SubProgramHead;
 class Parameters;
 class ParaDecList;
 class ParaTypeList;
@@ -537,26 +538,38 @@ public:
 
 class SubProgram : public Node {
 public:
-    enum t {FUNCTION, PROCEDURE} type;
-    SubProgram (ID * _id, Parameters * p, SimpleType * st, Routine * rt): id(_id), parameters(p), simple_type(st), routine(rt) {
+    SubProgram (SubProgramHead *_head, Routine * rt): head(_head), routine(rt) {
         this->is_leaf = false;
         this->name = "Subprogram";
-        this->type = FUNCTION;
-    }
-    SubProgram (ID * _id, Parameters * p, Routine * rt): id(_id), parameters(p), routine(rt) {
-        this->is_leaf = false;
-        this->name = "Subprogram";
-        this->type = PROCEDURE;
     }
     ~SubProgram () = default;
 
-    ID * id;
-    Parameters * parameters;
-    SimpleType * simple_type;
+	SubProgramHead * head;
     Routine* routine;
     std::vector<Node *> get_descendants() override;
 
 	void codegen(CodeGenerator *cg) override;
+};
+
+class SubProgramHead : public Node {
+public:
+	enum t {FUNCTION, PROCEDURE} type;
+	SubProgramHead (ID * _id, Parameters * p, SimpleType * st): id(_id), parameters(p), simple_type(st) {
+		this->is_leaf = false;
+		this->name = "SubprogramHead";
+		this->type = FUNCTION;
+	}
+	SubProgramHead (ID * _id, Parameters * p): id(_id), parameters(p) {
+		this->is_leaf = false;
+		this->name = "SubprogramHead";
+		this->type = PROCEDURE;
+	}
+	~SubProgramHead () = default;
+
+	ID * id;
+	Parameters * parameters;
+	SimpleType * simple_type;
+	std::vector<Node *> get_descendants() override;
 };
 
 class Parameters : public Node {
@@ -612,6 +625,8 @@ public:
 
     CompoundStmt * compound_stmt;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class CompoundStmt : public Node {
@@ -623,6 +638,8 @@ public:
 
     StatementList * stmt_list;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class StatementList : public Node {
@@ -699,6 +716,8 @@ public:
 
     void set_anchor(int a);
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class CaseStmt : public Node {
@@ -776,6 +795,8 @@ public:
     Expression * e1,* e2;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ProcStmt : public Node {

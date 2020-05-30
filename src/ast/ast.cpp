@@ -220,11 +220,17 @@ void RoutinePart::add(SubProgram * sp){
 
 std::vector<Node *> SubProgram::get_descendants(){
     std::vector<Node *> list;
-    list.push_back(this->id);
-    list.push_back(this->parameters);
-    if (this->type == SubProgram::FUNCTION) list.push_back(this->simple_type);
+    list.push_back(this->head);
     list.push_back(this->routine);
     return list;
+}
+
+std::vector<Node *> SubProgramHead::get_descendants(){
+	std::vector<Node *> list;
+	list.push_back(this->id);
+	list.push_back(this->parameters);
+	if (this->type == SubProgramHead::FUNCTION) list.push_back(this->simple_type);
+	return list;
 }
 
 std::vector<Node *> Parameters::get_descendants(){
