@@ -334,6 +334,7 @@ void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 		sem::Record *temp = (sem::Record*) check;
 		name = idd->id_list[i]->idt;// 获取前一个的名字
 		auto loc=std::find(temp->names.begin(),temp->names.end(),name);
+		// 判断record中变量是否存在
 		if(loc != temp->names.end()){
 			left_value->locations.push_back(loc-temp->names.begin());
 			check = temp->types[name];
