@@ -371,7 +371,7 @@ public:
 
 class SimpleType : public Node {
 public:
-    enum type {SYS_TYPE, IDENTIFY, IDLIST, RANGE, STRING} type;
+    enum type {SYS_TYPE, IDENTIFY, RANGE} type;
     SimpleType(SysType * st):sys_type(st) {
         this->type = SYS_TYPE;
         this->is_leaf = false;
@@ -382,11 +382,11 @@ public:
         this->is_leaf = false;
         this->name = "SimpleType";
     }
-    SimpleType(IDList * il):id_list(il) {
-        this->type = IDLIST;
-        this->is_leaf = false;
-        this->name = "SimpleType";
-    }
+    // SimpleType(IDList * il):id_list(il) {
+    //     this->type = IDLIST;
+    //     this->is_leaf = false;
+    //     this->name = "SimpleType";
+    // }
     SimpleType(RangeType * rt):range_type(rt) {
         this->type = RANGE;
         this->is_leaf = false;
@@ -396,9 +396,9 @@ public:
 
     SysType * sys_type;
     ID * id;
-    IDList * id_list;
+    // IDList * id_list;
     RangeType * range_type;
-    sem::SemType *sem_type;
+    sem::SemType *sem_type=nullptr;
     std::vector<Node *> get_descendants() override;
     void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
@@ -563,6 +563,7 @@ public:
 		this->is_leaf = false;
 		this->name = "SubprogramHead";
 		this->type = PROCEDURE;
+        this->simple_type = nullptr;
 	}
 	~SubProgramHead () = default;
 
@@ -570,11 +571,12 @@ public:
 	Parameters * parameters;
 	SimpleType * simple_type;
 	std::vector<Node *> get_descendants() override;
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 };
 
 class Parameters : public Node {
 public:
-    Parameters () {
+    Parameters () : is_empty(true) {
         this->is_leaf = true;
         this->name = "Parameters";
     }
@@ -584,8 +586,11 @@ public:
     }
     ~Parameters () = default;
 
+    bool is_empty;
     ParaDecList * para_dec_list;
+    sem::FuncInfo * func_info=nullptr;
     std::vector<Node *> get_descendants() override;
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 };
 
 class ParaDecList : public Node {

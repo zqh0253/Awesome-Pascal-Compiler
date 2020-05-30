@@ -45,10 +45,10 @@ void sem::Record::display(int i){
         std::cout << " const" << std::endl;
     else
         std::cout << " not const" << std::endl;
-	for (int j=0;j<types.size();j++){
+	for (int j=0;j<names.size();j++){
 		for (int j=0;j<i;j++) std::cout << "  ";
-		std::cout << "name:" << types[j].first << " type:";
-		types[j].second->display(i+1);
+		std::cout << "name:" << names[j] << " type:";
+		types[names[j]]->display(i+1);
 	}
 	return;
 }
@@ -104,6 +104,13 @@ sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 	return nullptr;
 }
 
+bool sem::SemanticAnalyzer::is_availabel(std::string &name, std::string e){
+	if (this->vars.count(name) && this->types.count(name) && this->funcs.count(name)){
+		throw sem::SemEXception(e);
+		return 0;
+	}
+	else return 1;
+}
 
 /* ------------ Semantic Analyze ------------ */
 void Node::sem_analyze(sem::SemanticAnalyzer *ca) {
@@ -138,6 +145,7 @@ void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 
 void TypeDef::sem_analyze(sem::SemanticAnalyzer *ca){
 	/* 类型检查 */
+	if (! ca->is_availabel(id->idt,("TypeDef: Type name "+id->idt+" has a conflict!"))) return;
 	/* 维护语义 */
 	ca->types[id->idt] = type_dec->sem_type;
 	return;
@@ -159,7 +167,6 @@ void TypeDec::sem_analyze(sem::SemanticAnalyzer *ca){
 }
 
 void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
-	sem_type = nullptr;
 	if (type == SimpleType::SYS_TYPE){
 		/* 类型检查 */
 		/* 维护语义 */
@@ -182,14 +189,15 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 	else if(type == SimpleType::IDENTIFY){
 		sem_type = ca->find_type(id->idt);
 	}
-	else if(type == SimpleType::IDLIST){
-		for(std::vector<ID *>::size_type i=0;i!=id_list->ID_list.size();i++){
-			if(id_list->ID_list[i] == id_list->ID_list[0]){
-				if (i==0) sem_type = ca->find_type(id_list->ID_list[0]->idt);
-			}
-			else throw sem::SemEXception("Type: "+id_list->name+" are not the same!");
-		}
-	}
+	// else if(type == SimpleType::IDLIST){
+	// 	// 可能存在一些问题，需要修改
+	// 	for(std::vector<ID *>::size_type i=0;i!=id_list->ID_list.size();i++){
+	// 		if(id_list->ID_list[i] == id_list->ID_list[0]){
+	// 			if (i==0) sem_type = ca->find_type(id_list->ID_list[0]->idt);
+	// 		}
+	// 		else throw sem::SemEXception("Type: "+id_list->name+" are not the same!");
+	// 	}
+	// }
 	else if(type == SimpleType::RANGE){
 		// 这里也许需要存变量的值
 		// if (range_type->type == RangeType::IDENTIFY){
@@ -224,19 +232,18 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 	sem::Record *re = (sem::Record*)sem_type;
 	for(std::vector<VarDec *>::size_type i=0;i!=record_dec_list->var_dec_list.size();i++){
 		VarDec *temp = record_dec_list->var_dec_list[i];
-		std::vector<std::string> names;
 		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
 				throw sem::SemEXception("Def: Type "+temp->type_dec->name+" is not exist!");
 		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（record内部）
-			if (std::find(names.begin(),names.end(),name) != names.end())
+			if (std::find(re->names.begin(),re->names.end(),name) != re->names.end())
 				throw sem::SemEXception("Def: Variable name "+name+" in record \""+ re_name +"\" has a conflict!");
 			else {
-				re->types.push_back(make_pair(name,temp->type_dec->sem_type));
+				re->names.push_back(name);
+				re->types[name] = temp->type_dec->sem_type;
 			}
-			names.push_back(name);
 		}
 	}
 	ca->types[re_name] = sem_type;
@@ -253,7 +260,7 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（当前语义块内部）
-			if (ca->vars.count(name))
+			if (ca->is_availabel(name,("VarDef: Variable name "+name+" has a conflict!")))
 				throw sem::SemEXception("Def: Variable name "+name+" has a conflict!");
 			else ca->vars[name] = temp->type_dec->sem_type;
 		}
@@ -261,6 +268,44 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 	return;
 }
 
+void SubProgramHead::sem_analyze(sem::SemanticAnalyzer *ca){
+	// 检查命名是否合法
+	sem::FuncInfo *temp;
+	if (! ca->is_availabel(id->idt, ("FuncDef: Function name "+id->idt+" has a conflict!"))) return;
+	// 判断是否有参数
+	if (parameters->func_info == nullptr){
+		temp = new sem::FuncInfo();
+	}
+	else temp = parameters->func_info;
+	// 判断是否有返回值
+	if (simple_type == nullptr) temp->ret = sem::Entity_List[sem::VOID];
+	else temp->ret = simple_type->sem_type;
+	// 根据函数名记录函数
+	ca->funcs[id->idt] = temp;
+	return;
+}
 
-
-
+void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
+	if (is_empty) return;
+	else{
+		func_info = new sem::FuncInfo();
+		std::vector<std::string> names;
+		for(std::vector<ParaTypeList *>::size_type i=0;i!=para_dec_list->para_dec_list.size();i++){
+			ParaTypeList *temp = para_dec_list->para_dec_list[i];
+			// 检查类型是否存在
+			if (temp->simple_type->sem_type == nullptr)
+					throw sem::SemEXception("Function: Type "+temp->simple_type->id->idt+" is not exist!");
+			for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
+				std::string name = temp->id_list->ID_list[j]->idt;
+				// 检查变量名是否冲突（function内部）
+				if (std::find(names.begin(),names.end(),name) != names.end())
+					throw sem::SemEXception("Function: Variable name "+name+" in parameters has a conflict!");
+				else {
+					func_info->types.push_back(make_pair(name,temp->simple_type->sem_type));
+				}
+				names.push_back(name);
+			}
+		}
+	}
+	return;
+}

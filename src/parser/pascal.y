@@ -191,7 +191,6 @@ type_dec : simple_type {$$=new TypeDec($1);}
 
 simple_type : sys_type {$$=new SimpleType($1);}
             | IDT {$$=new SimpleType($1);}
-            | OP_LPAREN id_list OP_RPAREN {$$=new SimpleType($2);}
             | range_type {$$=new SimpleType($1);}
 
 sys_type : TYPE_BOOL {$$=new SysType(SysType::BOOLEAN);}

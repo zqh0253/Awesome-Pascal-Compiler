@@ -89,7 +89,8 @@ namespace sem {
 		Record(std::string name, SemanticAnalyzer *ca):SemType(sem::RECORD),type_name(name),local(ca){}
 		std::string type_name;
 		SemanticAnalyzer *local;
-		std::vector<std::pair<std::string, SemType*>> types;
+		std::vector<std::string> names;
+		std::map<std::string, SemType*> types;
 		void display(int i);
 		~Record() = default;
 		std::string global_name();
@@ -101,9 +102,9 @@ namespace sem {
 		FuncInfo() = default;
 
 		SemType *ret;
-		std::vector<SemType *> types;
-		std::vector<std::string> names;
+		std::vector<std::pair<std::string, SemType*>> types;
 
+		// void display();
 		~FuncInfo() = default;
 	};
 
@@ -113,6 +114,11 @@ namespace sem {
 		int num=0;
 		SemanticAnalyzer(const std::string &name) {
 			this->name = name;
+		}
+		SemanticAnalyzer(const std::string &_name, std::vector<std::pair<std::string, SemType*>> &types):name(_name){
+			for(int i=0;i!=types.size();i++){
+				this->vars[types[i].first] = types[i].second;
+			}
 		}
 		unsigned int level;
 		CodeGenerator *cg;
@@ -135,8 +141,12 @@ namespace sem {
 		SemanticAnalyzer *global_sem();
 
 		void display(int i);
+		// 搜索变量
 		SemType *find_var(std::string &name);
 		SemType *find_type(std::string &name);
+
+		// 检测本层内冲突
+		bool is_availabel(std::string &name, std::string e);
 
 		// ~SemanticAnalyzer() = default;
 		~SemanticAnalyzer(){this->display(0);}

@@ -143,8 +143,8 @@ std::vector<Node *> SimpleType::get_descendants(){
         list.push_back(this->sys_type);
     else if (this->type == SimpleType::IDENTIFY)
         list.push_back(this->id);
-    else if (this->type == SimpleType::IDLIST)
-        list.push_back(this->id_list);
+    // else if (this->type == SimpleType::IDLIST)
+    //     list.push_back(this->id_list);
     else if (this->type == SimpleType::RANGE)
         list.push_back(this->range_type);
     return list;
