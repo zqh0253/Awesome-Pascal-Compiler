@@ -171,9 +171,9 @@ namespace sem {
 
 		void display(int i);
 		// 搜索变量
-		SemType *find_var(std::string &name);
-		SemType *find_type(std::string &name);
-		FuncInfo *find_func(std::string &name);
+		SemType *find_var(const std::string &name);
+		SemType *find_type(const std::string &name);
+		FuncInfo *find_func(const std::string &name);
 
 		// 检测本层内冲突
 		bool is_available(std::string &name, const std::string &e);

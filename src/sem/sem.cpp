@@ -127,7 +127,7 @@ sem::SemanticAnalyzer *sem::SemanticAnalyzer::global_sem() {
 	return cg->global_sem();
 }
 
-sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
+sem::SemType *sem::SemanticAnalyzer::find_var(const std::string &name){
 	sem::SemanticAnalyzer* temp = this;
 	for(temp=this; temp != this->global_sem(); temp = temp->last_sem()){
 		if(temp->vars.count(name)) return temp->vars[name];
@@ -136,7 +136,7 @@ sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
 	else throw sem::SemException("Var: variable '" + name + "' has not be defined!");
 }
 
-sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
+sem::SemType *sem::SemanticAnalyzer::find_type(const std::string &name){
 	sem::SemanticAnalyzer* temp = this;
 	for(temp=this; temp != this->global_sem(); temp = temp->last_sem()){
 		if(temp->types.count(name)) return temp->types[name];
@@ -145,7 +145,7 @@ sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 	else throw sem::SemException("Type: type '" + name + "' has not be defined!");
 }
 
-sem::FuncInfo *sem::SemanticAnalyzer::find_func(std::string &name){
+sem::FuncInfo *sem::SemanticAnalyzer::find_func(const std::string &name){
 	sem::SemanticAnalyzer* temp = this;
 	for(temp=this; temp != this->global_sem(); temp = temp->last_sem()){
 		if(temp->funcs.count(name)) return temp->funcs[name];

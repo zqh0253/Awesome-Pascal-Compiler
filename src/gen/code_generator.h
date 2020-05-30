@@ -128,42 +128,64 @@ public:
 	}
 
 	// function
-	llvm::Function *createFunction(const std::string &name, sem::FuncInfo *func) {
+	llvm::Function *create_llvm_function(const std::string &name, sem::FuncInfo *func) {
 		std::vector<llvm::Type*> arg_list;
+		for (auto t: func->types) {
+			arg_list.push_back(to_llvm_type(t.second));
+		}
+		if (func->ret) arg_list.pop_back();
 		llvm::FunctionType *func_type = llvm::FunctionType::get(to_llvm_type(func->ret), arg_list, false);
 		llvm::Function *llvm_func = llvm::Function::Create(func_type, llvm::GlobalValue::InternalLinkage,
 		                                                   to_global_name(name), cur_module);
 		llvm::BasicBlock *bb = llvm::BasicBlock::Create(*context, "start", llvm_func);
 		sem::SemanticAnalyzer *sa = new sem::SemanticAnalyzer(to_global_name(name), func->types);
 		push_block(bb, sa);
+		for (int i = 0; i < func->types.size(); i++) {
+			auto it = func->types[i];
+			alloc_local_variable(to_llvm_type(it.second), it.first);
+			if (!func->ret || i < func->types.size()-1)
+				store_local_variable(it.first, llvm_func->getArg(i));
+		}
 		return llvm_func;
 	}
 
-	llvm::Function *getFunction(const std::string &name) {
+	llvm::Function *get_llvm_function(const std::string &name) {
 		return cur_module->getFunction(to_global_name(name));
 	}
 
-//	void register_printf(llvm::Module *module) {
-//		std::vector<llvm::Type*> printf_arg_types; // 这里是参数表
-//		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(module->getContext()));
-//
-//		llvm::FunctionType* printf_type =
-//				llvm::FunctionType::get(
-//						llvm::Type::getInt32Ty(module->getContext()), printf_arg_types, true);
-//		// 这里的true表示后面接不定参数
-//		llvm::Function *func = llvm::Function::Create(
-//				printf_type, llvm::Function::ExternalLinkage,
-//				llvm::Twine("printf"),
-//				module
-//		);
-//		func->setCallingConv(llvm::CallingConv::C); // 一定注意调用方式的正确性
-//	}
+	llvm::Value *make_call(const std::string &name, std::vector<llvm::Value*> args) {
+		llvm::Function *func = get_llvm_function(name);
+		if (name == "printf") {
+			func = cur_module->getFunction(name);
+			args[0] = ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast,
+					args[0], ir_builder->getInt8PtrTy());
+		}
+		return ir_builder->CreateCall(func, args);
+	}
 
+	void register_printf() {
+		std::vector<llvm::Type*> printf_arg_types; // 这里是参数表
+		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(cur_module->getContext()));
 
-	// instruction
+		llvm::FunctionType* printf_type =
+				llvm::FunctionType::get(
+						llvm::Type::getInt32Ty(cur_module->getContext()), printf_arg_types, true);
+		// 这里的true表示后面接不定参数
+		llvm::Function *func = llvm::Function::Create(
+				printf_type, llvm::Function::ExternalLinkage,
+				llvm::Twine("printf"),
+				cur_module
+		);
+		func->setCallingConv(llvm::CallingConv::C); // 一定注意调用方式的正确性
+		local_sem()->funcs["printf"] = nullptr;
+	}
+
+	// variable
 	llvm::Instruction *alloc_local_variable(llvm::Type *type, const std::string &name);
-	llvm::Value *get_local_variable(std::string &name);
-	llvm::Instruction *store_local_variable(std::string &name, llvm::Value *val);
+	llvm::Value *get_local_variable(const std::string &name);
+	llvm::Instruction *store_local_variable(const std::string &name, llvm::Value *val);
+	llvm::Value *load_variable(llvm::Value *ptr);
+	llvm::Value *load_local_variable(const std::string &name);
 	llvm::Value *get_record_member(sem::RecordMember *rm);
 	llvm::Value *get_record_member(sem::RecordMember *rm, llvm::Value *index);
 	llvm::Value *get_record_member(sem::RecordMember *rm, int index);
