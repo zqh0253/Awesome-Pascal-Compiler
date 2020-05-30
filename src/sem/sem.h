@@ -42,7 +42,10 @@ namespace sem {
         virtual void display(int i);
 		virtual ~SemType() = default;
 		virtual bool operator==(SemType &t){
-			return (type== t.type && is_const == t.is_const);
+			return (type == t.type);
+		}
+		virtual bool operator!=(SemType &t){
+			return (type != t.type);
 		}
 		// virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
@@ -58,7 +61,12 @@ namespace sem {
         Range(int _begin, int _end, int _is_const):SemType(RANGE, _is_const),begin(_begin),end(_end){}
 
 		int begin, end;
-
+		// bool operator==(Range &t){
+		// 	return (type == t.type && begin == t.begin && end == t.end);
+		// }
+		// bool operator!=(Range &t){
+		// 	return (type != t.type || begin != t.begin || end != t.end);
+		// }
 		~Range() = default;
         // ~Range(){std::cout << "Range is over" << std::endl;}
 	};

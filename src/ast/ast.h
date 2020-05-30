@@ -984,9 +984,10 @@ public:
     Expression * expression;
     Expr * expr;
     llvm::Value *llvm_val = nullptr;
+    int resault_type;
 
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -1005,11 +1006,11 @@ public:
 
     Expr * expr;
     Term * term;
-
+    int resault_type;
 	llvm::Value *llvm_val = nullptr;
 
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -1028,11 +1029,11 @@ public:
 
     Term * term;
     Factor * factor;
-
+    int resault_type;
 	llvm::Value *llvm_val = nullptr;
 
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 
@@ -1089,10 +1090,12 @@ public:
     Expression * expr;
     Factor * factor;
 
+    int resault_type;
+
 	llvm::Value *llvm_val = nullptr;
 
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 

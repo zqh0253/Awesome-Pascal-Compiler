@@ -125,9 +125,10 @@ void Node::sem_analyze(sem::SemanticAnalyzer *ca) {
 
 
 void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
-	/* 类型检查 */
-	/* 维护语义 */
 	std::string &const_name = id->idt;
+	/* 类型检查 */
+	if (! ca->find_var(const_name)) return;
+	/* 维护语义 */
 	sem::SemType *const_type = nullptr;
 	// 由于ast和sem设计出入，这里做了一次类型所对应的数字映射
 	if (const_value->type == ConstValue::INTEGER) {
@@ -158,8 +159,6 @@ void TypeDef::sem_analyze(sem::SemanticAnalyzer *ca){
 }
 
 void TypeDec::sem_analyze(sem::SemanticAnalyzer *ca){
-	/* 类型检查 */
-	/* 维护语义 */
 	if (type == TypeDec::SIMPLE){
 		sem_type = simple_type->sem_type;
 	}
@@ -174,7 +173,6 @@ void TypeDec::sem_analyze(sem::SemanticAnalyzer *ca){
 
 void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 	if (type == SimpleType::SYS_TYPE){
-		/* 类型检查 */
 		/* 维护语义 */
 		if(sys_type->type == SysType::INTEGER){
 			sem_type = sem::Entity_List[sem::INT];
@@ -206,12 +204,12 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 	// }
 	else if(type == SimpleType::RANGE){
 		// 这里也许需要存变量的值
-		// if (range_type->type == RangeType::IDENTIFY){
-		// 	ca->find_var(range_type->left_id->idt);
-		// 	ca->find_var(range_type->right_id->idt);
-		// 	sem_type = new sem::Range(left_id->)
-		// }else
-		if (range_type->type == RangeType::CONST){
+		if (range_type->type == RangeType::IDENTIFY){
+			if( ca->find_var(range_type->left_id->idt)->type != sem::INT ||
+				ca->find_var(range_type->right_id->idt)->type != sem::INT)
+				throw sem::SemException("Type: Range can only be defined by inerger!");
+		}
+		else if (range_type->type == RangeType::CONST){
 			if (range_type->left_const->type != ConstValue::INTEGER || range_type->right_const->type != ConstValue::INTEGER)
 				throw sem::SemException("Type: Range can only be defined by inerger!");
 			sem_type = new sem::Range(range_type->left_const->integer,range_type->right_const->integer);
