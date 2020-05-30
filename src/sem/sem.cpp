@@ -85,16 +85,22 @@ sem::SemanticAnalyzer *sem::SemanticAnalyzer::global_sem() {
 }
 
 sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
-	if (this->vars.count(name)) return this->vars[name];
-	else if(this->global_sem()->vars.count(name)) return this->global_sem()->vars[name];
-	else throw sem::SemEXception("Type: variable "+name+" has not be defined!");
+	sem::SemanticAnalyzer* temp = this;
+	for(temp=this; temp != this->global_sem(); temp = temp->last_sem()){
+		if(temp->vars.count(name)) return temp->vars[name];
+	}
+	if(temp->vars.count(name)) return temp->vars[name];
+	else throw sem::SemEXception("Var: variable "+name+" has not be defined!");
 	return nullptr;
 }
 
 sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
-	if (this->types.count(name)) return this->types[name];
-	else if(this->global_sem()->types.count(name)) return this->global_sem()->types[name];
-	else throw sem::SemEXception("Type: variable "+name+" has not be defined!");
+	sem::SemanticAnalyzer* temp = this;
+	for(temp=this; temp != this->global_sem(); temp = temp->last_sem()){
+		if(temp->types.count(name)) return temp->types[name];
+	}
+	if(temp->types.count(name)) return temp->types[name];
+	else throw sem::SemEXception("Type: type "+name+" has not be defined!");
 	return nullptr;
 }
 
@@ -219,10 +225,12 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 	for(std::vector<VarDec *>::size_type i=0;i!=record_dec_list->var_dec_list.size();i++){
 		VarDec *temp = record_dec_list->var_dec_list[i];
 		std::vector<std::string> names;
+		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
 				throw sem::SemEXception("Def: Type "+temp->type_dec->name+" is not exist!");
 		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
+			// 检查变量名是否冲突（record内部）
 			if (std::find(names.begin(),names.end(),name) != names.end())
 				throw sem::SemEXception("Def: Variable name "+name+" in record \""+ re_name +"\" has a conflict!");
 			else {
@@ -239,10 +247,12 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 	if (is_empty) return;
 	for(std::vector<VarDec *>::size_type i=0;i!=var_dec_list->var_dec_list.size();i++){
 		VarDec *temp = var_dec_list->var_dec_list[i];
+		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
 				throw sem::SemEXception("Def: Type "+temp->type_dec->name+" is not exist!");
 		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
+			// 检查变量名是否冲突（当前语义块内部）
 			if (ca->vars.count(name))
 				throw sem::SemEXception("Def: Variable name "+name+" has a conflict!");
 			else ca->vars[name] = temp->type_dec->sem_type;
@@ -251,14 +261,6 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 	return;
 }
 
-// / 测试用
-// int main(){
-//     sem::SemType A(sem::INT);
-//     A.display();
-//     sem::SemType *p = new sem::Array(0,5,&A);
-//     p->display();
-//     delete p;
-//     // sem::Array B(0,5,&A);
-//     // std::cout << TYPES_MAP[B.type] << " " << TYPES_MAP[B.el_type->type] << std::endl;
-//     return 0;
-// }
+
+
+
