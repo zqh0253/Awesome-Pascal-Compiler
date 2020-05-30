@@ -260,8 +260,7 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（当前语义块内部）
-			if (ca->is_availabel(name,("VarDef: Variable name "+name+" has a conflict!")))
-				throw sem::SemEXception("Def: Variable name "+name+" has a conflict!");
+			if (! ca->is_availabel(name,("VarDef: Variable name "+name+" has a conflict!"))) return;
 			else ca->vars[name] = temp->type_dec->sem_type;
 		}
 	}
