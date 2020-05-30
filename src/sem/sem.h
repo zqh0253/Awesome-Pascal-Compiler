@@ -152,10 +152,10 @@ namespace sem {
 		~SemanticAnalyzer(){this->display(0);}
 	};
 
-	class SemEXception{
+	class SemException{
 	public:
-		SemEXception(std::string str):sem_e(str){}
-		virtual std::string what(){
+		SemException(const std::string &str): sem_e(str){}
+		virtual const std::string& what(){
 			return sem_e;
 		}
 	private:

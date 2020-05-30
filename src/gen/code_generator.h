@@ -127,8 +127,9 @@ public:
 		llvm::FunctionType *func_type = llvm::FunctionType::get(to_llvm_type(func->ret), arg_list, false);
 		llvm::Function *llvm_func = llvm::Function::Create(func_type, llvm::GlobalValue::InternalLinkage,
 		                                                   to_global_name(name), cur_module);
-		llvm::BasicBlock *bb = llvm::BasicBlock::Create(*context, CodeGenerator::get_entry_name(name), llvm_func);
-		push_block(bb, name);
+		llvm::BasicBlock *bb = llvm::BasicBlock::Create(*context, "start", llvm_func);
+		sem::SemanticAnalyzer *sa = new sem::SemanticAnalyzer(to_global_name(name), func->types);
+		push_block(bb, sa);
 		return llvm_func;
 	}
 
@@ -137,7 +138,7 @@ public:
 	}
 
 	// instruction
-	llvm::Instruction *alloc_local_variable(llvm::Type *type, std::string &name);
+	llvm::Instruction *alloc_local_variable(llvm::Type *type, const std::string &name);
 	llvm::Instruction *store_local_variable(std::string &name, llvm::Value *val);
 
 };

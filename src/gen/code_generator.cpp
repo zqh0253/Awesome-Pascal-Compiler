@@ -27,14 +27,13 @@ void CodeGenerator::gencode_children(Node *n) {
 	n->sem_analyze(local_sem());
 }
 
-llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, std::string &name) {
-	return new llvm::AllocaInst(type, type->getPrimitiveSizeInBits(), name, local_bb());
+llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, const std::string &name) {
+	return ir_builder->CreateAlloca(type, type->getPrimitiveSizeInBits(), nullptr, name);
 }
 
 llvm::Instruction *CodeGenerator::store_local_variable(std::string &name, llvm::Value *val) {
 	llvm::Value *v = local_bb()->getValueSymbolTable()->lookup(name);
 	return ir_builder->CreateStore(val, v, false);
-//	return new llvm::StoreInst(val, v, false, local_bb());
 }
 
 llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
@@ -107,11 +106,11 @@ void Program::codegen(CodeGenerator *cg) {
 	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
 	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::InternalLinkage,
 	                                              func_name, cg->cur_module);
-	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context,
-			CodeGenerator::get_entry_name(func_name), func);
+	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context, "start", func);
 	cg->push_block(bb, new sem::SemanticAnalyzer(func_name));
 //	std::cout << "Begin generating code for " << name << "(" << this << ")" << std::endl;
 	cg->gencode_children(this);
+	cg->ir_builder->CreateRetVoid();
 	cg->cur_module->print(llvm::outs(), nullptr);
 }
 
@@ -218,6 +217,30 @@ void RoutinePart::codegen(CodeGenerator *cg) {
 }
 
 void SubProgram::codegen(CodeGenerator *cg) {
+	head->codegen(cg);
+	for (auto it = cg->local_sem()->vars.begin(); it != cg->local_sem()->vars.end(); it++) {
+		cg->alloc_local_variable(cg->to_llvm_type(it->second), it->first);
+	}
+	routine->codegen(cg);
+	cg->pop_block();
+}
+
+void SubProgramHead::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+	std::string &func_name = id->idt;
+	sem::FuncInfo *func = cg->local_sem()->funcs[func_name];
+	cg->createFunction(func_name, cg->local_sem()->funcs[func_name]);
+}
+
+void Parameters::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void ParaDecList::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void ParaTypeList::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 }
 
@@ -230,8 +253,28 @@ void CompoundStmt::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 }
 
+void StatementList::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
 void Statement::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
+}
+
+void CaseStmt::codegen(CodeGenerator *cg) {
+
+}
+
+void CaseExprList::codegen(CodeGenerator *cg) {
+
+}
+
+void CaseExpr::codegen(CodeGenerator *cg) {
+
+}
+
+void GotoStmt::codegen(CodeGenerator *cg) {
+
 }
 
 void AssignStmt::codegen(CodeGenerator *cg) {
@@ -246,4 +289,69 @@ void AssignStmt::codegen(CodeGenerator *cg) {
 //		llvm::GetElementPtrInst::Create(cg->to_llvm_type(t), v, , "ptr", cg->local_bb());
 //		v = cg->local_bb()->getValueSymbolTable()->lookup("ptr");
 //	}
+}
+
+void ProcStmt::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+}
+
+void IfStmt::codegen(CodeGenerator *cg) {
+	expr->codegen(cg);
+	llvm::BasicBlock *true_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	cg->ir_builder->SetInsertPoint(true_bb);
+	stmt->codegen(cg);
+	llvm::BasicBlock *false_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	cg->ir_builder->SetInsertPoint(false_bb);
+	else_clause->codegen(cg);
+
+	cg->ir_builder->SetInsertPoint(cg->local_bb(), cg->local_bb()->getInstList().end());
+//	cg->ir_builder->CreateCondBr(expr->llvm_val, true_bb, false_bb);
+}
+
+void ElseClause::codegen(CodeGenerator *cg) {
+
+}
+
+void RepeatStmt::codegen(CodeGenerator *cg) {
+
+}
+
+void WhileStmt::codegen(CodeGenerator *cg) {
+
+}
+
+void ForStmt::codegen(CodeGenerator *cg) {
+
+}
+
+void SysProc::codegen(CodeGenerator *cg) {
+
+}
+
+void IDDotted::codegen(CodeGenerator *cg) {
+
+}
+
+void Expression::codegen(CodeGenerator *cg) {
+
+}
+
+void Expr::codegen(CodeGenerator *cg) {
+
+}
+
+void Term::codegen(CodeGenerator *cg) {
+
+}
+
+void Factor::codegen(CodeGenerator *cg) {
+
+}
+
+void ArgsList::codegen(CodeGenerator *cg) {
+
+}
+
+void ExprList::codegen(CodeGenerator *cg) {
+
 }

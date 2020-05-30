@@ -55,15 +55,14 @@ void sem::Record::display(int i){
 
 void sem::SemanticAnalyzer::display(int i){
 	std::cout << "======= sem of "<< name <<" =======" << std::endl;
-	std::map<std::string, sem::SemType *>::iterator iter;
 	std::cout <<"All Types"<< std::endl;
-	for (iter = types.begin();iter !=  types.end();iter++){
+	for (auto iter = types.begin();iter !=  types.end();iter++){
 		for (int j=0;j<i;j++) std::cout << "  ";
 		std::cout << "name:" << iter->first << " type:";
 		iter->second->display(i+1);
 	}
 	std::cout <<"All Vars"<< std::endl;
-	for (iter = vars.begin();iter !=  vars.end();iter++){
+	for (auto iter = vars.begin();iter !=  vars.end();iter++){
 		for (int j=0;j<i;j++) std::cout << "  ";
 		std::cout << "name:" << iter->first << " type:";
 		iter->second->display(i+1);
@@ -90,7 +89,7 @@ sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
 		if(temp->vars.count(name)) return temp->vars[name];
 	}
 	if(temp->vars.count(name)) return temp->vars[name];
-	else throw sem::SemEXception("Var: variable "+name+" has not be defined!");
+	else throw sem::SemException("Var: variable " + name + " has not be defined!");
 	return nullptr;
 }
 
@@ -100,13 +99,13 @@ sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 		if(temp->types.count(name)) return temp->types[name];
 	}
 	if(temp->types.count(name)) return temp->types[name];
-	else throw sem::SemEXception("Type: type "+name+" has not be defined!");
+	else throw sem::SemException("Type: type " + name + " has not be defined!");
 	return nullptr;
 }
 
 bool sem::SemanticAnalyzer::is_available(std::string &name, const std::string &e){
 	if (this->vars.count(name) && this->types.count(name) && this->funcs.count(name)){
-		throw sem::SemEXception(e);
+		throw sem::SemException(e);
 		return 0;
 	}
 	else return 1;
@@ -195,7 +194,7 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 	// 		if(id_list->ID_list[i] == id_list->ID_list[0]){
 	// 			if (i==0) sem_type = ca->find_type(id_list->ID_list[0]->idt);
 	// 		}
-	// 		else throw sem::SemEXception("Type: "+id_list->name+" are not the same!");
+	// 		else throw sem::SemException("Type: "+id_list->name+" are not the same!");
 	// 	}
 	// }
 	else if(type == SimpleType::RANGE){
@@ -207,7 +206,7 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 		// }else
 		if (range_type->type == RangeType::CONST){
 			if (range_type->left_const->type != ConstValue::INTEGER || range_type->right_const->type != ConstValue::INTEGER)
-				throw sem::SemEXception("Type: Range can only be defined by inerger!");
+				throw sem::SemException("Type: Range can only be defined by inerger!");
 			sem_type = new sem::Range(range_type->left_const->integer,range_type->right_const->integer);
 		}
 	}
@@ -221,7 +220,7 @@ void ArrayType::sem_analyze(sem::SemanticAnalyzer *ca){
 		sem_type = new sem::Array( de->begin, de->end, type_dec->sem_type);
 	}
 	else{
-		throw sem::SemEXception("Type: Array can only be defined by range!");
+		throw sem::SemException("Type: Array can only be defined by range!");
 	}
 	return;
 }
@@ -230,16 +229,16 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 	std::string re_name = sem::RECORD_FIRST_NAME + std::to_string(ca->num++);
 	sem_type = new sem::Record(re_name,ca);
 	sem::Record *re = (sem::Record*)sem_type;
-	for(std::vector<VarDec *>::size_type i=0;i!=record_dec_list->var_dec_list.size();i++){
+	for(int i=0;i!=record_dec_list->var_dec_list.size();i++){
 		VarDec *temp = record_dec_list->var_dec_list[i];
 		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
-				throw sem::SemEXception("Def: Type "+temp->type_dec->name+" is not exist!");
-		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
+				throw sem::SemException("Def: Type " + temp->type_dec->name + " is not exist!");
+		for(int j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（record内部）
 			if (std::find(re->names.begin(),re->names.end(),name) != re->names.end())
-				throw sem::SemEXception("Def: Variable name "+name+" in record \""+ re_name +"\" has a conflict!");
+				throw sem::SemException("Def: Variable name " + name + " in record \"" + re_name + "\" has a conflict!");
 			else {
 				re->names.push_back(name);
 				re->types[name] = temp->type_dec->sem_type;
@@ -252,12 +251,12 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 
 void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 	if (is_empty) return;
-	for(std::vector<VarDec *>::size_type i=0;i!=var_dec_list->var_dec_list.size();i++){
+	for(int i=0;i!=var_dec_list->var_dec_list.size();i++){
 		VarDec *temp = var_dec_list->var_dec_list[i];
 		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
-				throw sem::SemEXception("Def: Type "+temp->type_dec->name+" is not exist!");
-		for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
+				throw sem::SemException("Def: Type " + temp->type_dec->name + " is not exist!");
+		for(int j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（当前语义块内部）
 			if (! ca->is_available(name,("VarDef: Variable name "+name+" has a conflict!"))) return;
@@ -289,16 +288,16 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 	else{
 		func_info = new sem::FuncInfo();
 		std::vector<std::string> names;
-		for(std::vector<ParaTypeList *>::size_type i=0;i!=para_dec_list->para_dec_list.size();i++){
+		for(int i=0;i!=para_dec_list->para_dec_list.size();i++){
 			ParaTypeList *temp = para_dec_list->para_dec_list[i];
 			// 检查类型是否存在
 			if (temp->simple_type->sem_type == nullptr)
-					throw sem::SemEXception("Function: Type "+temp->simple_type->id->idt+" is not exist!");
-			for(std::vector<ID *>::size_type j=0; j != temp->id_list->ID_list.size();j++){
+					throw sem::SemException("Function: Type " + temp->simple_type->id->idt + " is not exist!");
+			for(int j=0; j != temp->id_list->ID_list.size();j++){
 				std::string name = temp->id_list->ID_list[j]->idt;
 				// 检查变量名是否冲突（function内部）
 				if (std::find(names.begin(),names.end(),name) != names.end())
-					throw sem::SemEXception("Function: Variable name "+name+" in parameters has a conflict!");
+					throw sem::SemException("Function: Variable name " + name + " in parameters has a conflict!");
 				else {
 					func_info->types.push_back(make_pair(name,temp->simple_type->sem_type));
 				}
@@ -306,5 +305,4 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 			}
 		}
 	}
-	return;
 }

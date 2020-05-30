@@ -18,6 +18,11 @@ VAR
     b : test;
     asd: rtype;
     asdf: INTEGER;
+function f(a: integer; b: rtype): integer;
+BEGIN
+
+END;
+
 BEGIN
 
 END.

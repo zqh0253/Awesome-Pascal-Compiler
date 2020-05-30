@@ -15,7 +15,7 @@ int main() {
     CodeGenerator cg;
     try {
 	    cg.gencode(ast_root);
-    } catch (sem::SemEXception e) {
+    } catch (sem::SemException e) {
 		std::cout << e.what() << std::endl;
 		cg.local_sem()->display(0);
     }

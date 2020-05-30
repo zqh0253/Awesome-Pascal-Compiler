@@ -572,6 +572,7 @@ public:
 	SimpleType * simple_type;
 	std::vector<Node *> get_descendants() override;
     void sem_analyze(sem::SemanticAnalyzer *ca) override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Parameters : public Node {
@@ -588,9 +589,10 @@ public:
 
     bool is_empty;
     ParaDecList * para_dec_list;
-    sem::FuncInfo * func_info=nullptr;
+    sem::FuncInfo * func_info = nullptr;
     std::vector<Node *> get_descendants() override;
     void sem_analyze(sem::SemanticAnalyzer *ca) override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ParaDecList : public Node {
@@ -604,6 +606,7 @@ public:
     std::vector<ParaTypeList *> para_dec_list;
     void add(ParaTypeList *);
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ParaTypeList : public Node {
@@ -617,6 +620,7 @@ public:
     IDList * id_list;
     SimpleType * simple_type;
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 
@@ -658,6 +662,7 @@ public:
     void add(Statement *);
 
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Statement : public Node {
@@ -735,6 +740,7 @@ public:
     Expression * expr;
     CaseExprList * case_expr_list;
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class CaseExprList : public Node {
@@ -748,6 +754,7 @@ public:
     std::vector<CaseExpr *> case_expr_list;
     void add(CaseExpr *);
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class CaseExpr : public Node {
@@ -767,6 +774,7 @@ public:
     IDDotted * idd;
     Statement * stmt;
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class GotoStmt : public Node {
@@ -778,6 +786,7 @@ public:
 
     int destination;
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class AssignStmt : public Node {
@@ -847,6 +856,8 @@ public:
     ExprList * expr_list;
     Factor * factor;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class IfStmt : public Node {
@@ -860,6 +871,8 @@ public:
     Statement * stmt;
     ElseClause * else_clause;
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ElseClause : public Node {
@@ -875,6 +888,7 @@ public:
 
     Statement * stmt;
     std::vector<Node *> get_descendants() override;
+	void codegen(CodeGenerator *cg) override;
 };
 
 class RepeatStmt : public Node {
@@ -888,6 +902,8 @@ public:
     Expression * expr;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class WhileStmt : public Node {
@@ -900,6 +916,7 @@ public:
     Statement * stmt;
 
     std::vector<Node *> get_descendants() override;
+    void codegen(CodeGenerator *cg) override;
 };
 
 class ForStmt : public Node {
@@ -915,6 +932,8 @@ public:
     Statement * stmt;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class SysProc : public Node {
@@ -927,6 +946,8 @@ public:
     ~SysProc() = default;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class IDDotted : public Node {
@@ -939,6 +960,8 @@ public:
     std::vector<ID *> id_list;
     void add(ID *);
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Expression : public Node {
@@ -958,6 +981,8 @@ public:
     Expr * expr;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Expr : public Node {
@@ -977,6 +1002,8 @@ public:
     Term * term;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Term : public Node {
@@ -996,6 +1023,8 @@ public:
     Factor * factor;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class Factor : public Node {
@@ -1052,6 +1081,8 @@ public:
     Factor * factor;
 
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ArgsList : public Node {
@@ -1062,6 +1093,8 @@ public:
     std::vector<Expression *> args_list;
     void add(Expression *);
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 class ExprList: public Node {
@@ -1072,6 +1105,8 @@ public:
     std::vector<Expression *> expr_list;
     void add(Expression *);
     std::vector<Node *> get_descendants() override;
+
+	void codegen(CodeGenerator *cg) override;
 };
 
 #endif
