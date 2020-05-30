@@ -324,17 +324,17 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 	// 需要判定左右是否一样
 	sem::SemType *check;
-	int n = idd->id_list.size()-1;
+	int n = idd->id_list.size();
 	std::string name = idd->id_list[0]->idt;
 	// 建立左值结构
 	check = ca->find_var(name);
 	left_value = new sem::LeftValue(name,check);
 	// 当n=0，不进入循环，n>0，循环内为record
-	for(int i=0;i<n;i++){
+	for(int i=1;i<n;i++){
 		sem::Record *temp = (sem::Record*) check;
 		name = idd->id_list[i]->idt;// 获取前一个的名字
-		std::vector<std::string>::iterator loc=std::find(temp->names.begin(),temp->names.end(),name);
-		if(loc == temp->names.end()){
+		auto loc=std::find(temp->names.begin(),temp->names.end(),name);
+		if(loc != temp->names.end()){
 			left_value->locations.push_back(loc-temp->names.begin());
 			check = temp->types[name];
 		}

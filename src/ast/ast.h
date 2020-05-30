@@ -1,10 +1,12 @@
 #ifndef AST_H_ 
 #define AST_H_
 
+#include "sem/sem.h"
+#include "gen/llvm.h"
+
 #include<string>
 #include<vector>
 #include<iostream>
-#include "sem/sem.h"
 
 class Node;
 class Program;
@@ -980,6 +982,7 @@ public:
 
     Expression * expression;
     Expr * expr;
+    llvm::Value *llvm_val = nullptr;
 
     std::vector<Node *> get_descendants() override;
 
@@ -1002,6 +1005,8 @@ public:
     Expr * expr;
     Term * term;
 
+	llvm::Value *llvm_val = nullptr;
+
     std::vector<Node *> get_descendants() override;
 
 	void codegen(CodeGenerator *cg) override;
@@ -1022,6 +1027,8 @@ public:
 
     Term * term;
     Factor * factor;
+
+	llvm::Value *llvm_val = nullptr;
 
     std::vector<Node *> get_descendants() override;
 
@@ -1080,6 +1087,8 @@ public:
     ConstValue * const_value;
     Expression * expr;
     Factor * factor;
+
+	llvm::Value *llvm_val = nullptr;
 
     std::vector<Node *> get_descendants() override;
 

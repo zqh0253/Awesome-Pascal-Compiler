@@ -19,14 +19,11 @@ VAR
     asd: rtype;
     asdf: INTEGER;
 function f(a: integer; b: rtype): integer;
-    function g(a: integer; b: rtype): integer;
-    begin
-
-    end;
 BEGIN
 
 END;
 
 BEGIN
-
+    b := 1;
+    asd.d.a := 1;
 END.
