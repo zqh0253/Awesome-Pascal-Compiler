@@ -96,7 +96,18 @@ namespace sem {
 		std::string global_name();
 	};
 
-/*******************函数信息******************/
+	/*******************左值信息******************/
+	class RecordMember{
+	public:
+		RecordMember(const std::string &_name, SemType *_begin_type):name(_name),begin_type(_begin_type){}
+		std::string name;
+		SemType *begin_type;
+		SemType *real_type=nullptr;
+		std::vector<int> locations;
+		~RecordMember() = default;
+	};
+
+	/*******************函数信息******************/
 	class FuncInfo {
 	public:
 		FuncInfo() = default;
@@ -108,17 +119,7 @@ namespace sem {
 		~FuncInfo() = default;
 	};
 
-/*******************左值信息******************/
-	class LeftValue{
-	public:
-		LeftValue(const std::string &_name, SemType *_begin_type):name(_name),begin_type(_begin_type){}
-		std::string name;
-		SemType *begin_type;
-		std::vector<int> locations;
-		~LeftValue() = default;
-	};
-
-/*******************符号表******************/
+	/*******************符号表******************/
 	class SemanticAnalyzer {
 	public:
 		int num=0;

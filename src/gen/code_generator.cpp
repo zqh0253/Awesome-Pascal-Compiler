@@ -284,11 +284,11 @@ void GotoStmt::codegen(CodeGenerator *cg) {
 
 void AssignStmt::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-	std::cout << left_value << std::endl;
-	llvm::Value *v = cg->get_local_variable(left_value->name);
+	std::cout << idd->re_mem << std::endl;
+	llvm::Value *v = cg->get_local_variable(idd->re_mem->name);
 	std::vector<llvm::Value*> idx;
-	std::cout << left_value->locations.size() << std::endl;
-	for (auto t: left_value->locations) {
+	std::cout << idd->re_mem->locations.size() << std::endl;
+	for (auto t: idd->re_mem->locations) {
 		idx.push_back(cg->ir_builder->getInt32(t));
 	}
 	std::cout << idx.size() << std::endl;
@@ -296,7 +296,7 @@ void AssignStmt::codegen(CodeGenerator *cg) {
 //		idx.push_back(e1->llvm_val);
 //	}
 	if (!idx.empty())
-		v = cg->ir_builder->CreateGEP(cg->to_llvm_type(left_value->begin_type), v, idx);
+		v = cg->ir_builder->CreateGEP(cg->to_llvm_type(idd->re_mem->begin_type), v, idx);
 	cg->ir_builder->CreateStore(cg->ir_builder->getInt32(1), v);
 }
 

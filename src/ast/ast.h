@@ -811,7 +811,6 @@ public:
     Expression * e1,* e2;
 
     std::vector<Node *> get_descendants() override;
-    sem::LeftValue *left_value;
 	void codegen(CodeGenerator *cg) override;
     void sem_analyze(sem::SemanticAnalyzer *ca) override;
 };
@@ -960,10 +959,12 @@ public:
         this->name = "ID_dotted";
     }
 
+    
     std::vector<ID *> id_list;
+    sem::RecordMember *re_mem=nullptr;
     void add(ID *);
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 

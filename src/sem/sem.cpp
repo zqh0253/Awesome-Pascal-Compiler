@@ -323,27 +323,31 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 
 void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 	// 需要判定左右是否一样
-	sem::SemType *check;
-	int n = idd->id_list.size();
-	std::string name = idd->id_list[0]->idt;
-	// 建立左值结构
-	check = ca->find_var(name);
-	left_value = new sem::LeftValue(name,check);
-	// 当n=0，不进入循环，n>0，循环内为record
-	for(int i=1;i<n;i++){
-		sem::Record *temp = (sem::Record*) check;
-		name = idd->id_list[i]->idt;// 获取前一个的名字
-		auto loc=std::find(temp->names.begin(),temp->names.end(),name);
-		// 判断record中变量是否存在
-		if(loc != temp->names.end()){
-			left_value->locations.push_back(loc-temp->names.begin());
-			check = temp->types[name];
-		}
-		else throw sem::SemException("Var: Variable name " + name + " can't be found in record \"" + temp->type_name + "\"");
-	}
-	// array类型检测未完成
-	if (check->is_const) throw sem::SemException("Var: Const variable "+name+" can't be changed!");
+	// 需要array类型检测
+	if (idd->re_mem == nullptr) throw sem::SemException("Unknow error: Can't get Record Member!");
+	else if (idd->re_mem->real_type->is_const) throw sem::SemException("Var: Const variable "+name+" can't be changed!");
 	return;
 }
 
+void IDDotted::sem_analyze(sem::SemanticAnalyzer *ca){
+	// 需要判定左右是否一样
+	std::string name = id_list[0]->idt;
+	// 建立成员变量结构
+	sem::SemType *real_type = ca->find_var(name);
+	re_mem = new sem::RecordMember(name,real_type);
+	// 当n=0，不进入循环，n>0，循环内为record
+	for(int i=1;i<id_list.size();i++){
+		sem::Record *temp = (sem::Record*) real_type;
+		name = id_list[i]->idt;// 获取前一个的名字
+		auto loc=std::find(temp->names.begin(),temp->names.end(),name);
+		// 判断record中变量是否存在
+		if(loc != temp->names.end()){
+			re_mem->locations.push_back(loc-temp->names.begin());
+			real_type = temp->types[name];
+		}
+		else throw sem::SemException("Var: Variable name " + name + " can't be found in record \"" + temp->type_name + "\"");
+	}
+	re_mem->real_type = real_type;
+	return;
+}
 
