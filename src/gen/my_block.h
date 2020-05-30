@@ -7,16 +7,12 @@
 class MyBlock {
 public:
 	llvm::BasicBlock *bb;
+	llvm::BasicBlock *cbb;
 	sem::SemanticAnalyzer *sa;
-	MyBlock() {
-		bb = nullptr;
-		sa = nullptr;
-	}
 	MyBlock(llvm::BasicBlock *bb, sem::SemanticAnalyzer *sa) {
-		this->bb = bb;
+		this->bb = this->cbb = bb;
 		this->sa = sa;
 	}
-
 };
 
 

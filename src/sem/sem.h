@@ -159,7 +159,7 @@ namespace sem {
 		std::map<std::string, SemType*> types;
 		std::map<std::string, FuncInfo *> funcs;
 
-		std::string to_global_name(std::string &local_name) {
+		std::string to_global_name(const std::string &local_name) {
 			return this->name + "_" + local_name;
 		}
 

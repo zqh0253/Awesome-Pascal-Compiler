@@ -36,7 +36,7 @@ sem::SemType *CodeGenerator::get_var_sem_type(const std::string &name) {
 }
 
 sem::FuncInfo *CodeGenerator::get_sem_func(const std::string &name) {
-	return local_sem()->funcs[name];
+	return local_sem()->find_func(name);
 }
 
 llvm::Type *CodeGenerator::get_var_llvm_type(const std::string &name) {
@@ -353,15 +353,21 @@ void AssignStmt::codegen(CodeGenerator *cg) {
 
 void IfStmt::codegen(CodeGenerator *cg) {
 	expr->codegen(cg);
+	llvm::BasicBlock *new_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+
 	llvm::BasicBlock *true_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
 	cg->ir_builder->SetInsertPoint(true_bb);
 	stmt->codegen(cg);
+	cg->ir_builder->CreateBr(new_bb);
+
 	llvm::BasicBlock *false_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
 	cg->ir_builder->SetInsertPoint(false_bb);
 	else_clause->codegen(cg);
+	cg->ir_builder->CreateBr(new_bb);
 
-	cg->ir_builder->SetInsertPoint(cg->local_bb(), cg->local_bb()->getInstList().end());
-//	cg->ir_builder->CreateCondBr(expr->llvm_val, true_bb, false_bb);
+	cg->ir_builder->SetInsertPoint(cg->local_cbb());
+	cg->ir_builder->CreateCondBr(expr->llvm_val, true_bb, false_bb);
+	cg->set_local_cbb(new_bb);
 }
 
 void ElseClause::codegen(CodeGenerator *cg) {

@@ -43,7 +43,7 @@ public:
 			block->sa->cg = this;
 			block->sa->level = this->block_stack.size();
 			block_stack.push_back(block);
-			ir_builder->SetInsertPoint(block->bb);
+			ir_builder->SetInsertPoint(block->cbb);
 		}
 	}
 	void push_block(llvm::BasicBlock *bb, sem::SemanticAnalyzer *sa) {
@@ -55,12 +55,17 @@ public:
 	MyBlock *pop_block() {
 		MyBlock *top = local_block();
 		block_stack.pop_back();
-		ir_builder->SetInsertPoint(local_bb());
+		ir_builder->SetInsertPoint(local_cbb());
 		return top;
 	}
 	sem::SemanticAnalyzer *local_sem() { return local_block()->sa; }
 	sem::SemanticAnalyzer *global_sem() { return global_block()->sa; }
 	llvm::BasicBlock *local_bb() { return local_block()->bb; }
+	llvm::BasicBlock *local_cbb() { return local_block()->cbb; }
+	void set_local_cbb(llvm::BasicBlock *bb) {
+		local_block()->cbb = bb;
+		ir_builder->SetInsertPoint(bb);
+	}
 	MyBlock *local_block() { return get_block(block_stack.size() - 1); }
 	MyBlock *get_block(int index) { return block_stack[index]; }
 	MyBlock *global_block() { return get_block(0); }
@@ -150,15 +155,18 @@ public:
 	}
 
 	llvm::Function *get_llvm_function(const std::string &name) {
-		return cur_module->getFunction(to_global_name(name));
+		return cur_module->getFunction(name);
 	}
 
 	llvm::Value *make_call(const std::string &name, std::vector<llvm::Value*> args) {
-		llvm::Function *func = get_llvm_function(name);
+		llvm::Function *func;
 		if (name == "printf") {
+			std::cout << "printf" << std::endl;
 			func = cur_module->getFunction(name);
 			args[0] = ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast,
 					args[0], ir_builder->getInt8PtrTy());
+		} else {
+			func = get_llvm_function(get_sem_func(name)->local->to_global_name(name));
 		}
 		return ir_builder->CreateCall(func, args);
 	}
@@ -177,7 +185,10 @@ public:
 				cur_module
 		);
 		func->setCallingConv(llvm::CallingConv::C); // 一定注意调用方式的正确性
-		local_sem()->funcs["printf"] = nullptr;
+		sem::FuncInfo* sem_func = new sem::FuncInfo();
+		sem_func->ret = new sem::SemType(sem::INT);
+		local_sem()->funcs["printf"] = sem_func;
+
 	}
 
 	// variable

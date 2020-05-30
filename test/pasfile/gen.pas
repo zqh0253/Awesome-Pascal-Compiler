@@ -10,6 +10,11 @@ BEGIN
 END;
 
 BEGIN
-    b := f(cn);
+    IF false THEN begin
+        b := f(cn);
+    end else begin
+        b := 1;
+    end;
+
     b := printf('%d', b);
 END.
