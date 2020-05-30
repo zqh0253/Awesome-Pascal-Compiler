@@ -111,7 +111,7 @@ namespace sem {
 /*******************左值信息******************/
 	class LeftValue{
 	public:
-		LeftValue(std::string _name, SemType *_begin_type):name(_name),begin_type(_begin_type){}
+		LeftValue(const std::string &_name, SemType *_begin_type):name(_name),begin_type(_begin_type){}
 		std::string name;
 		SemType *begin_type;
 		std::vector<int> locations;
