@@ -9,6 +9,7 @@
 class CodeGenerator;
 /*******************变量类型******************/
 namespace sem {
+	extern const int ERROR;
 	extern const int INT;
 	extern const int REAL;
 	extern const int CHAR;
@@ -29,6 +30,15 @@ namespace sem {
 	extern std::string STRING_FIRST_NAME;
 	extern std::string RANGE_FIRST_NAME;
 	extern std::string ARRAY_FIRST_NAME;
+	extern std::string TYPES_MAP[9];
+
+	// 运算合法性判断+返回类型
+	bool CanBeOperated(const int a);
+	bool CanAssign(const int a, const int b);
+	int BasicOperate(const int a, const int b);
+
+	// 初始化函数
+	void Init();
 
 	class SemanticAnalyzer;
 	class SemType {
@@ -163,6 +173,7 @@ namespace sem {
 		// 搜索变量
 		SemType *find_var(std::string &name);
 		SemType *find_type(std::string &name);
+		FuncInfo *find_func(std::string &name);
 
 		// 检测本层内冲突
 		bool is_available(std::string &name, const std::string &e);
@@ -180,8 +191,5 @@ namespace sem {
 	private:
 		std::string sem_e;
 	};
-
-	// 初始化函数
-	void Init();
 }
 #endif

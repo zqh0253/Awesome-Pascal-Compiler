@@ -4,11 +4,12 @@
 
 /* ------------ Semantic Struct ------------ */
 namespace sem {
+	const int ERROR = -1;
 	const int INT = 0;
 	const int REAL = 1;
 	const int CHAR = 2;
-	const int VOID = 3;
-	const int BOOL = 4;
+	const int BOOL = 3;
+	const int VOID = 4;
 	const int STRING = 5;
 	const int RANGE = 6;
 	const int ARRAY = 7;
@@ -20,6 +21,7 @@ namespace sem {
 	std::string ARRAY_FIRST_NAME = "$array_";
 	SemType *Entity_List[20] = {nullptr};
 	std::map<std::string, SemType *> Global_Types;
+	std::string TYPES_MAP[9]={"int","real","char","bool","void","string","range","array"};
 }
 
 void sem::Init(){
@@ -28,6 +30,39 @@ void sem::Init(){
 		sem::Entity_List[i+sem::CONST] = new SemType(i,true);
 	}
 	return;
+}
+
+bool sem::CanBeOperated(const int a){
+	if (a == sem::INT || a == sem::REAL || a == sem::BOOL || a == sem::CHAR) return true;
+	else return false;
+}
+
+bool sem::CanAssign(const int a, const int b){
+	if (a == b) return true;
+	// 目前四个可以乱来，后续有变化的话再修改
+	if (CanBeOperated(a) && CanBeOperated(b)) return true;
+	return false;
+}
+
+int sem::BasicOperate(const int a, const int b){
+	// 保证a b 在int real char bool内
+	if (sem::CanBeOperated(a) && sem::CanBeOperated(b)){
+		// 如果a和b相等，证明是同类型运算，返回对应类型
+		if (a == b) return a;
+		// a与b不同类型
+		else{
+			// a b中存在real, 直接返回real
+			if (a == sem::REAL || b == sem::REAL) return sem::REAL;
+			// a b中不存在real，但是存在int，直接返回int
+			else if (a == sem::INT || b == sem::INT) return sem::INT;
+			// a b中不存在real和int，但是存在char，直接返回char
+			else if (a == sem::CHAR || b == sem::CHAR) return sem::CHAR;
+			// a b中不存在real和int和char，直接返回bool————这是逻辑上不可能发生的
+			else return sem::BOOL;
+		}
+	}
+	// 如果a或者b有一个不是可运算类型，直接返回-1
+	else return sem::ERROR;
 }
 
 // 待完成
@@ -40,8 +75,7 @@ void sem::Init(){
 // }
 
 void sem::SemType::display(int i){
-    std::string TYPES_MAP[9]={"int","real","char","void","bool","string","range","array"};
-    std::cout << TYPES_MAP[this->type];
+    std::cout << sem::TYPES_MAP[this->type];
     if (this->is_const)
         std::cout << " const" << std::endl;
     else
@@ -99,7 +133,7 @@ sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
 		if(temp->vars.count(name)) return temp->vars[name];
 	}
 	if(temp->vars.count(name)) return temp->vars[name];
-	else throw sem::SemException("Var: variable " + name + " has not be defined!");
+	else throw sem::SemException("Var: variable '" + name + "' has not be defined!");
 }
 
 sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
@@ -108,7 +142,16 @@ sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 		if(temp->types.count(name)) return temp->types[name];
 	}
 	if(temp->types.count(name)) return temp->types[name];
-	else throw sem::SemException("Type: type " + name + " has not be defined!");
+	else throw sem::SemException("Type: type '" + name + "' has not be defined!");
+}
+
+sem::FuncInfo *sem::SemanticAnalyzer::find_func(std::string &name){
+	sem::SemanticAnalyzer* temp = this;
+	for(temp=this; temp != this->global_sem(); temp = temp->last_sem()){
+		if(temp->funcs.count(name)) return temp->funcs[name];
+	}
+	if(temp->funcs.count(name)) return temp->funcs[name];
+	else throw sem::SemException("Type: function '" + name + "' has not be defined!");
 }
 
 bool sem::SemanticAnalyzer::is_available(std::string &name, const std::string &e){
@@ -127,25 +170,10 @@ void Node::sem_analyze(sem::SemanticAnalyzer *ca) {
 void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 	std::string &const_name = id->idt;
 	/* 类型检查 */
-	if (! ca->find_var(const_name)) return;
+	if (! ca->is_available(const_name, "Const: the const variavle name "+const_name+" has a conflict!")) return;
 	/* 维护语义 */
 	sem::SemType *const_type = nullptr;
-	// 由于ast和sem设计出入，这里做了一次类型所对应的数字映射
-	if (const_value->type == ConstValue::INTEGER) {
-		const_type = sem::Entity_List[sem::INT+sem::CONST];
-	} else if (const_value->type == ConstValue::REAL) {
-		const_type = sem::Entity_List[sem::REAL+sem::CONST];
-	} else if (const_value->type == ConstValue::CHAR) {
-		const_type = sem::Entity_List[sem::CHAR+sem::CONST];
-	} else if (const_value->type == ConstValue::STRING) {
-		const_type = new sem::String(const_value->str.size(), true);
-	} else if (const_value->type == ConstValue::SYSCON){
-		if (const_value->sys_con == ConstValue::MAXINT) {
-			const_type = sem::Entity_List[sem::INT+sem::CONST];
-		} else if (const_value->sys_con == ConstValue::TRUE || const_value->sys_con == ConstValue::FALSE) {
-			const_type = sem::Entity_List[sem::BOOL+sem::CONST];
-		}
-	}
+	const_type = sem::Entity_List[const_value->sem_type+sem::CONST];
 	ca->vars[const_name] = const_type;
 	return;
 }
@@ -238,12 +266,12 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 		VarDec *temp = record_dec_list->var_dec_list[i];
 		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
-				throw sem::SemException("Def: Type " + temp->type_dec->name + " is not exist!");
+				throw sem::SemException("Def: Type '" + temp->type_dec->name + "' is not exist!");
 		for(int j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（record内部）
 			if (std::find(re->names.begin(),re->names.end(),name) != re->names.end())
-				throw sem::SemException("Def: Variable name " + name + " in record \"" + re_name + "\" has a conflict!");
+				throw sem::SemException("Def: Variable name '" + name + "' in record '" + re_name + "' has a conflict!");
 			else {
 				re->names.push_back(name);
 				re->types[name] = temp->type_dec->sem_type;
@@ -260,11 +288,11 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 		VarDec *temp = var_dec_list->var_dec_list[i];
 		// 检查类型是否存在
 		if (temp->type_dec->sem_type == nullptr)
-				throw sem::SemException("Def: Type " + temp->type_dec->name + " is not exist!");
+			throw sem::SemException("Def: Type '" + temp->type_dec->name + "' is not exist!");
 		for(int j=0; j != temp->id_list->ID_list.size();j++){
 			std::string name = temp->id_list->ID_list[j]->idt;
 			// 检查变量名是否冲突（当前语义块内部）
-			if (! ca->is_available(name,("VarDef: Variable name "+name+" has a conflict!"))) return;
+			if (! ca->is_available(name,("VarDef: Variable name '"+name+"' has a conflict!"))) return;
 			else ca->vars[name] = temp->type_dec->sem_type;
 		}
 	}
@@ -274,7 +302,7 @@ void VarPart::sem_analyze(sem::SemanticAnalyzer *ca){
 void SubProgramHead::sem_analyze(sem::SemanticAnalyzer *ca){
 	// 检查命名是否合法
 	sem::FuncInfo *temp;
-	if (! ca->is_available(id->idt, ("FuncDef: Function name "+id->idt+" has a conflict!"))) return;
+	if (! ca->is_available(id->idt, ("FuncDef: Function name '"+id->idt+"' has a conflict!"))) return;
 	// 判断是否有参数
 	if (parameters->func_info == nullptr){
 		temp = new sem::FuncInfo();
@@ -304,12 +332,12 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 			ParaTypeList *temp = para_dec_list->para_dec_list[i];
 			// 检查类型是否存在
 			if (temp->simple_type->sem_type == nullptr)
-					throw sem::SemException("Function: Type " + temp->simple_type->id->idt + " is not exist!");
+					throw sem::SemException("Function: Type '" + temp->simple_type->id->idt + "' is not exist!");
 			for(int j=0; j != temp->id_list->ID_list.size();j++){
 				std::string name = temp->id_list->ID_list[j]->idt;
 				// 检查变量名是否冲突（function内部）
 				if (std::find(names.begin(),names.end(),name) != names.end())
-					throw sem::SemException("Function: Variable name " + name + " in parameters has a conflict!");
+					throw sem::SemException("Function: Variable name '" + name + "' in parameters has a conflict!");
 				else {
 					func_info->types.push_back(make_pair(name,temp->simple_type->sem_type));
 				}
@@ -317,18 +345,34 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 			}
 		}
 	}
+	return;
 }
 
 void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 	// 需要判定左右是否一样
-	// 需要array类型检测
-	if (idd->re_mem == nullptr) throw sem::SemException("Unknow error: Can't get Record Member!");
-	else if (idd->re_mem->real_type->is_const) throw sem::SemException("Var: Const variable "+name+" can't be changed!");
+	if (type==AssignStmt::SINGLE){
+		// 判定是否为常量
+		if (idd->re_mem->real_type->is_const) throw sem::SemException("Var: Const variable '"+idd->re_mem->name+"' can't be changed!");
+		// 只判定数字，所以对于结构体、数组可能存在问题
+		if (! sem::CanAssign(idd->re_mem->real_type->type, e1->resault_type))
+			// 对于不可赋值情况，直接抛出错误
+			throw sem::SemException("Assign : '=' can't be used between '"+sem::TYPES_MAP[idd->re_mem->real_type->type]+"' and '"+sem::TYPES_MAP[e1->resault_type]+"'!");
+	}
+	else if (type==AssignStmt::ARRAY) {
+		// 首先判定表达式1作为下标是否为整数
+		if (e1->resault_type != sem::INT) throw sem::SemException("Expression : the index of array '"+idd->re_mem->name+"' must be an integer!");
+		sem::Array *temp = (sem::Array*)idd->re_mem->real_type;
+		// 判定是否为常量
+		if (temp->el_type->is_const) throw sem::SemException("Var: Const variable '"+idd->re_mem->name+"' can't be changed!");
+		// 判断赋值是否允许
+		if (! sem::CanAssign(temp->el_type->type, e1->resault_type))
+			throw sem::SemException("Assign : '=' can't be used between '"+sem::TYPES_MAP[temp->el_type->type]+"' and '"+sem::TYPES_MAP[e1->resault_type]+"'!");
+	}
+	else throw sem::SemException("Unknown error : in AssignStmt");
 	return;
 }
 
 void IDDotted::sem_analyze(sem::SemanticAnalyzer *ca){
-	// 需要判定左右是否一样
 	std::string name = id_list[0]->idt;
 	// 建立成员变量结构
 	sem::SemType *real_type = ca->find_var(name);
@@ -343,9 +387,71 @@ void IDDotted::sem_analyze(sem::SemanticAnalyzer *ca){
 			re_mem->locations.push_back(loc-temp->names.begin());
 			real_type = temp->types[name];
 		}
-		else throw sem::SemException("Var: Variable name " + name + " can't be found in record \"" + temp->type_name + "\"");
+		else throw sem::SemException("Var: Variable name '" + name + "' can't be found in record '" + temp->type_name + "'!");
 	}
 	re_mem->real_type = real_type;
 	return;
 }
+
+/** Expression **/
+// 表达式相关目前只需要做类型检查和隐式转换
+void Expression::sem_analyze(sem::SemanticAnalyzer *ca){
+	if (op == Expression::SINGLE) resault_type = expr->resault_type;
+	else {
+		if (sem::BasicOperate(expr->resault_type, expression->resault_type) == sem::ERROR) 
+			throw sem::SemException("Expression : '"+sem::TYPES_MAP[expr->resault_type]+"' and '"+sem::TYPES_MAP[expression->resault_type]+"' can't be operated!");
+		// 其他所有运算都是布尔运算
+		resault_type = sem::BOOL;
+	}
+	return;
+}
+
+void Expr::sem_analyze(sem::SemanticAnalyzer *ca){
+	if (op == Expr::SINGLE) resault_type = term->resault_type;
+	else {
+		resault_type = sem::BasicOperate(term->resault_type, expr->resault_type);
+		if (resault_type == sem::ERROR) 
+			throw sem::SemException("Expression : '"+sem::TYPES_MAP[term->resault_type]+"' and '"+sem::TYPES_MAP[expr->resault_type]+"' can't be operated!");
+	}
+	return;
+}
+
+void Term::sem_analyze(sem::SemanticAnalyzer *ca){
+	if (op == Term::SINGLE)
+		resault_type = factor->resault_type;
+	else {
+		// 模运算需要保证左右都是整型
+		if (op == Term::MOD && (factor->resault_type == sem::REAL || term->resault_type == sem::REAL))
+			throw sem::SemException("Expression : '%' can't be used for real number!");
+		else resault_type = sem::BasicOperate(factor->resault_type, term->resault_type);
+		if (resault_type == sem::ERROR) 
+			throw sem::SemException("Expression : '"+sem::TYPES_MAP[factor->resault_type]+"' and '"+sem::TYPES_MAP[term->resault_type]+"' can't be operated!");
+	}
+	return;
+}
+
+void Factor::sem_analyze(sem::SemanticAnalyzer *ca){
+	if (type == Factor::FUNC_WITH_NO_ARGS || type == Factor::FUNC)
+		resault_type = ca->find_func(id1->idt)->ret->type;
+	else if (type == Factor::CONST_VALUE)
+		resault_type = const_value->sem_type;
+	else if (type == Factor::EXPRESSION)
+		resault_type = expr->resault_type;
+	else if (type == Factor::NOT_FACTOR || type == Factor::MINUS_FACTOR){
+		// 非运算    取负号运算
+		resault_type = factor->resault_type;
+		// 检测运算是否可行
+		if (!sem::CanBeOperated(resault_type)) throw sem::SemException("Expression : 'minus' can't be used for '"+sem::TYPES_MAP[resault_type]+"'!");
+	}
+	else if (type == Factor::MEMBER)
+		resault_type = idd->re_mem->real_type->type;
+	else if (type == Factor::ARRAY){
+		sem::Array *temp = (sem::Array*)idd->re_mem->real_type;
+		resault_type = temp->el_type->type;
+	}
+	else throw sem::SemException("Unknown error : in factor !");
+	return;
+}
+
+/****/
 

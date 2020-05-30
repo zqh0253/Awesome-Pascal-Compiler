@@ -255,30 +255,36 @@ public:
         this->integer = i;
         this->is_leaf = true;
         this->name = "ConstValue";
+        this->sem_type = sem::INT;
     }
     ConstValue(float f){
         this->type = REAL;
         this->real = f;
         this->is_leaf = true;
         this->name = "ConstValue";
+        this->sem_type = sem::REAL;
     }
     ConstValue(char c){
         this->type = CHAR;
         this->ch = c;
         this->is_leaf = true;
         this->name = "ConstValue";
+        this->sem_type = sem::CHAR;
     }
     ConstValue(std::string s){
         this->type = STRING;
         this->str = s;
         this->is_leaf = true;
         this->name = "ConstValue";
+        this->sem_type = sem::STRING;
     }
     ConstValue(enum SYSCON sc){
         this->type = SYSCON;
         this->sys_con = sc;
         this->is_leaf = true;
         this->name = "ConstValue";
+        if (this->sys_con == FALSE || this->sys_con == TRUE) this->sem_type = sem::BOOL;
+        else if(this->sys_con == MAXINT) this->sem_type = sem::INT;
     }
     ~ConstValue() = default;
 
@@ -286,7 +292,7 @@ public:
     float real;
     char ch;
     std::string str;
-
+    int sem_type;
     std::vector<Node *> get_descendants() override;
 };
 
