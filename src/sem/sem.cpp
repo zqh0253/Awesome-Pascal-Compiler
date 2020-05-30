@@ -320,3 +320,9 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 		}
 	}
 }
+
+void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
+
+}
+
+

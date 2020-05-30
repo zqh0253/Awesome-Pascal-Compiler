@@ -108,6 +108,15 @@ namespace sem {
 		~FuncInfo() = default;
 	};
 
+/*******************左值信息******************/
+	class LeftValue{
+	public:
+		LeftValue(SemType *_begin_type):begin_type(_begin_type){}
+		SemType *begin_type;
+		std::vector<int> locations;
+		~LeftValue() = default;
+	};
+
 /*******************符号表******************/
 	class SemanticAnalyzer {
 	public:

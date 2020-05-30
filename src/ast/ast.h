@@ -809,8 +809,9 @@ public:
     Expression * e1,* e2;
 
     std::vector<Node *> get_descendants() override;
-
+    sem::LeftValue *left_value;
 	void codegen(CodeGenerator *cg) override;
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 };
 
 class ProcStmt : public Node {
