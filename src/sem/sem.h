@@ -9,22 +9,22 @@
 class CodeGenerator;
 /*******************变量类型******************/
 namespace sem {
-	const int INT = 0;
-	const int REAL = 1;
-	const int CHAR = 2;
-	const int VOID = 3;
-	const int BOOL = 4;
-	const int STRING = 5;
-	const int RANGE = 6;
-	const int ARRAY = 7;
-	const int RECORD = 8;
+	extern const int INT;
+	extern const int REAL;
+	extern const int CHAR;
+	extern const int VOID;
+	extern const int BOOL;
+	extern const int STRING;
+	extern const int RANGE;
+	extern const int ARRAY;
+	extern const int RECORD;
 
 	/*
 	* 用于区分实际实体
 	* 0-5 为基本类型
 	* 6-11 为基本类型的常量形式
 	*/
-	const int CONST = 6;
+	extern const int CONST;
 	extern std::string RECORD_FIRST_NAME;
 	extern std::string STRING_FIRST_NAME;
 	extern std::string RANGE_FIRST_NAME;
@@ -116,7 +116,7 @@ namespace sem {
 			this->name = name;
 		}
 		SemanticAnalyzer(const std::string &_name, std::vector<std::pair<std::string, SemType*>> &types):name(_name){
-			for(int i=0;i!=types.size();i++){
+			for(int i=0;i!=types.size();i++) {
 				this->vars[types[i].first] = types[i].second;
 			}
 		}
@@ -129,7 +129,7 @@ namespace sem {
 		std::map<std::string, SemType*> types;
 		std::map<std::string, FuncInfo *> funcs;
 
-		std::string global_name(std::string &local_name) {
+		std::string to_global_name(std::string &local_name) {
 			return this->name + "_" + local_name;
 		}
 

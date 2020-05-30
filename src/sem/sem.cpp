@@ -4,6 +4,16 @@
 
 /* ------------ Semantic Struct ------------ */
 namespace sem {
+	const int INT = 0;
+	const int REAL = 1;
+	const int CHAR = 2;
+	const int VOID = 3;
+	const int BOOL = 4;
+	const int STRING = 5;
+	const int RANGE = 6;
+	const int ARRAY = 7;
+	const int RECORD = 8;
+	const int CONST = 6;
 	std::string RECORD_FIRST_NAME = "$record_";
 	std::string STRING_FIRST_NAME = "$string_";
 	std::string RANGE_FIRST_NAME = "$range_";
@@ -72,7 +82,7 @@ void sem::SemanticAnalyzer::display(int i){
 }
 
 std::string sem::Record::global_name() {
-	return local->global_name(type_name);
+	return local->to_global_name(type_name);
 }
 
 sem::SemanticAnalyzer *sem::SemanticAnalyzer::last_sem() {
@@ -90,7 +100,6 @@ sem::SemType *sem::SemanticAnalyzer::find_var(std::string &name){
 	}
 	if(temp->vars.count(name)) return temp->vars[name];
 	else throw sem::SemException("Var: variable " + name + " has not be defined!");
-	return nullptr;
 }
 
 sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
@@ -100,15 +109,13 @@ sem::SemType *sem::SemanticAnalyzer::find_type(std::string &name){
 	}
 	if(temp->types.count(name)) return temp->types[name];
 	else throw sem::SemException("Type: type " + name + " has not be defined!");
-	return nullptr;
 }
 
 bool sem::SemanticAnalyzer::is_available(std::string &name, const std::string &e){
-	if (this->vars.count(name) && this->types.count(name) && this->funcs.count(name)){
+	if (this->vars.count(name) || this->types.count(name) || this->funcs.count(name)){
 		throw sem::SemException(e);
-		return 0;
 	}
-	else return 1;
+	return true;
 }
 
 /* ------------ Semantic Analyze ------------ */
@@ -278,6 +285,13 @@ void SubProgramHead::sem_analyze(sem::SemanticAnalyzer *ca){
 	// 判断是否有返回值
 	if (simple_type == nullptr) temp->ret = sem::Entity_List[sem::VOID];
 	else temp->ret = simple_type->sem_type;
+	// 将返回值注册为变量，检查是否重名
+	for (auto t: temp->types) {
+		if (t.first == id->idt) {
+			throw sem::SemException("FuncDef: parameter '" + t.first + "' conflict!");
+		}
+	}
+	temp->types.push_back(make_pair(id->idt, temp->ret));
 	// 根据函数名记录函数
 	ca->funcs[id->idt] = temp;
 	return;

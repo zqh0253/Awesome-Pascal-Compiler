@@ -27,14 +27,6 @@ void CodeGenerator::gencode_children(Node *n) {
 	n->sem_analyze(local_sem());
 }
 
-llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, const std::string &name) {
-	return ir_builder->CreateAlloca(type, type->getPrimitiveSizeInBits(), nullptr, name);
-}
-
-llvm::Instruction *CodeGenerator::store_local_variable(std::string &name, llvm::Value *val) {
-	llvm::Value *v = local_bb()->getValueSymbolTable()->lookup(name);
-	return ir_builder->CreateStore(val, v, false);
-}
 
 llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	llvm::Constant *ret = nullptr;
@@ -84,11 +76,23 @@ llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
 		}
 	} else if (type->type == sem::RECORD) {
 		sem::Record *r = (sem::Record *)type;
-		ret = getStructTy(r->local->global_name(r->type_name));
+		ret = getStructTy(r->local->to_global_name(r->type_name));
 	}
 	return ret;
 }
 
+llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, const std::string &name) {
+	return ir_builder->CreateAlloca(type, type->getPrimitiveSizeInBits(), nullptr, name);
+}
+
+llvm::Instruction *CodeGenerator::store_local_variable(std::string &name, llvm::Value *val) {
+	llvm::Value *v = get_local_variable(name);
+	return ir_builder->CreateStore(val, v, false);
+}
+
+llvm::Value *CodeGenerator::get_local_variable(std::string &name) {
+	return local_bb()->getValueSymbolTable()->lookup(name);
+}
 
 
 /* ----- Code Generation ----- */
@@ -222,6 +226,7 @@ void SubProgram::codegen(CodeGenerator *cg) {
 		cg->alloc_local_variable(cg->to_llvm_type(it->second), it->first);
 	}
 	routine->codegen(cg);
+	cg->ir_builder->CreateRet(cg->get_local_variable(head->id->idt));
 	cg->pop_block();
 }
 

@@ -86,23 +86,23 @@ public:
 	llvm::Type *to_llvm_type(sem::SemType *type);
 
 	llvm::Type *getIntTy() {
-		return llvm::Type::getInt32Ty(*context);
+		return ir_builder->getInt32Ty();
 	}
 
 	llvm::Type *getVoidTy() {
-		return llvm::Type::getVoidTy(*context);
+		return ir_builder->getVoidTy();
 	}
 
 	llvm::Type *getCharTy() {
-		return llvm::Type::getInt8Ty(*context);
+		return ir_builder->getInt8Ty();
 	}
 
 	llvm::Type *getRealTy() {
-		return llvm::Type::getDoubleTy(*context);
+		return ir_builder->getDoubleTy();
 	}
 
 	llvm::Type *getBoolTy() {
-		return llvm::Type::getInt1Ty(*context);
+		return ir_builder->getInt1Ty();
 	}
 
 	llvm::Type *getStringTy(uint64_t size) {
@@ -139,6 +139,7 @@ public:
 
 	// instruction
 	llvm::Instruction *alloc_local_variable(llvm::Type *type, const std::string &name);
+	llvm::Value *get_local_variable(std::string &name);
 	llvm::Instruction *store_local_variable(std::string &name, llvm::Value *val);
 
 };
