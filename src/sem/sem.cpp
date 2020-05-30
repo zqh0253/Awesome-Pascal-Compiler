@@ -155,7 +155,7 @@ sem::FuncInfo *sem::SemanticAnalyzer::find_func(const std::string &name){
 }
 
 bool sem::SemanticAnalyzer::is_available(std::string &name, const std::string &e){
-	if (this->vars.count(name) || this->types.count(name) || this->funcs.count(name)){
+	if (this->vars.count(name) || this->types.count(name) || this->funcs.count(name) || name == "printf"){
 		throw sem::SemException(e);
 	}
 	return true;
@@ -318,6 +318,8 @@ void SubProgramHead::sem_analyze(sem::SemanticAnalyzer *ca){
 		}
 	}
 	temp->types.push_back(make_pair(id->idt, temp->ret));
+	// local指针记录
+	temp->local = ca;
 	// 根据函数名记录函数
 	ca->funcs[id->idt] = temp;
 	return;

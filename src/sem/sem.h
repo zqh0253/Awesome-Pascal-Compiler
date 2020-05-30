@@ -126,10 +126,11 @@ namespace sem {
 	};
 
 	/*******************函数信息******************/
+	// 末位为函数本身返回值
 	class FuncInfo {
 	public:
 		FuncInfo() = default;
-
+		SemanticAnalyzer *local;
 		SemType *ret;
 		std::vector<std::pair<std::string, SemType*>> types;
 
