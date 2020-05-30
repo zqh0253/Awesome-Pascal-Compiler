@@ -14,7 +14,7 @@ void CodeGenerator::gencode(Node *root) {
 	}
 	std::cout << "End generating code !" << std::endl;
 	llvm::llvm_shutdown();
-	local_sem()->display(0);
+//	local_sem()->display(0);
 }
 
 void CodeGenerator::gencode_children(Node *n) {
@@ -47,6 +47,7 @@ llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	llvm::Constant *ret = nullptr;
 	if (c->type == ConstValue::INTEGER) {
 		ret = llvm::ConstantInt::get(getIntTy(), c->integer);
+//		std::cout << c->integer << " " << ret << std::endl;
 	} else if (c->type == ConstValue::REAL) {
 		ret = llvm::ConstantFP::get(getRealTy(), c->real);
 	} else if (c->type == ConstValue::CHAR) {
@@ -108,6 +109,32 @@ llvm::Instruction *CodeGenerator::store_local_variable(std::string &name, llvm::
 
 llvm::Value *CodeGenerator::get_local_variable(std::string &name) {
 	return local_bb()->getValueSymbolTable()->lookup(name);
+}
+
+llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm) {
+	llvm::Value *v = get_local_variable(rm->name);
+	std::vector<llvm::Value*> idx;
+	for (auto t: rm->locations) {
+		idx.push_back(ir_builder->getInt32(t));
+	}
+	if (!idx.empty())
+		v = ir_builder->CreateGEP(to_llvm_type(rm->begin_type), v, idx);
+	return v;
+}
+
+llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm, llvm::Value *index) {
+	llvm::Value *v = get_local_variable(rm->name);
+	std::vector<llvm::Value*> idx;
+	for (auto t: rm->locations) {
+		idx.push_back(ir_builder->getInt32(t));
+	}
+	idx.push_back(index);
+	v = ir_builder->CreateGEP(to_llvm_type(rm->begin_type), v, idx);
+	return v;
+}
+
+llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm, int index) {
+	return get_record_member(rm, ir_builder->getInt32(index));
 }
 
 
@@ -299,19 +326,15 @@ void GotoStmt::codegen(CodeGenerator *cg) {
 void AssignStmt::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 //	std::cout << idd->re_mem << std::endl;
-	llvm::Value *v = cg->get_local_variable(idd->re_mem->name);
-	std::vector<llvm::Value*> idx;
-//	std::cout << idd->re_mem->locations.size() << std::endl;
-	for (auto t: idd->re_mem->locations) {
-		idx.push_back(cg->ir_builder->getInt32(t));
+	llvm::Value *v, *val;
+	if (this->type == AssignStmt::ARRAY) {
+		v = cg->get_record_member(idd->re_mem, this->e1->llvm_val);
+		val = e2->llvm_val;
+	} else {
+		v = cg->get_record_member(idd->re_mem);
+		val = e1->llvm_val;
 	}
-//	std::cout << idx.size() << std::endl;
-//	if (this->type == AssignStmt::ARRAY) {
-//		idx.push_back(e1->llvm_val);
-//	}
-	if (!idx.empty())
-		v = cg->ir_builder->CreateGEP(cg->to_llvm_type(idd->re_mem->begin_type), v, idx);
-	cg->ir_builder->CreateStore(cg->ir_builder->getInt32(1), v);
+	cg->ir_builder->CreateStore(val, v);
 }
 
 void ProcStmt::codegen(CodeGenerator *cg) {
@@ -358,10 +381,35 @@ void IDDotted::codegen(CodeGenerator *cg) {
 // Expressions
 void Expression::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
+	if (this->op == Expression::SINGLE) {
+		this->llvm_val = expr->llvm_val;
+	} else if (this->op == Expression::GE) {
+		this->llvm_val = cg->ir_builder->CreateICmp(llvm::CmpInst::ICMP_SGE, expression->llvm_val, expr->llvm_val);
+	} else if (this->op == Expression::GT) {
+		this->llvm_val = cg->ir_builder->CreateICmp(llvm::CmpInst::ICMP_SGT, expression->llvm_val, expr->llvm_val);
+	} else if (this->op == Expression::LE) {
+		this->llvm_val = cg->ir_builder->CreateICmp(llvm::CmpInst::ICMP_SLE, expression->llvm_val, expr->llvm_val);
+	} else if (this->op == Expression::LT) {
+		this->llvm_val = cg->ir_builder->CreateICmp(llvm::CmpInst::ICMP_SLT, expression->llvm_val, expr->llvm_val);
+	} else if (this->op == Expression::EQ) {
+		this->llvm_val = cg->ir_builder->CreateICmp(llvm::CmpInst::ICMP_EQ, expression->llvm_val, expr->llvm_val);
+	} else if (this->op == Expression::NE) {
+		this->llvm_val = cg->ir_builder->CreateICmp(llvm::CmpInst::ICMP_NE, expression->llvm_val, expr->llvm_val);
+	}
 }
 
 void Expr::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
+	if (this->op == Expr::SINGLE) {
+		this->llvm_val = term->llvm_val;
+	} else if (this->op == Expr::PULS) {
+//		std::cout << "Add " << expr->llvm_val << " " << term->llvm_val << std::endl;
+		this->llvm_val = cg->ir_builder->CreateAdd(expr->llvm_val, term->llvm_val);
+	} else if (this->op == Expr::MINUS) {
+		this->llvm_val = cg->ir_builder->CreateSub(expr->llvm_val, term->llvm_val);
+	} else if (this->op == Expr::OR) {
+		this->llvm_val = cg->ir_builder->CreateOr(expr->llvm_val, term->llvm_val);
+	}
 }
 
 void Term::codegen(CodeGenerator *cg) {
@@ -371,9 +419,9 @@ void Term::codegen(CodeGenerator *cg) {
 	} else if (this->op == Term::AND) {
 		this->llvm_val = cg->ir_builder->CreateAnd(term->llvm_val, factor->llvm_val);
 	} else if (this->op == Term::MUL) {
-//		this->llvm_val = cg->ir_builder->Creat eMul(term->llvm_val, factor->llvm_val);
+		this->llvm_val = cg->ir_builder->CreateMul(term->llvm_val, factor->llvm_val);
 	} else if (this->op == Term::DIV) {
-//		this->llvm_val = cg->ir_builder->CreateDiv(term->llvm_val, factor->llvm_val);
+		this->llvm_val = cg->ir_builder->CreateSDiv(term->llvm_val, factor->llvm_val);
 	}
 }
 
@@ -384,11 +432,9 @@ void Factor::codegen(CodeGenerator *cg) {
 	} else if (this->type == Factor::EXPRESSION) {
 		this->llvm_val = this->expr->llvm_val;
 	} else if (this->type == Factor::ARRAY) {
-		llvm::Value *v = cg->get_local_variable(this->id1->idt);
-		llvm::Type *t = cg->get_var_llvm_type(this->id1->idt);
-		this->llvm_val = cg->ir_builder->CreateGEP(t, v, this->expr->llvm_val);
+		this->llvm_val = cg->get_record_member(this->idd->re_mem, this->expr->llvm_val);
 	} else if (this->type == Factor::MEMBER) {
-
+		this->llvm_val = cg->get_record_member(this->idd->re_mem);
 	} else if (this->type == Factor::NOT_FACTOR) {
 		this->llvm_val = cg->ir_builder->CreateNot(this->factor->llvm_val);
 	} else if (this->type == Factor::MINUS_FACTOR) {
@@ -403,7 +449,7 @@ void Factor::codegen(CodeGenerator *cg) {
 }
 
 void ArgsList::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
 }
 
 void ExprList::codegen(CodeGenerator *cg) {

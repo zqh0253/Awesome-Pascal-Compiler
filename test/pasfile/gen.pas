@@ -1,9 +1,6 @@
 PROGRAM gen_test;
 CONST
     cn = 2;
-    dn = 123.23;
-    a = false;
-    s = 'ab';
 TYPE
     test = INTEGER;
     rtype = RECORD
@@ -18,12 +15,12 @@ VAR
     b : test;
     asd: rtype;
     asdf: INTEGER;
-function f(a: integer; b: rtype): integer;
+function f(a: integer): integer;
 BEGIN
-
+    f := a+1;
 END;
 
 BEGIN
     b := 1;
-    asd.d.a := 1;
+    asd.d.a := 1+f(asd.d.a);
 END.

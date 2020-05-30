@@ -143,11 +143,31 @@ public:
 		return cur_module->getFunction(to_global_name(name));
 	}
 
+//	void register_printf(llvm::Module *module) {
+//		std::vector<llvm::Type*> printf_arg_types; // 这里是参数表
+//		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(module->getContext()));
+//
+//		llvm::FunctionType* printf_type =
+//				llvm::FunctionType::get(
+//						llvm::Type::getInt32Ty(module->getContext()), printf_arg_types, true);
+//		// 这里的true表示后面接不定参数
+//		llvm::Function *func = llvm::Function::Create(
+//				printf_type, llvm::Function::ExternalLinkage,
+//				llvm::Twine("printf"),
+//				module
+//		);
+//		func->setCallingConv(llvm::CallingConv::C); // 一定注意调用方式的正确性
+//	}
+
+
 	// instruction
 	llvm::Instruction *alloc_local_variable(llvm::Type *type, const std::string &name);
 	llvm::Value *get_local_variable(std::string &name);
 	llvm::Instruction *store_local_variable(std::string &name, llvm::Value *val);
-
+	llvm::Value *get_record_member(sem::RecordMember *rm);
+	llvm::Value *get_record_member(sem::RecordMember *rm, llvm::Value *index);
+	llvm::Value *get_record_member(sem::RecordMember *rm, int index);
+//	llvm::Value *get_array_el(sem::RecordMember *rm);
 };
 
 
