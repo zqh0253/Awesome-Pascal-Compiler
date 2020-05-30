@@ -322,23 +322,22 @@ void Parameters::sem_analyze(sem::SemanticAnalyzer* ca){
 }
 
 void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
-	sem::Record *temp;
-	if (type == AssignStmt::SINGLE){
-		// 在vector中存放顺序是反的
-		int n = idd->id_list.size()-1;
-		std::string name = idd->id_list[n]->idt;
-		// 建立左值结构
-		left_value = new sem::LeftValue(name,ca->find_var(name));
-		// 当n=0，不进入循环，n>0，循环内为record
-		for(int i=n-1;i>=0;i--){
-			temp = (sem::Record*) ca->find_var(name);
-			name = idd->id_list[i]->idt;// 获取前一个的名字
-			left_value->locations.push_back(std::find(temp->names.begin(),temp->names.end(),name)-temp->names.begin());
-		}
+	// 需要判定左右是否一样
+	sem::SemType *check;
+	int n = idd->id_list.size()-1;
+	std::string name = idd->id_list[n]->idt;
+	// 建立左值结构
+	check = ca->find_var(name);
+	left_value = new sem::LeftValue(name,check);
+	// 当n=0，不进入循环，n>0，循环内为record
+	for(int i=0;i<n;i++){
+		sem::Record *temp = (sem::Record*) check;
+		name = idd->id_list[i]->idt;// 获取前一个的名字
+		left_value->locations.push_back(std::find(temp->names.begin(),temp->names.end(),name)-temp->names.begin());
+		check = ca->find_var(name);
 	}
 	// array类型检测未完成
-	else if (type == AssignStmt::ARRAY) ;
-	if (temp->is_const) throw sem::SemException("Var: Const variable "+temp->names[0]+" can't be changed!");
+	if (check->is_const) throw sem::SemException("Var: Const variable "+name+" can't be changed!");
 	return;
 }
 
