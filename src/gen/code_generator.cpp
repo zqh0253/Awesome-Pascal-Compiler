@@ -27,6 +27,21 @@ void CodeGenerator::gencode_children(Node *n) {
 	n->sem_analyze(local_sem());
 }
 
+sem::SemType *CodeGenerator::get_sem_type(const std::string &name) {
+	return local_sem()->types[name];
+}
+
+sem::SemType *CodeGenerator::get_var_sem_type(const std::string &name) {
+	return local_sem()->vars[name];
+}
+
+sem::FuncInfo *CodeGenerator::get_sem_func(const std::string &name) {
+	return local_sem()->funcs[name];
+}
+
+llvm::Type *CodeGenerator::get_var_llvm_type(const std::string &name) {
+	return to_llvm_type(get_var_sem_type(name));
+}
 
 llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	llvm::Constant *ret = nullptr;
@@ -47,6 +62,7 @@ llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	}
 	return ret;
 }
+
 
 llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
 	llvm::Type *ret = nullptr;
@@ -147,8 +163,7 @@ void ConstExpr::codegen(CodeGenerator *cg) {
 	std::string &const_name = id->idt;
 //	std::cout << const_name << std::endl;
 //	std::cout << const_value->type << std::endl;
-	sem::SemType *const_type = cg->local_sem()->vars[const_name];
-	llvm::Type *llvm_type = cg->to_llvm_type(const_type);
+	llvm::Type *llvm_type = cg->get_var_llvm_type(const_name);
 	llvm::Value *llvm_value = cg->to_llvm_constant(const_value);
 
 	cg->alloc_local_variable(llvm_type, const_name);
@@ -167,7 +182,7 @@ void TypeDef::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 	if (type_dec->type == TypeDec::RECORD) {
 		// 在 LLVM 中重命名 Record
-		sem::Record *record = (sem::Record *)cg->local_sem()->types[id->idt];
+		sem::Record *record = (sem::Record *)cg->get_sem_type(id->idt);
 		llvm::StructType *t = cg->getStructTy(record->global_name());
 		record->type_name = id->idt;
 		t->setName(record->global_name());
@@ -233,8 +248,7 @@ void SubProgram::codegen(CodeGenerator *cg) {
 void SubProgramHead::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 	std::string &func_name = id->idt;
-	sem::FuncInfo *func = cg->local_sem()->funcs[func_name];
-	cg->createFunction(func_name, cg->local_sem()->funcs[func_name]);
+	cg->createFunction(func_name, cg->get_sem_func(func_name));
 }
 
 void Parameters::codegen(CodeGenerator *cg) {
@@ -284,14 +298,14 @@ void GotoStmt::codegen(CodeGenerator *cg) {
 
 void AssignStmt::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-	std::cout << idd->re_mem << std::endl;
+//	std::cout << idd->re_mem << std::endl;
 	llvm::Value *v = cg->get_local_variable(idd->re_mem->name);
 	std::vector<llvm::Value*> idx;
-	std::cout << idd->re_mem->locations.size() << std::endl;
+//	std::cout << idd->re_mem->locations.size() << std::endl;
 	for (auto t: idd->re_mem->locations) {
 		idx.push_back(cg->ir_builder->getInt32(t));
 	}
-	std::cout << idx.size() << std::endl;
+//	std::cout << idx.size() << std::endl;
 //	if (this->type == AssignStmt::ARRAY) {
 //		idx.push_back(e1->llvm_val);
 //	}
@@ -338,11 +352,12 @@ void SysProc::codegen(CodeGenerator *cg) {
 }
 
 void IDDotted::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
 }
 
+// Expressions
 void Expression::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
 }
 
 void Expr::codegen(CodeGenerator *cg) {
@@ -350,11 +365,41 @@ void Expr::codegen(CodeGenerator *cg) {
 }
 
 void Term::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
+	if (this->op == Term::SINGLE) {
+		this->llvm_val = factor->llvm_val;
+	} else if (this->op == Term::AND) {
+		this->llvm_val = cg->ir_builder->CreateAnd(term->llvm_val, factor->llvm_val);
+	} else if (this->op == Term::MUL) {
+//		this->llvm_val = cg->ir_builder->Creat eMul(term->llvm_val, factor->llvm_val);
+	} else if (this->op == Term::DIV) {
+//		this->llvm_val = cg->ir_builder->CreateDiv(term->llvm_val, factor->llvm_val);
+	}
 }
 
 void Factor::codegen(CodeGenerator *cg) {
+	cg->gencode_children(this);
+	if (this->type == Factor::CONST_VALUE) {
+		this->llvm_val = cg->to_llvm_constant(this->const_value);
+	} else if (this->type == Factor::EXPRESSION) {
+		this->llvm_val = this->expr->llvm_val;
+	} else if (this->type == Factor::ARRAY) {
+		llvm::Value *v = cg->get_local_variable(this->id1->idt);
+		llvm::Type *t = cg->get_var_llvm_type(this->id1->idt);
+		this->llvm_val = cg->ir_builder->CreateGEP(t, v, this->expr->llvm_val);
+	} else if (this->type == Factor::MEMBER) {
 
+	} else if (this->type == Factor::NOT_FACTOR) {
+		this->llvm_val = cg->ir_builder->CreateNot(this->factor->llvm_val);
+	} else if (this->type == Factor::MINUS_FACTOR) {
+		this->llvm_val = cg->ir_builder->CreateNeg(this->factor->llvm_val);
+	} else if (this->type == Factor::FUNC_WITH_NO_ARGS) {
+		this->llvm_val =
+				cg->ir_builder->CreateCall(cg->getFunction(id1->idt));
+	} else if (this->type == Factor::FUNC) {
+		this->llvm_val =
+				cg->ir_builder->CreateCall(cg->getFunction(id1->idt), args_list->get_llvm_args());
+	}
 }
 
 void ArgsList::codegen(CodeGenerator *cg) {

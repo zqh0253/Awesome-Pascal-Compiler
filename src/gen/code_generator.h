@@ -81,7 +81,13 @@ public:
 		return ret;
 	}
 
+	// sem
+	sem::SemType *get_var_sem_type(const std::string &name);
+	sem::SemType *get_sem_type(const std::string &name);
+	sem::FuncInfo *get_sem_func(const std::string &name);
+
 	// constant and type
+	llvm::Type *get_var_llvm_type(const std::string &name);
 	llvm::Constant *to_llvm_constant(ConstValue *c);
 	llvm::Type *to_llvm_type(sem::SemType *type);
 
@@ -134,7 +140,7 @@ public:
 	}
 
 	llvm::Function *getFunction(const std::string &name) {
-		return cur_module->getFunction(name);
+		return cur_module->getFunction(to_global_name(name));
 	}
 
 	// instruction

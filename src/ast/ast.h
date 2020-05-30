@@ -1105,6 +1105,13 @@ public:
     void add(Expression *);
     std::vector<Node *> get_descendants() override;
 
+	std::vector<llvm::Value*> get_llvm_args() {
+		std::vector<llvm::Value*> ret;
+		for (auto e: args_list) {
+			ret.push_back(e->llvm_val);
+		}
+		return ret;
+	}
 	void codegen(CodeGenerator *cg) override;
 };
 
