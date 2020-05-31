@@ -399,10 +399,9 @@ void IDDotted::sem_analyze(sem::SemanticAnalyzer *ca){
 void Expression::sem_analyze(sem::SemanticAnalyzer *ca){
 	if (op == Expression::SINGLE) resault_type = expr->resault_type;
 	else {
-		if (sem::BasicOperate(expr->resault_type, expression->resault_type) == sem::ERROR) 
+		resault_type = sem::BasicOperate(expr->resault_type, expression->resault_type);
+		if (resault_type == sem::ERROR)
 			throw sem::SemException("Expression : '"+sem::TYPES_MAP[expr->resault_type]+"' and '"+sem::TYPES_MAP[expression->resault_type]+"' can't be operated!");
-		// 其他所有运算都是布尔运算
-		resault_type = sem::BOOL;
 	}
 	return;
 }

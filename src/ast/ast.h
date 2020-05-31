@@ -1077,7 +1077,9 @@ public:
             ARRAY,
             MEMBER,
             ASTERISK,
-            ADDR
+            ADDR,
+		    ASTERISK_ARRAY,
+		    ADDR_ARRAY
     } type;
     Factor (ID * i) : id1(i) {
         this->is_leaf = false;
@@ -1108,6 +1110,10 @@ public:
         this->name = "Factor";
         type = ARRAY;
     }
+	Factor (IDDotted * i, Expression * e, enum t ty) : idd(i), expr(e), type(ty) {
+		this->is_leaf = false;
+		this->name = "Factor";
+	}
     Factor (IDDotted * i) : idd(i){
         this->is_leaf = false;
         this->name = "Factor";

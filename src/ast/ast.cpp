@@ -480,6 +480,14 @@ std::vector<Node *> Factor::get_descendants(){
     else if (this->type == Factor::ASTERISK){
 	    list.push_back(this->idd);
     }
+    else if (this->type == Factor::ADDR_ARRAY){
+	    list.push_back(this->idd);
+	    list.push_back(this->expr);
+    }
+    else if (this->type == Factor::ASTERISK_ARRAY){
+	    list.push_back(this->idd);
+	    list.push_back(this->expr);
+    }
     else {
         list.push_back(this->factor);
     }

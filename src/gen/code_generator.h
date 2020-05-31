@@ -174,7 +174,7 @@ public:
 		return ir_builder->CreateCall(func, args);
 	}
 
-	void register_printf() {
+	void link_printf() {
 		std::vector<llvm::Type*> printf_arg_types;
 		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(cur_module->getContext()));
 
@@ -190,7 +190,6 @@ public:
 		auto sem_func = new sem::FuncInfo();
 		sem_func->ret = new sem::SemType(sem::INT);
 		local_sem()->funcs["printf"] = sem_func;
-
 	}
 
 	// variable
@@ -202,7 +201,7 @@ public:
 	llvm::Value *load_local_variable(const std::string &name);
 	llvm::Value *get_record_member(sem::RecordMember *rm);
 	llvm::Value *get_record_member_el(sem::RecordMember *rm, llvm::Value *index);
-	llvm::Value *get_array_ptr(llvm::Value *arr, llvm::Type *el_type);
+	llvm::Value *get_array_ptr(llvm::Value *arr, llvm::Type *el_type) const;
 	llvm::Value *get_array_ptr(llvm::Value *arr, sem::SemType *el_type);
 	llvm::Value *get_array_el(llvm::Value *arr, llvm::Value *index, llvm::Type *el_type, int size);
 	llvm::Value *get_array_el(llvm::Value *arr, llvm::Value *index, sem::SemType *arr_type);
