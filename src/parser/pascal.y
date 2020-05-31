@@ -75,10 +75,10 @@ CaseExpr* caseexpr;
 %token REV_AND REV_ARRAY REV_BEGIN REV_BREAK REV_CASE REV_CONST REV_CONTINUE REV_DEFAULT REV_DIV REV_DO REV_DOWNTO 
 %token REV_ELSE REV_END REV_EXIT REV_FILE REV_FOR REV_FORWARD REV_FUNCTION REV_GOTO REV_IF REV_IN REV_LABEL REV_MOD 
 %token REV_NIL REV_NOT REV_OF REV_OR REV_PACKED REV_PROCEDURE REV_PROGRAM REV_RECORD REV_REPEAT REV_SET REV_SIZEOF 
-%token REV_THEN REV_TO REV_TYPE REV_UNTIL REV_VAR REV_WHILE REV_WITH REV_XOR REV_READ REV_WRITE REV_WRITELN
+%token REV_THEN REV_TO REV_TYPE REV_UNTIL REV_VAR REV_WHILE REV_WITH REV_XOR REV_READ REV_WRITE REV_WRITELN REV_PTR
 
 %token OP_ADD OP_SUB OP_MOD OP_MUL OP_DIV OP_EQ OP_LT OP_GT OP_LBRAC OP_RBRAC OP_PERIOD OP_COMMA OP_COLON OP_SEMICOLON OP_AT 
-%token OP_CARET OP_LPAREN OP_RPAREN OP_NE OP_LEQ OP_GEQ OP_ASSIGN OP_RANGE 
+%token OP_CARET OP_LPAREN OP_RPAREN OP_NE OP_LEQ OP_GEQ OP_ASSIGN OP_RANGE OP_ASTERISK OP_ADDR
 
 %token TYPE_INT TYPE_REAL TYPE_CHAR TYPE_BOOL TYPE_STRING 
 
@@ -198,7 +198,7 @@ sys_type : TYPE_BOOL {$$=new SysType(SysType::BOOLEAN);}
             | TYPE_INT {$$=new SysType(SysType::INTEGER);}
             | TYPE_REAL {$$=new SysType(SysType::REAL);}
             | TYPE_STRING {$$=new SysType(SysType::STRING);}
-
+            | TYPE_POINTER {$$=new SysType(SysType::POINTER);}
 range_type : const_value OP_RANGE const_value {$$=new RangeType($1,$3,false,false);}
             | OP_SUB const_value OP_RANGE const_value {$$=new RangeType($2,$4, true,false);}
             | OP_SUB const_value OP_RANGE OP_SUB const_value {$$=new RangeType($2,$5, true,true);}
@@ -332,6 +332,8 @@ factor      : IDT OP_LPAREN args_list OP_RPAREN  {$$=new Factor($1,$3);}
             | OP_SUB factor             {$$=new Factor($2, Factor::MINUS_FACTOR);}
             | IDD OP_LBRAC expression OP_RBRAC  {$$=new Factor($1, $3);}
             | IDD                       {$$=new Factor($1);}
+            | OP_ADDR                   {$$=new Factor($2, Factor::ADDR);}
+            | OP_ASTERISK               {$$=new Factor($2, Factor::ASTERISK;)}
 
 sys_proc    : REV_READ                  {$$=new SysProc(SysProc::READ);}
             | REV_WRITE                  {$$=new SysProc(SysProc::WRITE);}

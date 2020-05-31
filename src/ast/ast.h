@@ -434,7 +434,7 @@ public:
 
 class SysType : public Node {
 public:
-    enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING} type;
+    enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING, POINTER} type;
     SysType(enum t type) {
         this->type = type;
         this->is_leaf = true;
@@ -1072,7 +1072,9 @@ public:
             NOT_FACTOR,
             MINUS_FACTOR,
             ARRAY,
-            MEMBER
+            MEMBER,
+            ASTERISK,
+            ADDR
     } type;
     Factor (ID * i) : id1(i) {
         this->is_leaf = false;
