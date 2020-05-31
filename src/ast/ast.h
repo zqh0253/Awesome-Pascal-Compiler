@@ -370,6 +370,7 @@ public:
 class TypeDec : public Node {
 public:
     enum type {SIMPLE, ARRAY, RECORD} type;
+    int ptr = 0;
     TypeDec(SimpleType * st):simple_type(st) {
         this->type = SIMPLE;
         this->is_leaf = false;
@@ -434,7 +435,7 @@ public:
 
 class SysType : public Node {
 public:
-    enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING, POINTER} type;
+    enum t {BOOLEAN, CHAR, INTEGER, REAL, STRING} type;
     SysType(enum t type) {
         this->type = type;
         this->is_leaf = true;
@@ -1110,6 +1111,10 @@ public:
         this->name = "Factor";
         type = MEMBER;
     }
+	Factor (IDDotted * i, enum t ty) : idd(i), type(ty){
+		this->is_leaf = false;
+		this->name = "Factor";
+	}
     ~Factor() = default;
     ID * id1;
     IDDotted * idd;

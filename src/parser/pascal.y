@@ -80,7 +80,7 @@ CaseExpr* caseexpr;
 %token OP_ADD OP_SUB OP_MOD OP_MUL OP_DIV OP_EQ OP_LT OP_GT OP_LBRAC OP_RBRAC OP_PERIOD OP_COMMA OP_COLON OP_SEMICOLON OP_AT 
 %token OP_CARET OP_LPAREN OP_RPAREN OP_NE OP_LEQ OP_GEQ OP_ASSIGN OP_RANGE OP_ASTERISK OP_ADDR
 
-%token TYPE_INT TYPE_REAL TYPE_CHAR TYPE_BOOL TYPE_STRING 
+%token TYPE_INT TYPE_REAL TYPE_CHAR TYPE_BOOL TYPE_STRING TYPE_POINTER
 
 %token BOOL_TRUE BOOL_FALSE IDT
 
@@ -188,6 +188,7 @@ type_def : IDT OP_EQ type_dec OP_SEMICOLON {$$=new TypeDef($1,$3);}
 type_dec : simple_type {$$=new TypeDec($1);}
             | array_type {$$=new TypeDec($1);}
             | record_type {$$=new TypeDec($1);}
+            | TYPE_POINTER simple_type {$$=new TypeDec($2); $$->ptr = 1;}
 
 simple_type : sys_type {$$=new SimpleType($1);}
             | IDT {$$=new SimpleType($1);}
@@ -198,7 +199,6 @@ sys_type : TYPE_BOOL {$$=new SysType(SysType::BOOLEAN);}
             | TYPE_INT {$$=new SysType(SysType::INTEGER);}
             | TYPE_REAL {$$=new SysType(SysType::REAL);}
             | TYPE_STRING {$$=new SysType(SysType::STRING);}
-            | TYPE_POINTER {$$=new SysType(SysType::POINTER);}
 range_type : const_value OP_RANGE const_value {$$=new RangeType($1,$3,false,false);}
             | OP_SUB const_value OP_RANGE const_value {$$=new RangeType($2,$4, true,false);}
             | OP_SUB const_value OP_RANGE OP_SUB const_value {$$=new RangeType($2,$5, true,true);}
@@ -333,7 +333,7 @@ factor      : IDT OP_LPAREN args_list OP_RPAREN  {$$=new Factor($1,$3);}
             | IDD OP_LBRAC expression OP_RBRAC  {$$=new Factor($1, $3);}
             | IDD                       {$$=new Factor($1);}
             | OP_ADDR IDD                 {$$=new Factor($2, Factor::ADDR);}
-            | OP_ASTERISK IDD               {$$=new Factor($2, Factor::ASTERISK;)}
+            | OP_ASTERISK IDD               {$$=new Factor($2, Factor::ASTERISK);}
 
 sys_proc    : REV_READ                  {$$=new SysProc(SysProc::READ);}
             | REV_WRITE                  {$$=new SysProc(SysProc::WRITE);}

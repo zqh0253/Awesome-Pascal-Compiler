@@ -99,7 +99,7 @@ TYPE_REAL real
 TYPE_CHAR character|char
 TYPE_BOOL boolean|bool
 TYPE_STRING string
-TYPE_POINTER ptr | pointer
+TYPE_POINTER ptr|pointer
 
 BOOL_TRUE true
 BOOL_FALSE false
@@ -184,8 +184,8 @@ COMMENT "{"[^\}]*"}"
 {OP_ASSIGN} {return OP_ASSIGN;}
 {OP_RANGE} {return OP_RANGE;}
 {OP_MOD} {return OP_MOD;}
-{OP_ASTERISK} {return OP_ASTERISK}
-{OP_ADDR} {return OP_ADDR}
+{OP_ASTERISK} {return OP_ASTERISK;}
+{OP_ADDR} {return OP_ADDR;}
 
 {TYPE_INT} {return TYPE_INT;}
 {TYPE_REAL} {return TYPE_REAL;}

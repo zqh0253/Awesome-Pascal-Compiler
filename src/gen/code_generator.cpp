@@ -521,6 +521,13 @@ void Factor::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 	if (this->type == Factor::CONST_VALUE) {
 		this->llvm_val = cg->to_llvm_constant(this->const_value);
+		if (cg->get_local_variable("c")) {
+//			auto v = cg->ir_builder->CreatePtrToInt(cg->load_local_variable("c"), cg->getIntTy()->getPointerElementType());
+//			auto b = cg->get_local_variable("b");
+//			auto bpt = llvm::PointerType::get(b->getType(), 0);
+//			cg->store_local_variable(c, b);
+//			cg->store_local_variable(cg->load_local_variable("c"), this->llvm_val);
+		}
 	} else if (this->type == Factor::EXPRESSION) {
 		this->llvm_val = this->expr->llvm_val;
 	} else if (this->type == Factor::ARRAY) {
