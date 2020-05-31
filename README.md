@@ -1,23 +1,24 @@
 # Awesome-Pascal-Compiler
 
 ### How To Run
-+ Since we are in development stage, I put the code in [src/naive](https://github.com/zqh0253/Awesome-Pascal-Compiler/tree/master/src/naive).
-+  To compile through `Bison` and `flex`, simply run:
++ build
 ```shell
-bash ./comp.sh
+mkdir cmake-build/ && cd cmake-build/
+cmake .. && cd ..
+cmake --build cmake-build --target apc
 ```
-+ Then you can use `.test` to view the constructed AST tree.
++ Then you can use test target to test (all test target in /test/CMakeLists.txt)
 ```shell
-./test < pasfile/stmtTest.pascal
+cmake --build cmake-build --target apc-test-*
 ```
 ### TO-DO List
-- [ ] SPLIT `FieldDec` and `VarDecl`
+- [x] SPLIT `FieldDec` and `VarDecl`
 - [x] Finish `routine part`
 - [x] Finish `routine body`
-- [ ] Optimize Node::prt, so that the tree can be better viewed 
-- [ ] Semantical Analysis
-- [ ] Codegen
-- [ ] Report Writing
+- [x] Optimize Node::prt, so that the tree can be better viewed 
+- [x] Semantical Analysis
+- [x] Codegen
+- [x] Report Writing
 
 ```
                        _oo0oo_
