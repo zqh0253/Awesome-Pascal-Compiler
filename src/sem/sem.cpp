@@ -14,7 +14,9 @@ namespace sem {
 	const int RANGE = 6;
 	const int ARRAY = 7;
 	const int RECORD = 8;
+
 	const int CONST = 6;
+	const int PTR = 12;
 	std::string RECORD_FIRST_NAME = "$record_";
 	std::string STRING_FIRST_NAME = "$string_";
 	std::string RANGE_FIRST_NAME = "$range_";
@@ -67,17 +69,11 @@ int sem::BasicOperate(const int a, const int b){
 	else return sem::ERROR;
 }
 
-// 待完成
-// bool sem::has_exist(std::string name, sem::SemType *ret){
-// 	if (sem::Global_Types.count(name)){
-// 		ret = Global_Types[name];
-// 		return true;
-// 	}
-// 	else  return false;
-// }
-
 void sem::SemType::display(int i){
     std::cout << sem::TYPES_MAP[this->type];
+	if (this->is_ptr)
+        std::cout << " pointer";
+
     if (this->is_const)
         std::cout << " const" << std::endl;
     else
@@ -488,7 +484,7 @@ void ProcStmt::sem_analyze(sem::SemanticAnalyzer *ca){
 				throw sem::SemException("Parameter : the type of parametr '"+temp->types[i].first+"' is not '"+sem::TYPES_MAP[args_list->args_list[i]->resault_type]+"'!");
 			// 对于record和array追加判定
 			if (args_list->args_list[i]->resault_type == sem::RECORD){
-				
+
 			}
 		}
 	}

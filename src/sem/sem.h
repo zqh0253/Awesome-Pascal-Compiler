@@ -24,8 +24,10 @@ namespace sem {
 	* 用于区分实际实体
 	* 0-5 为基本类型
 	* 6-11 为基本类型的常量形式
+	* 12-17 为基本类型的指针形式
 	*/
 	extern const int CONST;
+	extern const int PTR;
 	extern std::string RECORD_FIRST_NAME;
 	extern std::string STRING_FIRST_NAME;
 	extern std::string RANGE_FIRST_NAME;
@@ -43,11 +45,13 @@ namespace sem {
 	class SemanticAnalyzer;
 	class SemType {
 	public:
-		SemType(int _type):type(_type),is_const(false){}
-		SemType(int _type, int _is_const):type(_type),is_const(_is_const){}
+		SemType(int _type):type(_type),is_const(false),is_ptr(false){}
+		SemType(int _type, int _is_const):type(_type),is_const(_is_const),is_ptr(false){}
+		SemType(int _type, int _is_const, int _is_ptr):type(_type),is_const(_is_const),is_ptr(_is_ptr){}
 
 		int type; // 表示 BuiltinType 或 Range 或 Array 或 Record
 		bool is_const;
+		bool is_ptr; // 该类型是否是指针
 
         virtual void display(int i);
 		virtual ~SemType() = default;
@@ -71,12 +75,6 @@ namespace sem {
         Range(int _begin, int _end, int _is_const):SemType(RANGE, _is_const),begin(_begin),end(_end){}
 
 		int begin, end;
-		// bool operator==(Range &t){
-		// 	return (type == t.type && begin == t.begin && end == t.end);
-		// }
-		// bool operator!=(Range &t){
-		// 	return (type != t.type || begin != t.begin || end != t.end);
-		// }
 		~Range() = default;
         // ~Range(){std::cout << "Range is over" << std::endl;}
 	};
