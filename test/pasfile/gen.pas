@@ -4,17 +4,19 @@ CONST
 
 VAR
     b : INTEGER;
+    i : INTEGER;
+    j : INTEGER;
 function f(a: integer): integer;
 BEGIN
     f := a+2;
 END;
 
 BEGIN
-    IF false THEN begin
-        b := f(cn);
-    end else begin
-        b := 1;
+    for i := 0 to 9 do begin
+        j := 0;
+        repeat
+            b := printf('%d\n', i+1);
+            j := j+1;
+        until j > 2;
     end;
-
-    b := printf('%d', b);
 END.

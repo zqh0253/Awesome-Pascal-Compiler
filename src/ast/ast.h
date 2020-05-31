@@ -294,6 +294,26 @@ public:
     std::string str;
     int sem_type;
     std::vector<Node *> get_descendants() override;
+
+    std::string& process_string() {
+    	int idx = 0;
+    	while (idx < str.size()) {
+    		if (str[idx] != '\\' || idx == str.size() - 1) {
+    			idx++;
+    			continue;
+    		}
+    		char c = str[idx+1];
+    		if (c == 'n') {
+			    str = str.replace(idx, 2, "\n");
+    		} else if (c == 't') {
+			    str = str.replace(idx, 2, "\t");
+		    } else if (c == '\\' || c == '\'') {
+			    str = str.erase(idx);
+		    }
+		    idx ++;
+    	}
+    	return str;
+    }
 };
 
 class TypePart : public Node {

@@ -47,14 +47,12 @@ llvm::Constant *CodeGenerator::to_llvm_constant(ConstValue *c) {
 	llvm::Constant *ret = nullptr;
 	if (c->type == ConstValue::INTEGER) {
 		ret = llvm::ConstantInt::get(getIntTy(), c->integer);
-//		std::cout << c->integer << " " << ret << std::endl;
 	} else if (c->type == ConstValue::REAL) {
 		ret = llvm::ConstantFP::get(getRealTy(), c->real);
 	} else if (c->type == ConstValue::CHAR) {
 		ret = llvm::ConstantInt::get(getCharTy(), c->ch);
 	} else if (c->type == ConstValue::STRING) {
-		ret = ir_builder->CreateGlobalString(c->str);
-//		ret = llvm::ConstantDataArray::getString(*context, c->str);
+		ret = ir_builder->CreateGlobalString(c->process_string());
 	} else if (c->type == ConstValue::SYSCON && c->sys_con == ConstValue::MAXINT) {
 		ret = llvm::ConstantInt::get(getIntTy(), 0x7fffffff);
 	} else if (c->type == ConstValue::SYSCON && c->sys_con == ConstValue::TRUE) {
@@ -103,9 +101,12 @@ llvm::Instruction *CodeGenerator::alloc_local_variable(llvm::Type *type, const s
 	return ir_builder->CreateAlloca(type, nullptr, name);
 }
 
+llvm::Instruction *CodeGenerator::store_local_variable(llvm::Value *ptr, llvm::Value *val) {
+	return ir_builder->CreateStore(val, ptr, false);
+}
+
 llvm::Instruction *CodeGenerator::store_local_variable(const std::string &name, llvm::Value *val) {
-	llvm::Value *v = get_local_variable(name);
-	return ir_builder->CreateStore(val, v, false);
+	return store_local_variable(get_local_variable(name), val);
 }
 
 llvm::Value *CodeGenerator::load_variable(llvm::Value *ptr) {
@@ -352,20 +353,20 @@ void AssignStmt::codegen(CodeGenerator *cg) {
 }
 
 void IfStmt::codegen(CodeGenerator *cg) {
-	expr->codegen(cg);
+	llvm::BasicBlock *old_bb = cg->local_cbb();
 	llvm::BasicBlock *new_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
-
 	llvm::BasicBlock *true_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
-	cg->ir_builder->SetInsertPoint(true_bb);
+	expr->codegen(cg);
+	cg->set_local_cbb(true_bb);
 	stmt->codegen(cg);
 	cg->ir_builder->CreateBr(new_bb);
 
 	llvm::BasicBlock *false_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
-	cg->ir_builder->SetInsertPoint(false_bb);
+	cg->set_local_cbb(false_bb);
 	else_clause->codegen(cg);
 	cg->ir_builder->CreateBr(new_bb);
 
-	cg->ir_builder->SetInsertPoint(cg->local_cbb());
+	cg->ir_builder->SetInsertPoint(old_bb);
 	cg->ir_builder->CreateCondBr(expr->llvm_val, true_bb, false_bb);
 	cg->set_local_cbb(new_bb);
 }
@@ -375,15 +376,62 @@ void ElseClause::codegen(CodeGenerator *cg) {
 }
 
 void RepeatStmt::codegen(CodeGenerator *cg) {
+	llvm::BasicBlock *old_bb = cg->local_cbb();
+	llvm::BasicBlock *new_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	llvm::BasicBlock *loop_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	cg->set_local_cbb(loop_bb);
+	this->stmt_list->codegen(cg);
+	this->expr->codegen(cg);
+	llvm::Value *cond = cg->ir_builder->CreateICmpEQ(expr->llvm_val, cg->ir_builder->getTrue());
+	cg->ir_builder->CreateCondBr(cond, new_bb, loop_bb);
 
+	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->ir_builder->CreateBr(loop_bb);
+	cg->set_local_cbb(new_bb);
 }
 
 void WhileStmt::codegen(CodeGenerator *cg) {
+	llvm::BasicBlock *old_bb = cg->local_cbb();
+	llvm::BasicBlock *new_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	llvm::BasicBlock *cond_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	llvm::BasicBlock *loop_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	cg->ir_builder->SetInsertPoint(cond_bb);
+	expr->codegen(cg);
+	llvm::Value *cond = cg->ir_builder->CreateICmpEQ(expr->llvm_val, cg->ir_builder->getTrue());
+	cg->ir_builder->CreateCondBr(cond, loop_bb, new_bb);
+	cg->set_local_cbb(loop_bb);
+	stmt->codegen(cg);
+	cg->ir_builder->CreateBr(cond_bb);
 
+	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->ir_builder->CreateBr(cond_bb);
+	cg->set_local_cbb(new_bb);
 }
 
 void ForStmt::codegen(CodeGenerator *cg) {
+	llvm::BasicBlock *old_bb = cg->local_cbb();
+	llvm::BasicBlock *new_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	llvm::BasicBlock *cond_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	llvm::BasicBlock *loop_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
 
+	idd->codegen(cg);
+	expr1->codegen(cg);
+	llvm::Value *loop_var_ptr = cg->get_record_member(idd->re_mem);
+	cg->store_local_variable(loop_var_ptr, expr1->llvm_val);
+	expr2->codegen(cg);
+	cg->ir_builder->SetInsertPoint(cond_bb);
+	llvm::Value *loop_var = cg->load_variable(loop_var_ptr);
+	llvm::Value *cond = cg->ir_builder->CreateICmpSLE(loop_var, expr2->llvm_val);
+	cg->ir_builder->CreateCondBr(cond, loop_bb, new_bb);
+	cg->set_local_cbb(loop_bb);
+	stmt->codegen(cg);
+	loop_var = cg->ir_builder->CreateAdd(loop_var, cg->ir_builder->getInt32(1), loop_var->getName());
+	cg->store_local_variable(loop_var_ptr, loop_var);
+	cg->ir_builder->CreateBr(cond_bb);
+
+	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->ir_builder->CreateBr(cond_bb);
+	cg->set_local_cbb(new_bb);
 }
 
 void SysProc::codegen(CodeGenerator *cg) {

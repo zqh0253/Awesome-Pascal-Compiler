@@ -194,6 +194,7 @@ public:
 	// variable
 	llvm::Instruction *alloc_local_variable(llvm::Type *type, const std::string &name);
 	llvm::Value *get_local_variable(const std::string &name);
+	llvm::Instruction *store_local_variable(llvm::Value *ptr, llvm::Value *val);
 	llvm::Instruction *store_local_variable(const std::string &name, llvm::Value *val);
 	llvm::Value *load_variable(llvm::Value *ptr);
 	llvm::Value *load_local_variable(const std::string &name);
