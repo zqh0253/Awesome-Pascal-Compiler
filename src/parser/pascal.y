@@ -332,8 +332,8 @@ factor      : IDT OP_LPAREN args_list OP_RPAREN  {$$=new Factor($1,$3);}
             | OP_SUB factor             {$$=new Factor($2, Factor::MINUS_FACTOR);}
             | IDD OP_LBRAC expression OP_RBRAC  {$$=new Factor($1, $3);}
             | IDD                       {$$=new Factor($1);}
-            | OP_ADDR                   {$$=new Factor($2, Factor::ADDR);}
-            | OP_ASTERISK               {$$=new Factor($2, Factor::ASTERISK;)}
+            | OP_ADDR IDD                 {$$=new Factor($2, Factor::ADDR);}
+            | OP_ASTERISK IDD               {$$=new Factor($2, Factor::ASTERISK;)}
 
 sys_proc    : REV_READ                  {$$=new SysProc(SysProc::READ);}
             | REV_WRITE                  {$$=new SysProc(SysProc::WRITE);}
