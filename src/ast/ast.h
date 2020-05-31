@@ -884,7 +884,7 @@ public:
     ExprList * expr_list;
     Factor * factor;
     std::vector<Node *> get_descendants() override;
-
+    void sem_analyze(sem::SemanticAnalyzer *ca) override;
 	void codegen(CodeGenerator *cg) override;
 };
 

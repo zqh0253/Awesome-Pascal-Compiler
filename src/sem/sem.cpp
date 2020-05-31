@@ -41,6 +41,8 @@ bool sem::CanAssign(const int a, const int b){
 	if (a == b) return true;
 	// 目前四个可以乱来，后续有变化的话再修改
 	if (CanBeOperated(a) && CanBeOperated(b)) return true;
+	// 允许char对于string赋值
+	if (a == sem::STRING && b == sem::CHAR) return true;
 	return false;
 }
 
@@ -151,7 +153,7 @@ sem::FuncInfo *sem::SemanticAnalyzer::find_func(const std::string &name){
 		if(temp->funcs.count(name)) return temp->funcs[name];
 	}
 	if(temp->funcs.count(name)) return temp->funcs[name];
-	else throw sem::SemException("Type: function '" + name + "' has not be defined!");
+	else throw sem::SemException("Func: function '" + name + "' has not be defined!");
 }
 
 bool sem::SemanticAnalyzer::is_available(std::string &name, const std::string &e){
@@ -433,8 +435,22 @@ void Term::sem_analyze(sem::SemanticAnalyzer *ca){
 }
 
 void Factor::sem_analyze(sem::SemanticAnalyzer *ca){
-	if (type == Factor::FUNC_WITH_NO_ARGS || type == Factor::FUNC)
-		resault_type = ca->find_func(id1->idt)->ret->type;
+	if (type == Factor::FUNC_WITH_NO_ARGS || type == Factor::FUNC){
+		sem::FuncInfo *temp = (sem::FuncInfo*) ca->find_func(id1->idt);
+		resault_type = temp->ret->type;
+		if (id1->idt == "printf") return;
+		// 函数参数检查
+		if (type == Factor::FUNC){
+			if (args_list->args_list.size() != temp->types.size()-1) throw sem::SemException("Parameters : the function '"+temp->types[temp->types.size()-1].first+"' needs "+ std::to_string(temp->types.size()-1)+" parameters!");
+			for(int i=0;i<temp->types.size()-1;i++){
+				// 对于record和array检测可能存在一些问题
+				if (args_list->args_list[i]->resault_type != temp->types[i].second->type)
+					throw sem::SemException("Parameter : the type of parametr '"+temp->types[i].first+"' is not '"+sem::TYPES_MAP[args_list->args_list[i]->resault_type]+"'!");
+			}
+		}
+		// 判断函数是否不需要参数，types内部存在函数本身所以判定>1代表需要参数
+		else if (temp->types.size()>1) throw sem::SemException("Parameters : the function '"+temp->types[temp->types.size()-1].first+"' needs "+ std::to_string(temp->types.size()-1)+" parameters!");
+	}
 	else if (type == Factor::CONST_VALUE)
 		resault_type = const_value->sem_type;
 	else if (type == Factor::EXPRESSION)
@@ -457,3 +473,24 @@ void Factor::sem_analyze(sem::SemanticAnalyzer *ca){
 
 /****/
 
+void ProcStmt::sem_analyze(sem::SemanticAnalyzer *ca){
+	if (id->idt == "printf") return;
+	sem::FuncInfo *temp = (sem::FuncInfo*) ca->find_func(id->idt);
+	if (type == ProcStmt::SINGLE_ID){
+		// 判断函数是否不需要参数，types内部存在函数本身所以判定>1代表需要参数
+		if(temp->types.size() > 1) throw sem::SemException("Parameters : the function '"+temp->types[temp->types.size()-1].first+"' needs "+ std::to_string(temp->types.size()-1)+" parameters!");
+	}
+	else if (type == ProcStmt::ID_WITH_ARGS){
+		if (args_list->args_list.size() != temp->types.size()-1) throw sem::SemException("Parameters : the function '"+temp->types[temp->types.size()-1].first+"' needs "+ std::to_string(temp->types.size()-1)+" parameters!");
+		for(int i=0;i<temp->types.size()-1;i++){
+			// 对于一般类型判定
+			if (args_list->args_list[i]->resault_type != temp->types[i].second->type)
+				throw sem::SemException("Parameter : the type of parametr '"+temp->types[i].first+"' is not '"+sem::TYPES_MAP[args_list->args_list[i]->resault_type]+"'!");
+			// 对于record和array追加判定
+			if (args_list->args_list[i]->resault_type == sem::RECORD){
+				
+			}
+		}
+	}
+	return;
+}

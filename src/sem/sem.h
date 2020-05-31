@@ -185,7 +185,9 @@ namespace sem {
 
 	class SemException{
 	public:
-		SemException(const std::string &str): sem_e(str){}
+		SemException(const std::string &str){
+			sem_e = "[Semantic Error] "+str;
+		}
 		virtual const std::string& what(){
 			return sem_e;
 		}
