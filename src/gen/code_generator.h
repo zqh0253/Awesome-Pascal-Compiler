@@ -158,10 +158,14 @@ public:
 		return cur_module->getFunction(name);
 	}
 
-	llvm::Value *make_call(const std::string &name, std::vector<llvm::Value*> args) {
+	llvm::Value *make_call(const std::string &name) {
+		std::vector<llvm::Value*> args;
+		return make_call(name, args);
+	}
+
+	llvm::Value *make_call(const std::string &name, std::vector<llvm::Value*> &args) {
 		llvm::Function *func;
 		if (name == "printf") {
-			std::cout << "printf" << std::endl;
 			func = cur_module->getFunction(name);
 			args[0] = ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast,
 					args[0], ir_builder->getInt8PtrTy());
@@ -172,20 +176,19 @@ public:
 	}
 
 	void register_printf() {
-		std::vector<llvm::Type*> printf_arg_types; // 这里是参数表
+		std::vector<llvm::Type*> printf_arg_types;
 		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(cur_module->getContext()));
 
 		llvm::FunctionType* printf_type =
 				llvm::FunctionType::get(
 						llvm::Type::getInt32Ty(cur_module->getContext()), printf_arg_types, true);
-		// 这里的true表示后面接不定参数
 		llvm::Function *func = llvm::Function::Create(
 				printf_type, llvm::Function::ExternalLinkage,
 				llvm::Twine("printf"),
 				cur_module
 		);
-		func->setCallingConv(llvm::CallingConv::C); // 一定注意调用方式的正确性
-		sem::FuncInfo* sem_func = new sem::FuncInfo();
+		func->setCallingConv(llvm::CallingConv::C);
+		auto sem_func = new sem::FuncInfo();
 		sem_func->ret = new sem::SemType(sem::INT);
 		local_sem()->funcs["printf"] = sem_func;
 

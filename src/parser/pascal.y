@@ -233,7 +233,7 @@ sub_program_head : REV_FUNCTION IDT parameters OP_COLON simple_type {$$=new SubP
                  | REV_PROCEDURE IDT parameters {$$=new SubProgramHead($2,$3);}
 
 parameters : OP_LPAREN para_dec_list OP_RPAREN  {$$=new Parameters($2);}
-            |                                   {$$=new Parameters();}
+            | OP_LPAREN OP_RPAREN               {$$=new Parameters();}
 
 para_dec_list : para_dec_list OP_SEMICOLON para_type_list {$$=$1; $$->add($3);}
             | para_type_list                              {$$=new ParaDecList(); $$->add($1);}
@@ -269,7 +269,7 @@ statement :   INT OP_COLON assign_stmt {$$=new Statement($3); $$->set_anchor($1)
 assign_stmt : IDD OP_ASSIGN expression  {$$=new AssignStmt($1, $3);}
             | IDD OP_LBRAC expression OP_RBRAC OP_ASSIGN expression {$$=new AssignStmt($1,$3,$6);}
 
-proc_stmt   : IDT {$$=new ProcStmt($1);}
+proc_stmt   : IDT OP_LPAREN OP_RPAREN {$$=new ProcStmt($1);}
             | IDT OP_LPAREN args_list OP_RPAREN {$$=new ProcStmt($1, $3);}
             | sys_proc {$$=new ProcStmt($1);}
             | sys_proc OP_LPAREN expr_list OP_RPAREN {$$=new ProcStmt($1, $3);}
@@ -325,6 +325,7 @@ term        : term OP_MUL factor        {$$=new Term($1, Term::MUL, $3);}
             | factor                    {$$=new Term($1);}
 
 factor      : IDT OP_LPAREN args_list OP_RPAREN  {$$=new Factor($1,$3);}
+            | IDT OP_LPAREN OP_RPAREN  {$$=new Factor($1);}
             | const_value               {$$=new Factor($1);}
             | OP_LPAREN expression OP_RPAREN    {$$=new Factor($2);}
             | REV_NOT factor            {$$=new Factor($2, Factor::NOT_FACTOR);}

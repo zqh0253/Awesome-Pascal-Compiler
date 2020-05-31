@@ -6,16 +6,16 @@ VAR
     b : INTEGER;
     i : INTEGER;
     j : INTEGER;
-function f(a: integer): integer;
+function f(): integer;
 BEGIN
-    f := a+2;
+    f := 0;
 END;
 
 BEGIN
     for i := 0 to 9 do begin
-        j := 0;
+        j := f();
         repeat
-            b := printf('%d\n', i+1);
+            printf('%d\n', i+1);
             j := j+1;
         until j > 2;
     end;

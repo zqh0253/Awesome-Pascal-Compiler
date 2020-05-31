@@ -336,6 +336,19 @@ void GotoStmt::codegen(CodeGenerator *cg) {
 
 void ProcStmt::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
+//	enum { SINGLE_ID,               // ID
+//		ID_WITH_ARGS,           // ID LP args_list RP
+//		SYS_PROC,               // SYS_PROC
+//		SYS_PROC_WITH_EXPR,     // SYS_PROC LP expr_list RP
+//		READ_FACTOR             // If the sys_proc is read
+//	} type;
+	std::vector<llvm::Value*> args;
+	if (this->type == ProcStmt::ID_WITH_ARGS) {
+		for (auto e: args_list->args_list) {
+			args.push_back(e->llvm_val);
+		}
+	}
+	cg->make_call(id->idt, args);
 }
 
 void AssignStmt::codegen(CodeGenerator *cg) {
@@ -505,8 +518,7 @@ void Factor::codegen(CodeGenerator *cg) {
 	} else if (this->type == Factor::MINUS_FACTOR) {
 		this->llvm_val = cg->ir_builder->CreateNeg(this->factor->llvm_val);
 	} else if (this->type == Factor::FUNC_WITH_NO_ARGS) {
-		this->llvm_val =
-				cg->ir_builder->CreateCall(cg->get_llvm_function(id1->idt));
+		this->llvm_val = cg->make_call(id1->idt);
 	} else if (this->type == Factor::FUNC) {
 		std::vector<llvm::Value*> args;
 		for (auto e: args_list->args_list) {
@@ -521,5 +533,7 @@ void ArgsList::codegen(CodeGenerator *cg) {
 }
 
 void ExprList::codegen(CodeGenerator *cg) {
-
+	cg->gencode_children(this);
+	if (!expr_list.empty())
+		this->llvm_val = expr_list[expr_list.size()-1]->llvm_val;
 }
