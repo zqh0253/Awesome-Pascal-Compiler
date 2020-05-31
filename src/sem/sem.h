@@ -88,6 +88,9 @@ namespace sem {
 		SemType *el_type;
 
 		~Array() = default;
+		int size() {
+			return end - begin;
+		}
         // ~Array(){std::cout << "Array is over" << std::endl;}
 	};
 

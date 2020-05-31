@@ -246,14 +246,7 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 
 void ArrayType::sem_analyze(sem::SemanticAnalyzer *ca){
 	// 似乎只能用range定义
-	if (simple_type->type == SimpleType::RANGE){
-		sem::Range* de = (sem::Range*)simple_type->sem_type;
-		sem_type = new sem::Array( de->begin, de->end, type_dec->sem_type);
-	}
-	else{
-		throw sem::SemException("Type: Array can only be defined by range!");
-	}
-	return;
+	sem_type = new sem::Array( 0, this->size, type_dec->sem_type);
 }
 
 void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){

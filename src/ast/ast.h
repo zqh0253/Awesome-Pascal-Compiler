@@ -470,13 +470,14 @@ public:
 class ArrayType : public Node {
 // ARRAY (SimpleType) OF TypeDec
 public:
-    ArrayType(SimpleType * st, TypeDec * td): simple_type(st), type_dec(td) {
+    ArrayType(int s, TypeDec * td): size(s), type_dec(td) {
         this->is_leaf = false;
         this->name = "ArrayType";
     }
     ~ArrayType() = default;
 
-    SimpleType * simple_type;
+//    SimpleType * simple_type;
+	int size;
     TypeDec * type_dec;
     sem::SemType *sem_type;
     std::vector<Node *> get_descendants() override;
@@ -835,6 +836,7 @@ public:
     }
     ~AssignStmt () = default;
     IDDotted * idd;
+    int ptr = 0;
     Expression * e1,* e2;
 
     std::vector<Node *> get_descendants() override;

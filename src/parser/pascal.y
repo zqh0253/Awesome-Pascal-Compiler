@@ -205,7 +205,7 @@ range_type : const_value OP_RANGE const_value {$$=new RangeType($1,$3,false,fals
             | const_value OP_RANGE OP_SUB const_value {$$=new RangeType($1,$4, false,true);}
             | IDT OP_RANGE IDT {$$=new RangeType($1, $3);}
 
-array_type : REV_ARRAY OP_LBRAC simple_type OP_RBRAC REV_OF type_dec {$$=new ArrayType($3,$6);}
+array_type : REV_ARRAY OP_LBRAC INT OP_RBRAC REV_OF type_dec {$$=new ArrayType($3,$6);}
 
 record_type : REV_RECORD var_dec_list REV_END {$$=new RecordType($2);}
 
@@ -267,6 +267,7 @@ statement :   INT OP_COLON assign_stmt {$$=new Statement($3); $$->set_anchor($1)
             | goto_stmt {$$=new Statement($1);}
 
 assign_stmt : IDD OP_ASSIGN expression  {$$=new AssignStmt($1, $3);}
+            | OP_ASTERISK IDD OP_ASSIGN expression  {$$=new AssignStmt($2, $4); $$->ptr = 1;}
             | IDD OP_LBRAC expression OP_RBRAC OP_ASSIGN expression {$$=new AssignStmt($1,$3,$6);}
 
 proc_stmt   : IDT OP_LPAREN OP_RPAREN {$$=new ProcStmt($1);}

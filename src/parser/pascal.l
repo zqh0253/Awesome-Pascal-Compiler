@@ -91,7 +91,7 @@ OP_LEQ "<="
 OP_GEQ ">="
 OP_ASSIGN ":="
 OP_RANGE ".."
-OP_ASTERISK "*"
+OP_ASTERISK "`"
 OP_ADDR "&"
 
 TYPE_INT integer|longint

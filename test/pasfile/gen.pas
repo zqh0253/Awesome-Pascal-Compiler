@@ -1,18 +1,18 @@
 PROGRAM gen_test;
 CONST
     cn = 2;
-
+TYPE
+    A = record
+        arr : array[10] of integer;
+        i : integer;
+    end;
 VAR
     b : INTEGER;
-    i : INTEGER;
-    j : INTEGER;
-function f(): integer;
+    p : ptr INTEGER;
+    a : A;
+    arr : array[10] of integer;
 BEGIN
-    f := 0;
-END;
-
-BEGIN
-    if true then begin
-        b := cn;
-    end;
+    p := a.arr;
+    a.arr[0] := 2020;
+    printf('%d\n', a.arr[0]);
 END.

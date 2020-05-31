@@ -167,8 +167,7 @@ public:
 		llvm::Function *func;
 		if (name == "printf") {
 			func = cur_module->getFunction(name);
-			args[0] = ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast,
-					args[0], ir_builder->getInt8PtrTy());
+			args[0] = get_array_ptr(args[0], getCharTy());
 		} else {
 			func = get_llvm_function(get_sem_func(name)->local->to_global_name(name));
 		}
@@ -202,9 +201,11 @@ public:
 	llvm::Value *load_variable(llvm::Value *ptr);
 	llvm::Value *load_local_variable(const std::string &name);
 	llvm::Value *get_record_member(sem::RecordMember *rm);
-	llvm::Value *get_record_member(sem::RecordMember *rm, llvm::Value *index);
-	llvm::Value *get_record_member(sem::RecordMember *rm, int index);
-//	llvm::Value *get_array_el(sem::RecordMember *rm);
+	llvm::Value *get_record_member_el(sem::RecordMember *rm, llvm::Value *index);
+	llvm::Value *get_array_ptr(llvm::Value *arr, llvm::Type *el_type);
+	llvm::Value *get_array_ptr(llvm::Value *arr, sem::SemType *el_type);
+	llvm::Value *get_array_el(llvm::Value *arr, llvm::Value *index, llvm::Type *el_type, int size);
+	llvm::Value *get_array_el(llvm::Value *arr, llvm::Value *index, sem::SemType *arr_type);
 };
 
 

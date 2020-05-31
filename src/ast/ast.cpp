@@ -171,7 +171,7 @@ std::vector<Node *> RangeType::get_descendants(){
 
 std::vector<Node *> ArrayType::get_descendants(){
     std::vector<Node *> list;
-    list.push_back(simple_type);
+//    list.push_back(simple_type);
     list.push_back(type_dec);
     return list;
 }
@@ -473,6 +473,12 @@ std::vector<Node *> Factor::get_descendants(){
     }
     else if (this->type == Factor::MEMBER){
         list.push_back(this->idd);
+    }
+    else if (this->type == Factor::ADDR){
+	    list.push_back(this->idd);
+    }
+    else if (this->type == Factor::ASTERISK){
+	    list.push_back(this->idd);
     }
     else {
         list.push_back(this->factor);

@@ -18,7 +18,7 @@ void CodeGenerator::gencode(Node *root) {
 
 void CodeGenerator::gencode_children(Node *n) {
 	if (!n) return;
-//	std::cout << "Begin generating code for " << n->name << "(" << n << ")" << std::endl;
+	std::cout << "Begin generating code for " << n->name << "(" << n << ")" << std::endl;
 	for (auto &child: n->get_descendants()) {
 		if (child)
 			child->codegen(this);
@@ -93,6 +93,9 @@ llvm::Type *CodeGenerator::to_llvm_type(sem::SemType *type) {
 		sem::Record *r = (sem::Record *)type;
 		ret = getStructTy(r->local->to_global_name(r->type_name));
 	}
+	if (ret && type->is_ptr) {
+		ret = llvm::PointerType::get(ret, 0);
+	}
 	return ret;
 }
 
@@ -131,19 +134,38 @@ llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm) {
 	return v;
 }
 
-llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm, llvm::Value *index) {
-	llvm::Value *v = get_local_variable(rm->name);
+llvm::Value *CodeGenerator::get_record_member_el(sem::RecordMember *rm, llvm::Value *index) {
+	auto v = get_local_variable(rm->name);
 	std::vector<llvm::Value*> idx;
 	for (auto &t: rm->locations) {
 		idx.push_back(ir_builder->getInt32(t));
 	}
 	idx.push_back(index);
 	v = ir_builder->CreateGEP(to_llvm_type(rm->begin_type), v, idx);
-	return v;
+	auto el_type = ((sem::Array*)(rm->real_type))->el_type;
+	auto ptr = llvm::PointerType::get(to_llvm_type(el_type), 0);
+	return ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast, v, ptr);
 }
 
-llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm, int index) {
-	return get_record_member(rm, ir_builder->getInt32(index));
+llvm::Value *CodeGenerator::get_array_ptr(llvm::Value *arr, llvm::Type *el_type) {
+	auto ptr = llvm::PointerType::get(el_type, 0);
+	return ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast, arr, ptr);
+}
+
+llvm::Value *CodeGenerator::get_array_ptr(llvm::Value *arr, sem::SemType *el_type) {
+	return get_array_ptr(arr, to_llvm_type(el_type));
+}
+
+llvm::Value *CodeGenerator::get_array_el(llvm::Value *arr, llvm::Value *index, llvm::Type *el_type, int size) {
+	auto ptr = llvm::PointerType::get(el_type, 0);
+	auto v = ir_builder->CreateGEP(getArrayTy(el_type, size), arr, index);
+	return ir_builder->CreateCast(llvm::Instruction::CastOps::BitCast, v, ptr);
+}
+
+llvm::Value *CodeGenerator::get_array_el(llvm::Value *arr, llvm::Value *index, sem::SemType *arr_type) {
+	if (arr_type->type != sem::ARRAY) return nullptr;
+	auto t = (sem::Array*)arr_type;
+	return get_array_el(arr, index, to_llvm_type(t->el_type), t->size());
 }
 
 
@@ -372,10 +394,16 @@ void AssignStmt::codegen(CodeGenerator *cg) {
 //	std::cout << idd->re_mem << std::endl;
 	llvm::Value *v, *val;
 	if (this->type == AssignStmt::ARRAY) {
-		v = cg->get_record_member(idd->re_mem, this->e1->llvm_val);
+		v = cg->get_record_member_el(idd->re_mem, this->e1->llvm_val);
+//		std::cout << ((sem::Array*)(idd->re_mem->real_type))->size() << std::endl;
+//		v = cg->get_array_el(v, this->e1->llvm_val, idd->re_mem->real_type);
+//		std::cout << idd->re_mem->real_type->type << std::endl;
 		val = e2->llvm_val;
 	} else {
 		v = cg->get_record_member(idd->re_mem);
+		if (this->ptr) {
+			v = cg->load_variable(v);
+		}
 		val = e1->llvm_val;
 	}
 	cg->ir_builder->CreateStore(val, v);
@@ -518,20 +546,14 @@ void Term::codegen(CodeGenerator *cg) {
 }
 
 void Factor::codegen(CodeGenerator *cg) {
+	std::cout << this->type << std::endl;
 	cg->gencode_children(this);
 	if (this->type == Factor::CONST_VALUE) {
 		this->llvm_val = cg->to_llvm_constant(this->const_value);
-		if (cg->get_local_variable("c")) {
-//			auto v = cg->ir_builder->CreatePtrToInt(cg->load_local_variable("c"), cg->getIntTy()->getPointerElementType());
-//			auto b = cg->get_local_variable("b");
-//			auto bpt = llvm::PointerType::get(b->getType(), 0);
-//			cg->store_local_variable(c, b);
-//			cg->store_local_variable(cg->load_local_variable("c"), this->llvm_val);
-		}
 	} else if (this->type == Factor::EXPRESSION) {
 		this->llvm_val = this->expr->llvm_val;
 	} else if (this->type == Factor::ARRAY) {
-		this->llvm_val = cg->get_record_member(this->idd->re_mem, this->expr->llvm_val);
+		this->llvm_val = cg->get_record_member_el(this->idd->re_mem, expr->llvm_val);
 		this->llvm_val = cg->load_variable(llvm_val);
 	} else if (this->type == Factor::MEMBER) {
 		this->llvm_val = cg->get_record_member(this->idd->re_mem);
@@ -548,6 +570,12 @@ void Factor::codegen(CodeGenerator *cg) {
 			args.push_back(e->llvm_val);
 		}
 		this->llvm_val = cg->make_call(id1->idt, args);
+	} else if (this->type == Factor::ASTERISK) {
+		this->llvm_val = cg->get_record_member(this->idd->re_mem);
+		this->llvm_val = cg->load_variable(llvm_val);
+		this->llvm_val = cg->load_variable(llvm_val);
+	} else if (this->type == Factor::ADDR) {
+		this->llvm_val = cg->get_record_member(this->idd->re_mem);
 	}
 }
 
