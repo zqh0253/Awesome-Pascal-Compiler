@@ -170,7 +170,7 @@ void Node::sem_analyze(sem::SemanticAnalyzer *ca) {
 void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 	std::string &const_name = id->idt;
 	/* 类型检查 */
-	if (! ca->is_available(const_name, "Const: the const variavle name "+const_name+" has a conflict!")) return;
+	if (! ca->is_available(const_name, "Const: the const variavle name '"+const_name+"' has a conflict!")) return;
 	/* 维护语义 */
 	sem::SemType *const_type = nullptr;
 	const_type = sem::Entity_List[const_value->sem_type+sem::CONST];
@@ -180,7 +180,7 @@ void ConstExpr::sem_analyze(sem::SemanticAnalyzer *ca) {
 
 void TypeDef::sem_analyze(sem::SemanticAnalyzer *ca){
 	/* 类型检查 */
-	if (! ca->is_available(id->idt,("TypeDef: Type name "+id->idt+" has a conflict!"))) return;
+	if (! ca->is_available(id->idt,("TypeDef: Type name '"+id->idt+"' has a conflict!"))) return;
 	/* 维护语义 */
 	ca->types[id->idt] = type_dec->sem_type;
 	return;
