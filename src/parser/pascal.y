@@ -45,6 +45,7 @@ SimpleType* simplet;
 VarDecList* vdl;
 VarDec* vard;
 SubProgram* subp;
+SubProgramHead* subphead;
 Parameters* param;
 ParaDecList* paradl;
 ParaTypeList* paratl;
@@ -74,12 +75,12 @@ CaseExpr* caseexpr;
 %token REV_AND REV_ARRAY REV_BEGIN REV_BREAK REV_CASE REV_CONST REV_CONTINUE REV_DEFAULT REV_DIV REV_DO REV_DOWNTO 
 %token REV_ELSE REV_END REV_EXIT REV_FILE REV_FOR REV_FORWARD REV_FUNCTION REV_GOTO REV_IF REV_IN REV_LABEL REV_MOD 
 %token REV_NIL REV_NOT REV_OF REV_OR REV_PACKED REV_PROCEDURE REV_PROGRAM REV_RECORD REV_REPEAT REV_SET REV_SIZEOF 
-%token REV_THEN REV_TO REV_TYPE REV_UNTIL REV_VAR REV_WHILE REV_WITH REV_XOR REV_READ REV_WRITE REV_WRITELN
+%token REV_THEN REV_TO REV_TYPE REV_UNTIL REV_VAR REV_WHILE REV_WITH REV_XOR REV_READ REV_WRITE REV_WRITELN REV_PTR
 
 %token OP_ADD OP_SUB OP_MOD OP_MUL OP_DIV OP_EQ OP_LT OP_GT OP_LBRAC OP_RBRAC OP_PERIOD OP_COMMA OP_COLON OP_SEMICOLON OP_AT 
-%token OP_CARET OP_LPAREN OP_RPAREN OP_NE OP_LEQ OP_GEQ OP_ASSIGN OP_RANGE 
+%token OP_CARET OP_LPAREN OP_RPAREN OP_NE OP_LEQ OP_GEQ OP_ASSIGN OP_RANGE OP_ASTERISK OP_ADDR
 
-%token TYPE_INT TYPE_REAL TYPE_CHAR TYPE_BOOL TYPE_STRING 
+%token TYPE_INT TYPE_REAL TYPE_CHAR TYPE_BOOL TYPE_STRING TYPE_POINTER
 
 %token BOOL_TRUE BOOL_FALSE IDT
 
@@ -121,6 +122,7 @@ CaseExpr* caseexpr;
 %type <idd> IDD;
 
 %type <subp> sub_program;
+%type <subphead> sub_program_head;
 %type <param> parameters;
 %type <paradl> para_dec_list;
 %type <paratl> para_type_list;
@@ -186,10 +188,10 @@ type_def : IDT OP_EQ type_dec OP_SEMICOLON {$$=new TypeDef($1,$3);}
 type_dec : simple_type {$$=new TypeDec($1);}
             | array_type {$$=new TypeDec($1);}
             | record_type {$$=new TypeDec($1);}
+            | TYPE_POINTER simple_type {$$=new TypeDec($2); $$->ptr = 1;}
 
 simple_type : sys_type {$$=new SimpleType($1);}
             | IDT {$$=new SimpleType($1);}
-            | OP_LPAREN id_list OP_RPAREN {$$=new SimpleType($2);}
             | range_type {$$=new SimpleType($1);}
 
 sys_type : TYPE_BOOL {$$=new SysType(SysType::BOOLEAN);}
@@ -197,14 +199,13 @@ sys_type : TYPE_BOOL {$$=new SysType(SysType::BOOLEAN);}
             | TYPE_INT {$$=new SysType(SysType::INTEGER);}
             | TYPE_REAL {$$=new SysType(SysType::REAL);}
             | TYPE_STRING {$$=new SysType(SysType::STRING);}
-
 range_type : const_value OP_RANGE const_value {$$=new RangeType($1,$3,false,false);}
             | OP_SUB const_value OP_RANGE const_value {$$=new RangeType($2,$4, true,false);}
             | OP_SUB const_value OP_RANGE OP_SUB const_value {$$=new RangeType($2,$5, true,true);}
             | const_value OP_RANGE OP_SUB const_value {$$=new RangeType($1,$4, false,true);}
             | IDT OP_RANGE IDT {$$=new RangeType($1, $3);}
 
-array_type : REV_ARRAY OP_LBRAC simple_type OP_RBRAC REV_OF type_dec {$$=new ArrayType($3,$6);}
+array_type : REV_ARRAY OP_LBRAC INT OP_RBRAC REV_OF type_dec {$$=new ArrayType($3,$6);}
 
 record_type : REV_RECORD var_dec_list REV_END {$$=new RecordType($2);}
 
@@ -226,11 +227,13 @@ routine_part : routine_part sub_program {$$=$1; $$->add($2);}
             | sub_program               {$$=new RoutinePart(); $$->add($1);}
             |                           {$$=new RoutinePart(); $$->is_leaf = true;}
 
-sub_program : REV_FUNCTION IDT parameters OP_COLON simple_type OP_SEMICOLON routine OP_SEMICOLON {$$=new SubProgram($2,$3,$5,$7);}
-            | REV_PROCEDURE IDT parameters OP_SEMICOLON routine OP_SEMICOLON {$$=new SubProgram($2,$3,$5);}
+sub_program : sub_program_head OP_SEMICOLON routine OP_SEMICOLON {$$=new SubProgram($1,$3);}
+
+sub_program_head : REV_FUNCTION IDT parameters OP_COLON simple_type {$$=new SubProgramHead($2,$3,$5);}
+                 | REV_PROCEDURE IDT parameters {$$=new SubProgramHead($2,$3);}
 
 parameters : OP_LPAREN para_dec_list OP_RPAREN  {$$=new Parameters($2);}
-            |                                   {$$=new Parameters();}
+            | OP_LPAREN OP_RPAREN               {$$=new Parameters();}
 
 para_dec_list : para_dec_list OP_SEMICOLON para_type_list {$$=$1; $$->add($3);}
             | para_type_list                              {$$=new ParaDecList(); $$->add($1);}
@@ -264,9 +267,10 @@ statement :   INT OP_COLON assign_stmt {$$=new Statement($3); $$->set_anchor($1)
             | goto_stmt {$$=new Statement($1);}
 
 assign_stmt : IDD OP_ASSIGN expression  {$$=new AssignStmt($1, $3);}
+            | OP_ASTERISK IDD OP_ASSIGN expression  {$$=new AssignStmt($2, $4); $$->ptr = 1;}
             | IDD OP_LBRAC expression OP_RBRAC OP_ASSIGN expression {$$=new AssignStmt($1,$3,$6);}
 
-proc_stmt   : IDT {$$=new ProcStmt($1);}
+proc_stmt   : IDT OP_LPAREN OP_RPAREN {$$=new ProcStmt($1);}
             | IDT OP_LPAREN args_list OP_RPAREN {$$=new ProcStmt($1, $3);}
             | sys_proc {$$=new ProcStmt($1);}
             | sys_proc OP_LPAREN expr_list OP_RPAREN {$$=new ProcStmt($1, $3);}
@@ -322,21 +326,26 @@ term        : term OP_MUL factor        {$$=new Term($1, Term::MUL, $3);}
             | factor                    {$$=new Term($1);}
 
 factor      : IDT OP_LPAREN args_list OP_RPAREN  {$$=new Factor($1,$3);}
+            | IDT OP_LPAREN OP_RPAREN  {$$=new Factor($1);}
             | const_value               {$$=new Factor($1);}
             | OP_LPAREN expression OP_RPAREN    {$$=new Factor($2);}
             | REV_NOT factor            {$$=new Factor($2, Factor::NOT_FACTOR);}
             | OP_SUB factor             {$$=new Factor($2, Factor::MINUS_FACTOR);}
             | IDD OP_LBRAC expression OP_RBRAC  {$$=new Factor($1, $3);}
             | IDD                       {$$=new Factor($1);}
+            | OP_ADDR IDD                 {$$=new Factor($2, Factor::ADDR);}
+            | OP_ASTERISK IDD               {$$=new Factor($2, Factor::ASTERISK);}
+            | OP_ADDR IDD OP_LBRAC expression OP_RBRAC        {$$=new Factor($2, $4, Factor::ADDR_ARRAY);}
+            | OP_ASTERISK IDD OP_LBRAC expression OP_RBRAC     {$$=new Factor($2, $4, Factor::ASTERISK_ARRAY);}
 
 sys_proc    : REV_READ                  {$$=new SysProc(SysProc::READ);}
             | REV_WRITE                  {$$=new SysProc(SysProc::WRITE);}
             | REV_WRITELN                 {$$=new SysProc(SysProc::WRITELN);}
 %%
 
-int main() {
-    yyparse();
-    return 0; 
-}
+//int main() {
+//    yyparse();
+//    return 0;
+//}
 
 // int yyerror(char * s){ printf("%s\n",s); return 0; }

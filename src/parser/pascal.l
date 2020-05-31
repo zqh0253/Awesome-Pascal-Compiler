@@ -91,12 +91,15 @@ OP_LEQ "<="
 OP_GEQ ">="
 OP_ASSIGN ":="
 OP_RANGE ".."
+OP_ASTERISK "`"
+OP_ADDR "&"
 
 TYPE_INT integer|longint
 TYPE_REAL real
 TYPE_CHAR character|char
 TYPE_BOOL boolean|bool
 TYPE_STRING string
+TYPE_POINTER ptr|pointer
 
 BOOL_TRUE true
 BOOL_FALSE false
@@ -181,12 +184,15 @@ COMMENT "{"[^\}]*"}"
 {OP_ASSIGN} {return OP_ASSIGN;}
 {OP_RANGE} {return OP_RANGE;}
 {OP_MOD} {return OP_MOD;}
+{OP_ASTERISK} {return OP_ASTERISK;}
+{OP_ADDR} {return OP_ADDR;}
 
 {TYPE_INT} {return TYPE_INT;}
 {TYPE_REAL} {return TYPE_REAL;}
 {TYPE_CHAR} {return TYPE_CHAR;}
 {TYPE_BOOL} {return TYPE_BOOL;}
 {TYPE_STRING} {return TYPE_STRING;}
+{TYPE_POINTER} {return TYPE_POINTER;}
 
 {BOOL_TRUE} {return BOOL_TRUE;}
 {BOOL_FALSE} {return BOOL_FALSE;}
@@ -217,7 +223,10 @@ COMMENT "{"[^\}]*"}"
     return CHAR;
 }
 {STR} {
-    yylval.str = yytext;
+    yylval.str = yytext + 1;
+    char *p = yylval.str;
+    while (*p++);
+    *(p-2) = 0;
     return STR;
 }
 

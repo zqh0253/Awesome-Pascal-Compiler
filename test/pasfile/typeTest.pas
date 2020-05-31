@@ -1,8 +1,8 @@
 PROGRAM arrayRecord;
 CONST
-    a = FALSE;
     b = 10;
     c = 2.2;
+    a = FALSE;
     d = 't';
 TYPE
     test = INTEGER;
@@ -12,6 +12,7 @@ TYPE
     END;
 
 VAR
+    e : INTEGER;
     f : test;
     h : string;
     i : BOOLEAN;

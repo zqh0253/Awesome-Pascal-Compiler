@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "gen/code_generator.h"
 
 #define TAB(n) for (int i=0;i<n;i++) std::cout<<" "
 
@@ -20,6 +21,10 @@ std::vector<Node *> Program::get_descendants(){
     list.push_back(this->program_heading);
     list.push_back(this->routine);
     return list;
+}
+
+std::string &Program::get_program_name() {
+	return program_heading->program_ID->idt;
 }
 
 std::vector<Node *> ID::get_descendants(){
@@ -138,8 +143,8 @@ std::vector<Node *> SimpleType::get_descendants(){
         list.push_back(this->sys_type);
     else if (this->type == SimpleType::IDENTIFY)
         list.push_back(this->id);
-    else if (this->type == SimpleType::IDLIST)
-        list.push_back(this->id_list);
+    // else if (this->type == SimpleType::IDLIST)
+    //     list.push_back(this->id_list);
     else if (this->type == SimpleType::RANGE)
         list.push_back(this->range_type);
     return list;
@@ -166,7 +171,7 @@ std::vector<Node *> RangeType::get_descendants(){
 
 std::vector<Node *> ArrayType::get_descendants(){
     std::vector<Node *> list;
-    list.push_back(simple_type);
+//    list.push_back(simple_type);
     list.push_back(type_dec);
     return list;
 }
@@ -215,11 +220,17 @@ void RoutinePart::add(SubProgram * sp){
 
 std::vector<Node *> SubProgram::get_descendants(){
     std::vector<Node *> list;
-    list.push_back(this->id);
-    list.push_back(this->parameters);
-    if (this->type == SubProgram::FUNCTION) list.push_back(this->simple_type);
+    list.push_back(this->head);
     list.push_back(this->routine);
     return list;
+}
+
+std::vector<Node *> SubProgramHead::get_descendants(){
+	std::vector<Node *> list;
+	list.push_back(this->id);
+	list.push_back(this->parameters);
+	if (this->type == SubProgramHead::FUNCTION) list.push_back(this->simple_type);
+	return list;
 }
 
 std::vector<Node *> Parameters::get_descendants(){
@@ -462,6 +473,20 @@ std::vector<Node *> Factor::get_descendants(){
     }
     else if (this->type == Factor::MEMBER){
         list.push_back(this->idd);
+    }
+    else if (this->type == Factor::ADDR){
+	    list.push_back(this->idd);
+    }
+    else if (this->type == Factor::ASTERISK){
+	    list.push_back(this->idd);
+    }
+    else if (this->type == Factor::ADDR_ARRAY){
+	    list.push_back(this->idd);
+	    list.push_back(this->expr);
+    }
+    else if (this->type == Factor::ASTERISK_ARRAY){
+	    list.push_back(this->idd);
+	    list.push_back(this->expr);
     }
     else {
         list.push_back(this->factor);
