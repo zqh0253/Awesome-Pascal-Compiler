@@ -64,7 +64,7 @@ namespace sem {
 		// virtual ~SemType(){std::cout << "Type is over" << std::endl;}
 	};
 	// 全局变量
-	extern SemType *Entity_List[20];
+	extern SemType *Entity_List[30];
 	extern std::map<std::string, SemType *> Global_Types;
 	// 用于处理Clobal_Types的函数
 	// bool register_in(std::string name, sem::SemType *ret);
@@ -107,6 +107,7 @@ namespace sem {
 		SemanticAnalyzer *local;
 		std::vector<std::string> names;
 		std::map<std::string, SemType*> types;
+		Record *ptr = nullptr;
 		void display(int i);
 		~Record() = default;
 		std::string global_name();

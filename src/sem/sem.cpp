@@ -15,13 +15,13 @@ namespace sem {
 	const int ARRAY = 7;
 	const int RECORD = 8;
 
-	const int CONST = 6;
-	const int PTR = 12;
+	const int CONST = 8;
+	const int PTR = 2*CONST;
 	std::string RECORD_FIRST_NAME = "$record_";
 	std::string STRING_FIRST_NAME = "$string_";
 	std::string RANGE_FIRST_NAME = "$range_";
 	std::string ARRAY_FIRST_NAME = "$array_";
-	SemType *Entity_List[20] = {nullptr};
+	SemType *Entity_List[30] = {nullptr};
 	std::map<std::string, SemType *> Global_Types;
 	std::string TYPES_MAP[9]={"int","real","char","bool","void","string","range","array"};
 }
@@ -30,6 +30,7 @@ void sem::Init(){
 	for(int i=0;i<sem::CONST;i++){
 		sem::Entity_List[i] = new SemType(i);
 		sem::Entity_List[i+sem::CONST] = new SemType(i,true);
+		sem::Entity_List[i+sem::PTR] = new SemType(i,false,true);
 	}
 	return;
 }
@@ -187,6 +188,14 @@ void TypeDef::sem_analyze(sem::SemanticAnalyzer *ca){
 void TypeDec::sem_analyze(sem::SemanticAnalyzer *ca){
 	if (type == TypeDec::SIMPLE){
 		sem_type = simple_type->sem_type;
+		// 判断是否为指针
+		if (ptr){
+			if(sem_type->type < sem::CONST) sem_type = sem::Entity_List[sem_type->type+sem::PTR];
+			else if (sem_type->type == sem::RECORD){
+				sem::Record *temp = (sem::Record*) sem_type;
+				sem_type = temp->ptr;
+			}
+		}
 	}
 	else if (type == TypeDec::ARRAY){
 		sem_type = array_type->sem_type;
@@ -219,15 +228,6 @@ void SimpleType::sem_analyze(sem::SemanticAnalyzer *ca){
 	else if(type == SimpleType::IDENTIFY){
 		sem_type = ca->find_type(id->idt);
 	}
-	// else if(type == SimpleType::IDLIST){
-	// 	// 可能存在一些问题，需要修改
-	// 	for(std::vector<ID *>::size_type i=0;i!=id_list->ID_list.size();i++){
-	// 		if(id_list->ID_list[i] == id_list->ID_list[0]){
-	// 			if (i==0) sem_type = ca->find_type(id_list->ID_list[0]->idt);
-	// 		}
-	// 		else throw sem::SemException("Type: "+id_list->name+" are not the same!");
-	// 	}
-	// }
 	else if(type == SimpleType::RANGE){
 		// 这里也许需要存变量的值
 		if (range_type->type == RangeType::IDENTIFY){
@@ -276,7 +276,15 @@ void RecordType::sem_analyze(sem::SemanticAnalyzer *ca){
 			}
 		}
 	}
+	// 添加record指针结构
+	re->ptr = new sem::Record(re_name,ca);
+	re->ptr->types = re->types;
+	re->ptr->names = re->names;
+	re->ptr->is_ptr = true;
+	// 注册结构体
 	ca->types[re_name] = sem_type;
+	
+	
 	return;
 }
 
@@ -363,7 +371,7 @@ void AssignStmt::sem_analyze(sem::SemanticAnalyzer* ca){
 		if (e1->resault_type != sem::INT) throw sem::SemException("Expression : the index of array '"+idd->re_mem->name+"' must be an integer!");
 		sem::Array *temp = (sem::Array*)idd->re_mem->real_type;
 		// 判定是否为常量
-		if (temp->el_type->is_const) throw sem::SemException("Var: Const variable '"+idd->re_mem->name+"' can't be changed!");
+		if (temp->el_type->is_const || temp->is_ptr) throw sem::SemException("Var: Const variable '"+idd->re_mem->name+"' can't be changed!");
 		// 判断赋值是否允许
 		if (! sem::CanAssign(temp->el_type->type, e1->resault_type))
 			throw sem::SemException("Assign : '=' can't be used between '"+sem::TYPES_MAP[temp->el_type->type]+"' and '"+sem::TYPES_MAP[e1->resault_type]+"'!");
@@ -460,8 +468,16 @@ void Factor::sem_analyze(sem::SemanticAnalyzer *ca){
 	else if (type == Factor::MEMBER)
 		resault_type = idd->re_mem->real_type->type;
 	else if (type == Factor::ARRAY){
+		if (idd->re_mem->real_type->is_ptr) throw sem::SemException("Expression : '[]' can't be used for pointer!");
 		sem::Array *temp = (sem::Array*)idd->re_mem->real_type;
 		resault_type = temp->el_type->type;
+	}
+	else if (type == Factor::ADDR){
+		resault_type = idd->re_mem->real_type->type;
+	}
+	else if (type == Factor::ASTERISK){
+		if (idd->re_mem->real_type->is_ptr == 0) throw sem::SemException("Expression : '*' can only be used by pointer!");
+		resault_type = idd->re_mem->real_type->type;
 	}
 	else throw sem::SemException("Unknown error : in factor !");
 	return;
