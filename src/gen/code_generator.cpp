@@ -8,19 +8,18 @@ void CodeGenerator::gencode(Node *root) {
 		this->context = new llvm::LLVMContext;
 		this->ir_builder = new llvm::IRBuilder<>(*this->context);
 	}
-	std::cout << "Begin generating code ..." << std::endl;
+//	std::cout << "Begin generating code ..." << std::endl;
 	if (root && root->is_root()) {
 		root->codegen(this);
 	}
-	std::cout << "End generating code !" << std::endl;
+//	std::cout << "End generating code !" << std::endl;
 	llvm::llvm_shutdown();
-//	local_sem()->display(0);
 }
 
 void CodeGenerator::gencode_children(Node *n) {
 	if (!n) return;
-	std::cout << "Begin generating code for " << n->name << "(" << n << ")" << std::endl;
-	for (auto child: n->get_descendants()) {
+//	std::cout << "Begin generating code for " << n->name << "(" << n << ")" << std::endl;
+	for (auto &child: n->get_descendants()) {
 		if (child)
 			child->codegen(this);
 	}
@@ -124,7 +123,7 @@ llvm::Value *CodeGenerator::get_local_variable(const std::string &name) {
 llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm) {
 	llvm::Value *v = get_local_variable(rm->name);
 	std::vector<llvm::Value*> idx;
-	for (auto t: rm->locations) {
+	for (auto &t: rm->locations) {
 		idx.push_back(ir_builder->getInt32(t));
 	}
 	if (!idx.empty())
@@ -135,7 +134,7 @@ llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm) {
 llvm::Value *CodeGenerator::get_record_member(sem::RecordMember *rm, llvm::Value *index) {
 	llvm::Value *v = get_local_variable(rm->name);
 	std::vector<llvm::Value*> idx;
-	for (auto t: rm->locations) {
+	for (auto &t: rm->locations) {
 		idx.push_back(ir_builder->getInt32(t));
 	}
 	idx.push_back(index);
@@ -155,10 +154,8 @@ void Node::codegen(CodeGenerator *cg) {
 
 void Program::codegen(CodeGenerator *cg) {
 	// 初始化 Module 和 main 函数
-	std::cout << "Begin generating code for " << name << "(" << this << ")" << std::endl;
 	std::string &program_name = get_program_name();
 	cg->add_module(program_name);
-//	std::cout << program_name << std::endl;
 	std::string func_name = "main";
 	llvm::FunctionType *func_type = llvm::FunctionType::get(llvm::Type::getVoidTy(*cg->context), false);
 	llvm::Function *func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
@@ -166,7 +163,6 @@ void Program::codegen(CodeGenerator *cg) {
 	llvm::BasicBlock *bb = llvm::BasicBlock::Create(*cg->context, "start", func);
 	cg->push_block(bb, new sem::SemanticAnalyzer(func_name));
 	cg->register_printf();
-//	std::cout << "Begin generating code for " << name << "(" << this << ")" << std::endl;
 	cg->gencode_children(this);
 	cg->ir_builder->CreateRetVoid();
 	cg->cur_module->print(llvm::outs(), nullptr);
@@ -243,7 +239,7 @@ void RecordType::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 	sem::Record *record = cg->local_sem()->last_record();
 	std::vector<llvm::Type*> types;
-	for (auto var: record->types) {
+	for (auto &var: record->types) {
 		types.push_back(cg->to_llvm_type(var.second));
 	}
 	cg->createStructTy(types, record->global_name());
@@ -260,9 +256,9 @@ void VarDec::codegen(CodeGenerator *cg) {
 void VarPart::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
 	if (!is_empty) {
-		for (auto var: var_dec_list->var_dec_list) {
+		for (auto &var: var_dec_list->var_dec_list) {
 			llvm::Type *type = cg->to_llvm_type(var->type_dec->sem_type);
-			for (auto id: var->id_list->ID_list) {
+			for (auto &id: var->id_list->ID_list) {
 				cg->alloc_local_variable(type, id->idt);
 			}
 		}
@@ -275,9 +271,6 @@ void RoutinePart::codegen(CodeGenerator *cg) {
 
 void SubProgram::codegen(CodeGenerator *cg) {
 	head->codegen(cg);
-//	for (auto it = cg->local_sem()->vars.begin(); it != cg->local_sem()->vars.end(); it++) {
-//		cg->alloc_local_variable(cg->to_llvm_type(it->second), it->first);
-//	}
 	routine->codegen(cg);
 	cg->ir_builder->CreateRet(cg->load_local_variable(head->id->idt));
 	cg->pop_block();
@@ -319,7 +312,36 @@ void Statement::codegen(CodeGenerator *cg) {
 }
 
 void CaseStmt::codegen(CodeGenerator *cg) {
+	llvm::BasicBlock *old_bb = cg->local_cbb();
+	llvm::BasicBlock *new_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+	expr->codegen(cg);
 
+	std::vector<llvm::BasicBlock *> case_bbs;
+	for (auto &e: this->case_expr_list->case_expr_list) {
+		llvm::BasicBlock *case_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+		case_bbs.push_back(case_bb);
+		cg->set_local_cbb(case_bb);
+		e->stmt->codegen(cg);
+		cg->ir_builder->CreateBr(new_bb);
+	}
+
+	cg->set_local_cbb(old_bb);
+	for (int i = 0; i < case_bbs.size(); i++) {
+		llvm::BasicBlock *next_bb = new_bb;
+		if (i < case_bbs.size()-1)
+			next_bb = llvm::BasicBlock::Create(*cg->context, "", cg->local_bb()->getParent());
+		auto exp = this->case_expr_list->case_expr_list[i];
+		llvm::Value *cond;
+		if (exp->type == CaseExpr::CONST) {
+			cond = cg->to_llvm_constant(exp->const_value);
+		} else {
+			exp->idd->codegen(cg);
+			cond = cg->load_variable(cg->get_record_member(exp->idd->re_mem));
+		}
+		cond = cg->ir_builder->CreateICmpEQ(expr->llvm_val, cond);
+		cg->ir_builder->CreateCondBr(cond, case_bbs[i], next_bb);
+		cg->set_local_cbb(next_bb);
+	}
 }
 
 void CaseExprList::codegen(CodeGenerator *cg) {
@@ -336,15 +358,9 @@ void GotoStmt::codegen(CodeGenerator *cg) {
 
 void ProcStmt::codegen(CodeGenerator *cg) {
 	cg->gencode_children(this);
-//	enum { SINGLE_ID,               // ID
-//		ID_WITH_ARGS,           // ID LP args_list RP
-//		SYS_PROC,               // SYS_PROC
-//		SYS_PROC_WITH_EXPR,     // SYS_PROC LP expr_list RP
-//		READ_FACTOR             // If the sys_proc is read
-//	} type;
 	std::vector<llvm::Value*> args;
 	if (this->type == ProcStmt::ID_WITH_ARGS) {
-		for (auto e: args_list->args_list) {
+		for (auto &e: args_list->args_list) {
 			args.push_back(e->llvm_val);
 		}
 	}
@@ -379,7 +395,7 @@ void IfStmt::codegen(CodeGenerator *cg) {
 	else_clause->codegen(cg);
 	cg->ir_builder->CreateBr(new_bb);
 
-	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->set_local_cbb(old_bb);
 	cg->ir_builder->CreateCondBr(expr->llvm_val, true_bb, false_bb);
 	cg->set_local_cbb(new_bb);
 }
@@ -398,7 +414,7 @@ void RepeatStmt::codegen(CodeGenerator *cg) {
 	llvm::Value *cond = cg->ir_builder->CreateICmpEQ(expr->llvm_val, cg->ir_builder->getTrue());
 	cg->ir_builder->CreateCondBr(cond, new_bb, loop_bb);
 
-	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->set_local_cbb(old_bb);
 	cg->ir_builder->CreateBr(loop_bb);
 	cg->set_local_cbb(new_bb);
 }
@@ -416,7 +432,7 @@ void WhileStmt::codegen(CodeGenerator *cg) {
 	stmt->codegen(cg);
 	cg->ir_builder->CreateBr(cond_bb);
 
-	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->set_local_cbb(old_bb);
 	cg->ir_builder->CreateBr(cond_bb);
 	cg->set_local_cbb(new_bb);
 }
@@ -442,7 +458,7 @@ void ForStmt::codegen(CodeGenerator *cg) {
 	cg->store_local_variable(loop_var_ptr, loop_var);
 	cg->ir_builder->CreateBr(cond_bb);
 
-	cg->ir_builder->SetInsertPoint(old_bb);
+	cg->set_local_cbb(old_bb);
 	cg->ir_builder->CreateBr(cond_bb);
 	cg->set_local_cbb(new_bb);
 }
@@ -521,7 +537,7 @@ void Factor::codegen(CodeGenerator *cg) {
 		this->llvm_val = cg->make_call(id1->idt);
 	} else if (this->type == Factor::FUNC) {
 		std::vector<llvm::Value*> args;
-		for (auto e: args_list->args_list) {
+		for (auto &e: args_list->args_list) {
 			args.push_back(e->llvm_val);
 		}
 		this->llvm_val = cg->make_call(id1->idt, args);

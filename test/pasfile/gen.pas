@@ -1,6 +1,6 @@
 PROGRAM gen_test;
 CONST
-    cn = 2;
+    cn = 0;
 
 VAR
     b : INTEGER;
@@ -12,11 +12,20 @@ BEGIN
 END;
 
 BEGIN
-    for i := 0 to 9 do begin
-        j := f();
-        repeat
-            printf('%d\n', i+1);
-            j := j+1;
-        until j > 2;
+    case cn of
+    0:  for i := 0 to 9 do begin
+            j := f();
+            repeat
+                printf('%d\n', i+1);
+                j := j+1;
+            until j > 2;
+        end;
+    1:  for i := 0 to 9 do begin
+                j := f();
+                repeat
+                    printf('%d\n', i+1);
+                    j := j+1;
+                until j > 1;
+            end;
     end;
 END.
